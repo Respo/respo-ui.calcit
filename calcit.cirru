@@ -6827,4 +6827,4 @@
                       |T $ {} (:type :leaf) (:id |SJuPXIY3Fio-) (:text |:padding) (:by |root) (:at 1506675837748)
                       |j $ {} (:type :leaf) (:id |HyKDQ8Y2KssW) (:text |8) (:by |root) (:at 1506675837748)
         :proc $ {} (:type :expr) (:id |H1yJ7LY2Kosb) (:by nil) (:at 1506675837748) (:data $ {})
-  :configs $ {} (:reload-fn |respo-ui.main/reload!) (:modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru) (:output |src) (:port 6001) (:extension |.cljs) (:init-fn |respo-ui.main/main!) (:compact-output? true) (:storage-key |calcit.cirru) (:version |0.0.1)
+  :configs $ {} (:reload-fn |respo-ui.main/reload!) (:modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru) (:output |src) (:port 6001) (:extension |.cljs) (:init-fn |respo-ui.main/main!) (:compact-output? true) (:storage-key |calcit.cirru) (:version |0.4.0)
