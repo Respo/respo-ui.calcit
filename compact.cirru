@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru) (:version |0.4.0)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-router.calcit/compact.cirru) (:version |0.4.0)
   :files $ {}
     |respo-ui.comp.md $ {}
       :ns $ quote
@@ -22,7 +22,7 @@
       :defs $ {}
         |dict $ quote
           def dict $ {} (|index.html $ []) (|dev.html $ []) (|fonts.html $ []) (|widgets.html $ []) (|layouts.html $ []) (|lay-out.html $ []) (|components.html $ [])
-        |mode $ quote (def mode :history)
+        |mode $ quote (def mode :hash)
       :proc $ quote ()
     |respo-ui.core $ {}
       :ns $ quote
@@ -141,7 +141,7 @@
       :proc $ quote ()
     |respo-ui.main $ {}
       :ns $ quote
-        ns respo-ui.main $ :require ([] respo.core :refer $ [] render! clear-cache! realize-ssr!) ([] respo.cursor :refer $ [] update-states) ([] respo-ui.comp.container :refer $ [] comp-container) ([] respo-ui.router :as router) ([] cljs.reader :refer $ [] read-string) ([] respo-ui.schema :as schema) ([] respo-ui.config :as config)
+        ns respo-ui.main $ :require ([] respo.core :refer $ [] render! clear-cache! realize-ssr!) ([] respo.cursor :refer $ [] update-states) ([] respo-ui.comp.container :refer $ [] comp-container) ([] respo-ui.router :as router) ([] cljs.reader :refer $ [] read-string) ([] respo-ui.schema :as schema) ([] respo-ui.config :as config) ([] respo-router.parser :refer $ [] parse-address) ([] respo-router.core :refer $ [] render-url!) ([] respo-router.listener :refer $ [] listen!)
       :defs $ {}
         |ssr? $ quote
           def ssr? $ some? (.querySelector js/document |meta.respo-ssr)
@@ -163,14 +163,13 @@
         |main! $ quote
           defn main! () (println "\"Running mode:" $ if config/dev? "\"dev" "\"release") (if ssr? $ render-app! realize-ssr!) (render-app! render!)
             add-watch *store :changes $ fn () (render-app! render!)
-            ; render-router!
-            ; listen! router/dict dispatch! router/mode
-            ; add-watch *store :router-changes render-router!
+            render-router!
+            listen! router/dict dispatch! router/mode
+            add-watch *store :router-changes render-router!
             println "|App started!"
         |render-router! $ quote
           defn render-router! ()
-            ; render-url! (:router @*store) router/dict router/mode
-            echo "\"TODO"
+            render-url! (:router @*store) router/dict router/mode
         |render-app! $ quote
           defn render-app! (renderer)
             renderer mount-target (comp-container @*store) dispatch!
@@ -289,9 +288,9 @@
                     {} (:type :item) (:fill :b)
                     {} (:type :item) (:fill :c)
                 {}
-                  :a $ "#()" div ({} $ :style %) (<> "\"TODO A")
-                  :b $ "#()" div ({} $ :style %) (<> "\"TODO BB")
-                  :c $ "#()" div ({} $ :style %) (<> "\"TODO CCC")
+                  :a $ \ div ({} $ :style %) (<> "\"TODO A")
+                  :b $ \ div ({} $ :style %) (<> "\"TODO BB")
+                  :c $ \ div ({} $ :style %) (<> "\"TODO CCC")
               <> "\"Flex flow layout" style-title
               lay-out
                 {} (:type :flex)
@@ -304,9 +303,9 @@
                     {} (:type :item) (:fill :b)
                     {} (:type :item) (:fill :c)
                 {}
-                  :a $ "#()" div ({} $ :style %) (<> "\"TODO A")
-                  :b $ "#()" div ({} $ :style %) (<> "\"TODO BB")
-                  :c $ "#()" div ({} $ :style %) (<> "\"TODO CCC")
+                  :a $ \ div ({} $ :style %) (<> "\"TODO A")
+                  :b $ \ div ({} $ :style %) (<> "\"TODO BB")
+                  :c $ \ div ({} $ :style %) (<> "\"TODO CCC")
               <> "\"Flex layout" style-title
               lay-out
                 {} (:type :list)
@@ -451,15 +450,15 @@
                       let
                           gap $ :gap rule
                         cond
-                            vector? gap
+                            list? gap
                             first gap
                           (number? gap)
                             , gap
-                          :else nil
+                          true nil
                       , nil
                   (contains? (#{} :column :column-parted :center) (:layout rule))
                     =< nil $ :gap rule
-                  :else $ div
+                  true $ div
                     {} $ :style
                       {} (:background-color :red) (:width 4) (:height 4)
         |style-no-match $ quote
@@ -544,7 +543,7 @@
                   nil? item
                   <> (str "\"nothing to fill: " $ pr-str rule) (, style-todo)
                 (fn? item)
-                  item (merge ui/flex $ :style item) (, options)
+                  item (merge ui/flex) options
                 (some? $ :item item)
                   :item item
                 (fn? $ :render item)
@@ -584,7 +583,7 @@
               div ({})
                 div ({}) (<> |Widgets) (=< 8 nil)
                   a $ {} (:href |https://github.com/Respo/respo-ui/blob/master/src/respo_ui/comp/widgets_page.cljs) (:target |_blank) (:inner-text |Source)
-                div ({}) (<> span "|Some text as description" ui/text-label) (=< nil 16) (<> span |link ui/link)
+                div ({}) (<> "|Some text as description" ui/text-label) (=< nil 16) (<> |link ui/link)
                 =< nil 16
                 div ({})
                   button
@@ -607,7 +606,7 @@
                     {} $ :style (merge ui/button)
                     <> |Add
                   =< 16 nil
-                  <> span |nothing ui/text-label
+                  <> |nothing ui/text-label
                 =< nil 16
                 div ({})
                   select ({} $ :style ui/select)
@@ -720,9 +719,10 @@
         |comp-container $ quote
           defcomp comp-container (store)
             let
-                router $ do
-                  ; first $ :path (:router store)
-                  {} $ :name |layouts.html
+                router $ either
+                  first $ :path
+                    either (:router store) ({})
+                  {}
                 states $ :states store
               div
                 {} $ :style
