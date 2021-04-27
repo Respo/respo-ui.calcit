@@ -2,7 +2,7 @@
 {} (:package |respo-ui)
   :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!)
     :modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-router.calcit/compact.cirru
-    :version |0.4.0
+    :version |0.4.1
   :files $ {}
     |respo-ui.comp.md $ {}
       :ns $ quote
@@ -208,7 +208,7 @@
           defn updater (store op op-data)
             case op
               :states $ update-states store op-data
-              :router/nav $ assoc store :router (parse-address op-data router/dict)
+              :router/nav $ assoc store :router (; parse-address op-data router/dict) op-data
               op store
         |main! $ quote
           defn main! ()
@@ -216,9 +216,9 @@
             if ssr? $ render-app! realize-ssr!
             render-app! render!
             add-watch *store :changes $ fn (store prev) (render-app! render!)
-            render-router!
+            ; render-router!
             listen! router/dict dispatch! router/mode
-            add-watch *store :router-changes $ fn (store prev) (render-router!)
+            ; add-watch *store :router-changes $ fn (store prev) (render-router!)
             println "|App started!"
         |render-router! $ quote
           defn render-router! () $ render-url! (:router @*store) router/dict router/mode
@@ -613,7 +613,7 @@
                 merge
                   get-layout-style $ :layout rule
                   :style rule
-              ->>
+              ->
                 range $ :size rule
                 map-indexed $ fn (idx item)
                   [] (str idx)
@@ -632,7 +632,7 @@
                 merge
                   get-layout-style $ :layout rule
                   :style rule
-              ->> (:items rule)
+              -> (:items rule)
                 map-indexed $ fn (idx item)
                   [] (str idx)
                     let
@@ -652,14 +652,16 @@
             if (empty? xs) acc $ recur
               if (empty? acc)
                 [] $ first xs
-                conj acc (f n) (first xs)
+                -> acc
+                  conj $ f n
+                  conj $ first xs
               inc n
               , f (rest xs)
         |lilac-style $ quote
           def lilac-style $ optional+
             map+ (keyword+) (any+)
         |add-gap $ quote
-          defn add-gap (f xs)
+          defn add-gap (xs f)
             add-gap-iter ([]) 0 f xs
         |lilac-layout-names $ quote
           def lilac-layout-names $ optional+
@@ -852,7 +854,7 @@
                   {} (:padding "\"8px 16px 0")
                     :width $ :width options
                   :style options
-              ->> tabs $ map
+              -> tabs $ map
                 fn (info)
                   [] (:name info)
                     div
@@ -925,18 +927,20 @@
         |comp-container $ quote
           defcomp comp-container (store)
             let
-                router $ either
-                  first $ :path
-                    either (:router store) ({})
-                  {}
+                router $ do
+                  ; either
+                    first $ :path
+                      either (:router store) ({})
+                    {}
+                  :router store
                 states $ :states store
               div
                 {} $ :style
                   merge ui/fullscreen ui/row ui/global $ {} (:padding-top 16)
-                comp-sidebar $ or (:name router) |index.html
+                comp-sidebar $ or router (; :name router) |index.html
                 div
                   {} $ :style (merge ui/expand style-content)
-                  case (:name router)
+                  case router (; :name router)
                     nil $ comp-home
                     |home $ comp-home
                     |index.html $ comp-home
