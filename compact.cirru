@@ -208,7 +208,7 @@
           defn updater (store op op-data)
             case op
               :states $ update-states store op-data
-              :router/nav $ assoc store :router (; parse-address op-data router/dict) op-data
+              :router/nav $ assoc store :router (parse-address op-data router/dict)
               op store
         |main! $ quote
           defn main! ()
@@ -216,9 +216,9 @@
             if ssr? $ render-app! realize-ssr!
             render-app! render!
             add-watch *store :changes $ fn (store prev) (render-app! render!)
-            ; render-router!
+            render-router!
             listen! router/dict dispatch! router/mode
-            ; add-watch *store :router-changes $ fn (store prev) (render-router!)
+            add-watch *store :router-changes $ fn (store prev) (render-router!)
             println "|App started!"
         |render-router! $ quote
           defn render-router! () $ render-url! (:router @*store) router/dict router/mode
@@ -927,20 +927,18 @@
         |comp-container $ quote
           defcomp comp-container (store)
             let
-                router $ do
-                  ; either
-                    first $ :path
-                      either (:router store) ({})
-                    {}
-                  :router store
+                router $ either
+                  first $ :path
+                    either (:router store) ({})
+                  {}
                 states $ :states store
               div
                 {} $ :style
                   merge ui/fullscreen ui/row ui/global $ {} (:padding-top 16)
-                comp-sidebar $ or router (; :name router) |index.html
+                comp-sidebar $ or (:name router) |index.html
                 div
                   {} $ :style (merge ui/expand style-content)
-                  case router (; :name router)
+                  case (:name router)
                     nil $ comp-home
                     |home $ comp-home
                     |index.html $ comp-home
