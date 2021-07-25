@@ -2,7 +2,7 @@
 {} (:package |respo-ui)
   :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!)
     :modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-router.calcit/compact.cirru
-    :version |0.4.2
+    :version |0.4.3
   :files $ {}
     |respo-ui.comp $ {}
       :ns $ quote
@@ -106,7 +106,7 @@
           def column-dispersive $ {} (:display |flex) (:align-items |center) (:justify-content |space-around) (:flex-direction |column)
         |hsl $ quote
           defn hsl (h s l ? a)
-            if (some? a) (str "\"hsl(" h "\"," s "\"," l "\"," a "\")") (str "\"hsl(" h "\"," s "\"," l "\")")
+            if (some? a) (str "\"hsl(" h "\"," s "\"%," l "\"%," a "\")") (str "\"hsl(" h "\"," s "\"%," l "\"%)")
         |row $ quote
           def row $ {} (:display |flex) (:align-items |stretch) (:flex-direction |row)
         |card $ quote
