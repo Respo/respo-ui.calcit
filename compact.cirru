@@ -2,7 +2,8 @@
 {} (:package |respo-ui)
   :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!)
     :modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-router.calcit/compact.cirru
-    :version |0.4.3
+    :version |0.4.4
+  :entries $ {}
   :files $ {}
     |respo-ui.comp $ {}
       :ns $ quote
@@ -123,6 +124,7 @@
             :margin 4
             :display :inline-block
             :cursor :pointer
+            :user-select :none
         |font-code $ quote (def font-code "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace")
         |textarea $ quote
           def textarea $ {} (:outline :none) (:border :none) (:font-size 14) (:font-family default-fonts)
@@ -170,6 +172,7 @@
             :outline :none
             :vertical-align :top
             :background-color :white
+            :user-select :none
         |center $ quote
           def center $ {} (:display |flex) (:flex-direction |column) (:justify-content |center) (:align-items |center)
         |column $ quote
