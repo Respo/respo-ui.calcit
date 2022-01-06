@@ -2,7 +2,7 @@
 {} (:package |respo-ui)
   :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!)
     :modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-router.calcit/compact.cirru
-    :version |0.4.3
+    :version |0.4.4
   :entries $ {}
   :files $ {}
     |respo-ui.comp $ {}

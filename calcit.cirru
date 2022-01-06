@@ -12619,7 +12619,7 @@
           :at 1506675837748
           :by nil
           :id |rk1vfUFhYisW
-  :configs $ {} (:reload-fn |respo-ui.main/reload!) (:port 6001) (:output |src) (:compact-output? true) (:storage-key |calcit.cirru) (:version |0.4.3)
+  :configs $ {} (:reload-fn |respo-ui.main/reload!) (:port 6001) (:output |src) (:compact-output? true) (:storage-key |calcit.cirru) (:version |0.4.4)
     :modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-router.calcit/compact.cirru
     :init-fn |respo-ui.main/main!
     :extension |.cljs
