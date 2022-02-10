@@ -7,13 +7,12 @@
   :files $ {}
     |respo-ui.comp $ {}
       :ns $ quote
-        ns respo-ui.comp
-          :require
-            [] respo.core :refer $ [] defcomp div list-> input textarea button span select option a <>
-            [] respo.comp.space :refer $ [] =<
-            [] respo-ui.core :as ui
-            [] respo.util.format :refer $ [] hsl
-          :require-macros $ [] clojure.core.strint :refer ([] <<)
+        ns respo-ui.comp $ :require
+          [] respo.core :refer $ [] defcomp div list-> input textarea button span select option a <> pre
+          [] respo.comp.space :refer $ [] =<
+          [] respo-ui.core :as ui
+          [] respo.util.format :refer $ [] hsl
+          "\"cirru-color" :refer $ generateHtml
       :defs $ {}
         |style-button-cancel $ quote
           def style-button-cancel $ css "\"border: 1px solid hsl(0,0%,80%);\ncolor: hsl(0,0%,40%);\n\n&:hover {\n  border-color: hsl(0,0%,85%);\n}\n\n&:active {\n  transform: scale(1.05);\n}\n"
@@ -30,7 +29,8 @@
                     :border $ str "\"1px solid " (hsl 0 0 90)
                     :border-radius "\"4px"
                   , styles
-              <> text
+              pre $ {}
+                :innerHTML $ generateHtml text
         |css $ quote
           defn css (& args) "\"TODO"
         |comp-link $ quote
@@ -381,7 +381,7 @@
               <> "\"Placeholder demo"
             comp-placeholder "\"This is a demo"
             comp-placeholder "\"中文 Demo"
-            comp-snippet "\"respo-ui.comp/comp-placeholder\n\n(comp-placeholder \"demo\")\n(comp-placeholder \"中文\")" $ {}
+            comp-snippet "\"respo-ui.comp/comp-placeholder\n\ncomp-placeholder \"|demo\"\ncomp-placeholder \"|中文\"" $ {}
         |style-title $ quote
           def style-title $ {} (:margin-top 40) (:font-size 18) (:font-family ui/font-fancy)
             :color $ hsl 0 0 70
@@ -392,7 +392,7 @@
               <> "\"Links demo"
             comp-link $ {} (:text "\"a link")
               :on-click $ fn (e d!) (println "\"clicked")
-            comp-snippet "\"respo-ui.comp/comp-link\n\n(comp-link {:text \"demo\"})\n" $ {}
+            comp-snippet "\"respo-ui.comp/comp-link\n\ncomp-link $ &{} :text \"|demo\"\n" $ {}
         |comp-demo-tabs $ quote
           defcomp comp-demo-tabs (states)
             let
@@ -427,7 +427,7 @@
                   , en-tabs $ fn (info d!) (println "\"selected" info)
                     d! cursor $ assoc state :selected (:name info)
                 =< nil 8
-                comp-snippet "\"respo-ui.comp/comp-tabs\n\n(comp-tabs\n {:selected (:selected state) :style {}}\n [{:name :book, :title \"Book\"}\n  {:name :card, :title \"Card\"}\n  {:name :pl, :title \"Programming language\"}]\n (fn [info d!]\n   (println \"selected\" info)\n   (d! cursor (assoc state :selected (:name info)))))" $ {}
+                comp-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  {}\n    :selected (:selected state)\n    :style {}\n  []\n    &{} :name :book :title |Book\n    &{} :name :card :title |Card\n    &{} :name :pl :title \"|Programming language\"\n  fn (info d!)\n    println |selected info\n    d! cursor $ assoc state :selected $ :name info" $ {}
                 comp-tabs
                   {}
                     :selected $ :selected state
@@ -436,7 +436,7 @@
                     :style $ {}
                   , en-tabs $ fn (info d!) (println "\"selected" info)
                     d! cursor $ assoc state :selected (:name info)
-                comp-snippet "\"respo-ui.comp/comp-tabs\n\n(comp-tabs\n {:selected (:selected state) :style {}, :vertical? true, :width 200}\n tabs (fn [info d!]))" $ {}
+                comp-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  &{} :selected (:selected state) :style ({}) :vertical? true :width 200\n  , tabs\n  fn (info d!)" $ {}
         |comp-components-page $ quote
           defcomp comp-components-page (states)
             let
@@ -464,7 +464,7 @@
               comp-button $ {} (:type :cancel) (:text "\"Cancel button")
               comp-button $ {} (:disabled? true) (:text "\"Button disabled")
             =< nil 8
-            comp-snippet "\"respo-ui.comp/comp-button\n\n(comp-button {:type :normal})\n(comp-button {:type :main})\n(comp-button {:type :cancel})\n(comp-button {:disabled? true})\n\n" $ {}
+            comp-snippet "\"respo-ui.comp/comp-button\n\ncomp-button $ &{} :type :normal\ncomp-button $ &{} :type :main\ncomp-button $ &{} :type :cancel\ncomp-button $ &{} :disabled? true\n\n" $ {}
         |render-entry $ quote
           defn render-entry (url title)
             div ({})
