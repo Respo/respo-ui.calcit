@@ -1,7 +1,7 @@
 
 {} (:package |respo-ui)
   :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!)
-    :modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-router.calcit/compact.cirru
+    :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
     :version |0.4.4
   :entries $ {}
   :files $ {}
@@ -313,7 +313,7 @@
           [] respo.comp.space :refer $ [] =<
           [] respo-ui.core :as ui
           [] respo.util.format :refer $ [] hsl
-          [] respo-ui.comp.md :refer $ [] comp-md-block
+          [] respo-md.comp.md :refer $ [] comp-md-block
       :defs $ {}
         |render-demo $ quote
           defn render-demo (title layout)
@@ -705,8 +705,8 @@
         ns respo-ui.comp.home $ :require
           [] respo.core :refer $ [] defcomp div a img <>
           [] respo.comp.space :refer $ [] =<
-          [] respo-ui.comp.md :refer $ [] comp-md-block
           [] respo.util.format :refer $ [] hsl
+          respo-md.comp.md :refer $ comp-md-block
       :defs $ {}
         |comp-home $ quote
           defcomp comp-home () $ div ({})
@@ -728,7 +728,7 @@
           [] respo.core :refer $ [] defcomp div <>
           [] respo-ui.core :as ui
           [] respo.comp.space :refer $ [] =<
-          [] respo-ui.comp.md :refer $ [] comp-md-block
+          [] respo-md.comp.md :refer $ [] comp-md-block
       :defs $ {}
         |render-font-demo $ quote
           defn render-font-demo (family weight)
@@ -807,14 +807,6 @@
                     <> $ pr-str router
         |style-content $ quote
           def style-content $ {} (:padding 8)
-    |respo-ui.comp.md $ {}
-      :ns $ quote
-        ns respo-ui.comp.md $ :require
-          [] respo.core :refer $ [] defcomp div <>
-      :defs $ {}
-        |comp-md-block $ quote
-          defcomp comp-md-block (content options)
-            div ({}) (<> content)
     |respo-ui.comp.lay-out-page $ {}
       :ns $ quote
         ns respo-ui.comp.lay-out-page $ :require
