@@ -4,7 +4,7 @@ Respo UI for calcit-js
 
 ### Usages
 
-Find details in http://ui.respo-mvc.org/ .
+Find details in http://repo.respo-mvc.org/respo-ui.calcit/ .
 
 ### License
 
