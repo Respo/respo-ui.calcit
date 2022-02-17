@@ -2,7 +2,7 @@
 {} (:package |respo-ui)
   :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
-    :version |0.4.4
+    :version |0.4.5
   :entries $ {}
   :files $ {}
     |respo-ui.comp $ {}
@@ -47,7 +47,7 @@
               {} $ :style
                 merge
                   if (:vertical? options) ui/column ui/row
-                  {} (:padding "\"8px 16px 0")
+                  {} (:padding "\"4px 16px")
                     :width $ :width options
                   :style options
               -> tabs $ map
@@ -55,14 +55,14 @@
                   [] (:name info)
                     div
                       {}
-                        :style $ merge
-                          {} (:padding "\"0 8px") (:font-family ui/font-fancy) (:font-weight 300) (:cursor :pointer) (:font-size 16)
-                            :color $ hsl 0 0 70
-                            :line-height "\"32px"
+                        :style $ merge style-tab (:tab-style options)
                           if
                             = (:selected options) (:name info)
-                            {} (:font-weight 500)
-                              :color $ hsl 0 0 30
+                            merge
+                              {}
+                                :color $ hsl 0 0 100
+                                :background-color $ hsl 200 80 70
+                              :selected-tab-style options
                         :on-click $ fn (e d!) (on-route info d!)
                       <> $ :title info
         |comp-placeholder $ quote
@@ -84,7 +84,7 @@
           defcomp comp-button (props)
             div $ {}
               :class-name $ cx style-button
-                if (:disabled? props) style-button-disabled $ case style-button-normal (:type props) (:main style-button-main) (:cancel style-button-cancel)
+                if (:disabled? props) style-button-disabled $ case-default style-button-normal nil (:type props) (:main style-button-main) (:cancel style-button-cancel)
                 :class-name props
               :style $ :style props
               :on-click $ if (:disabled? props) nil (:on-click props)
@@ -92,6 +92,11 @@
               :inner-text $ or (:text props) "\"BUTTON"
         |style-button $ quote
           def style-button $ css "\"background-color: white;\npadding: 0px 12px;\ndisplay: inline-block;\nfont-size: 13px;\nline-height: 24px;\nborder-radius: 4px;\ncursor: pointer;\nuser-select: none;\ntransition-duration: 100ms;\n\n&:active {\ntransition-duration: 0ms;\n}"
+        |style-tab $ quote
+          def style-tab $ {} (:padding "\"0 8px") (:font-family ui/font-normal) (:font-weight 300) (:cursor :pointer) (:font-size 14)
+            :color $ hsl 0 0 70
+            :line-height "\"24px"
+            :border-radius "\"2px"
         |style-link $ quote
           def style-link $ css "\"color: hsl(240,80%,70%);\ntext-decoration: underline;\ncursor: pointer;\ntransition-duration: 100ms;\nuser-select: none;\n\n&:hover {\ncolor: hsl(240,80%,80%);\n}\n\n&:active {\ntransition-duration: 0ms;\ntransform: scale(1.05);\ncolor: hsl(240,80%,65%);\n}"
     |respo-ui.core $ {}
@@ -147,10 +152,10 @@
               :border $ str "\"1px solid " (hsl 0 0 80)
               :border-radius "\"4px"
               :font-size |14px
-              :padding "|8px 8px"
+              :padding "|4px 8px"
               :min-width |120px
               :line-height |16px
-              :height 32
+              :height 28
               :font-family default-fonts
               :vertical-align :top
         |column-evenly $ quote
@@ -163,7 +168,7 @@
         |row-dispersive $ quote
           def row-dispersive $ {} (:display |flex) (:align-items |center) (:justify-content |space-around) (:flex-direction |row)
         |button $ quote
-          def button $ {} (:min-width |80px) (:line-height |30px) (:border-radius "\"16px") (:font-size 14) (:text-align |center)
+          def button $ {} (:min-width |80px) (:line-height |24px) (:border-radius "\"4px") (:font-size 14) (:text-align |center)
             :border $ str "\"1px solid " (hsl 200 100 76)
             :color $ hsl 200 100 76
             :cursor |pointer
@@ -183,11 +188,13 @@
           def global $ {} (:line-height "\"2") (:font-size "\"14px") (:font-family default-fonts)
             :color $ hsl 0 0 20
         |select $ quote
-          def select $ {} (:height 32) (:outline |none) (:font-size 14) (:min-width 120)
+          def select $ {} (:height 28) (:outline |none) (:font-size 14) (:min-width 120)
             :border $ str "\"1px solid " (hsl 0 0 80)
+            :padding "\"0 4px"
             :border-radius "\"4px"
             :font-family default-fonts
             :vertical-align :top
+            :cursor :pointer
         |fullscreen $ quote
           def fullscreen $ {} (:position "\"absolute") (:left 0) (:top 0) (:width "\"100%") (:height "\"100%") (:overflow :auto)
     |respo-ui.main $ {}
@@ -237,10 +244,10 @@
             reset! *store $ updater @*store op op-data
         |updater $ quote
           defn updater (store op op-data)
-            case op
+            case-default op
+              do (println "\"Unknown op:" op) store
               :states $ update-states store op-data
               :router/nav $ assoc store :router (parse-address op-data router/dict)
-              op store
         |reload! $ quote
           defn reload! () (remove-watch *store :changes) (remove-watch *store :router-changes) (clear-cache!)
             add-watch *store :changes $ fn (store prev) (render-app! render!)
@@ -679,20 +686,18 @@
           defn lay-out (rule child-map & args)
             let
                 options $ either (first args) ({})
-              case (:type rule)
+              case-default (:type rule)
+                <>
+                  str "\"Unknown rule: " $ pr-str rule
+                  , style-todo
                 :flex $ render-layout-flex rule child-map options
                 :list $ render-layout-list rule child-map options
                 :grid $ <> "\"TODO grid" style-todo
                 :item $ render-fill-item rule child-map options
-                (:type rule)
-                  <>
-                    str "\"Unknown rule: " $ pr-str rule
-                    , style-todo
         |get-layout-style $ quote
           defn get-layout-style (layout-name)
-            case layout-name (:row ui/row) (:column ui/column) (:center ui/center) (:row-middle ui/row-middle) (:row-center ui/row-center) (:row-parted ui/row-parted) (:column-parted ui/column-parted)
+            case-default layout-name style-no-match (:row ui/row) (:column ui/column) (:center ui/center) (:row-middle ui/row-middle) (:row-center ui/row-center) (:row-parted ui/row-parted) (:column-parted ui/column-parted)
               :flow $ {}
-              layout-name style-no-match
         |style-todo $ quote
           def style-todo $ {}
             :color $ hsl 0 80 80
@@ -794,7 +799,8 @@
                 comp-sidebar $ or (:name router) |index.html
                 div
                   {} $ :style (merge ui/expand style-content)
-                  case (:name router)
+                  case-default (:name router)
+                    <> $ pr-str router
                     nil $ comp-home
                     |home $ comp-home
                     |index.html $ comp-home
@@ -804,7 +810,6 @@
                     |lay-out.html $ comp-lay-out-page
                     |fonts.html $ comp-fonts-page
                     |components.html $ comp-components-page (>> states :components)
-                    <> $ pr-str router
         |style-content $ quote
           def style-content $ {} (:padding 8)
     |respo-ui.comp.lay-out-page $ {}
