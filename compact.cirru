@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.5)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.6)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -27,31 +27,20 @@
         |comp-placeholder $ quote
           defcomp comp-placeholder (text)
             div
-              {} $ :style
-                merge ui/center $ {} (:padding 16) (:font-family ui/font-fancy)
-                  :color $ hsl 0 0 80
-                  :font-size 12
-                  :font-style :italic
+              {} $ :class-name css-placeholder
               <> text
         |comp-snippet $ quote
           defcomp comp-snippet (text styles)
             div
-              {} $ :style
-                merge
-                  {} (:font-family ui/font-code) (:white-space :pre) (:font-size 12) (:line-height "\"20px")
-                    :color $ hsl 0 0 40
-                    :padding "\"4px 6px"
-                    :border $ str "\"1px solid " (hsl 0 0 90)
-                    :border-radius "\"4px"
-                  , styles
+              {} (:class-name css-snippet) (:style styles)
               pre $ {}
                 :innerHTML $ generateHtml text
         |comp-tabs $ quote
           defcomp comp-tabs (options tabs on-route)
             list->
-              {} $ :style
-                merge
-                  if (:vertical? options) ui/column ui/row
+              {}
+                :class-name $ if (:vertical? options) css/column css/row
+                :style $ merge
                   {} (:padding "\"4px 16px")
                     :width $ :width options
                   :style options
@@ -59,8 +48,8 @@
                 fn (info)
                   [] (:name info)
                     div
-                      {}
-                        :style $ merge style-tab (:tab-style options)
+                      {} (:class-name css-tab)
+                        :style $ merge (:tab-style options)
                           if
                             = (:selected options) (:name info)
                             merge
@@ -72,6 +61,28 @@
                       <> $ :title info
         |css $ quote
           defn css (& args) "\"TODO"
+        |css-placeholder $ quote
+          defstyle css-placeholder $ {}
+            "\"$0" $ merge ui/center
+              {} (:padding 16) (:font-family ui/font-fancy)
+                :color $ hsl 0 0 80
+                :font-size 12
+                :font-style :italic
+        |css-snippet $ quote
+          defstyle css-snippet $ {}
+            "\"$0" $ {} (:font-family ui/font-code) (:white-space :pre) (:font-size 12) (:line-height "\"20px")
+              :color $ hsl 0 0 40
+              :padding "\"4px 6px"
+              :border $ str "\"1px solid " (hsl 0 0 90)
+              :border-radius "\"4px"
+        |css-tab $ quote
+          defstyle css-tab $ {}
+            "\"$0" $ {} (:padding "\"0 8px") (:font-family ui/font-normal) (:font-weight 300) (:cursor :pointer) (:font-size 14)
+              :color $ hsl 0 0 70
+              :line-height "\"24px"
+              :border-radius "\"2px"
+            "\"$0:hover" $ {}
+              :background-color $ hsl 0 0 98
         |cx $ quote
           defn cx (& args) "\"TODO"
         |style-button $ quote
@@ -86,11 +97,6 @@
           def style-button-normal $ css "\"border: 1px solid hsl(0,0%,80%);\ncursor: pointer;\n\n&:active {\ntransform: scale(1.05);\n}"
         |style-link $ quote
           def style-link $ css "\"color: hsl(240,80%,70%);\ntext-decoration: underline;\ncursor: pointer;\ntransition-duration: 100ms;\nuser-select: none;\n\n&:hover {\ncolor: hsl(240,80%,80%);\n}\n\n&:active {\ntransition-duration: 0ms;\ntransform: scale(1.05);\ncolor: hsl(240,80%,65%);\n}"
-        |style-tab $ quote
-          def style-tab $ {} (:padding "\"0 8px") (:font-family ui/font-normal) (:font-weight 300) (:cursor :pointer) (:font-size 14)
-            :color $ hsl 0 0 70
-            :line-height "\"24px"
-            :border-radius "\"2px"
       :ns $ quote
         ns respo-ui.comp $ :require
           [] respo.core :refer $ [] defcomp div list-> input textarea button span select option a <> pre
@@ -98,6 +104,8 @@
           [] respo-ui.core :as ui
           [] respo.util.format :refer $ [] hsl
           "\"cirru-color" :refer $ generateHtml
+          respo.css :refer $ defstyle
+          respo-ui.css :as css
     |respo-ui.comp.components $ {}
       :defs $ {}
         |comp-components-page $ quote
@@ -118,7 +126,7 @@
         |comp-demo-buttons $ quote
           defcomp comp-demo-buttons () $ div ({})
             div
-              {} $ :style style-title
+              {} $ :class-name css-title
               <> "\"Buttons demo"
             div ({})
               comp-button $ {} (:text "\"Normal button")
@@ -131,7 +139,7 @@
         |comp-demo-links $ quote
           defcomp comp-demo-links () $ div ({})
             div
-              {} $ :style style-title
+              {} $ :class-name css-title
               <> "\"Links demo"
             comp-link $ {} (:text "\"a link")
               :on-click $ fn (e d!) (println "\"clicked")
@@ -139,7 +147,7 @@
         |comp-demo-placeholder $ quote
           defcomp comp-demo-placeholder () $ div ({})
             div
-              {} $ :style style-title
+              {} $ :class-name css-title
               <> "\"Placeholder demo"
             comp-placeholder "\"This is a demo"
             comp-placeholder "\"中文 Demo"
@@ -156,7 +164,7 @@
                   {} (:name :pl) (:title "\"Programming language")
               div ({})
                 div
-                  {} $ :style style-title
+                  {} $ :class-name css-title
                   <> "\"Tabs demo"
                 comp-tabs
                   {} $ :selected (:selected state)
@@ -188,13 +196,14 @@
                   , en-tabs $ fn (info d!) (println "\"selected" info)
                     d! cursor $ assoc state :selected (:name info)
                 comp-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  &{} :selected (:selected state) :style ({}) :vertical? true :width 200\n  , tabs\n  fn (info d!)" $ {}
+        |css-title $ quote
+          defstyle css-title $ {}
+            "\"$0" $ {} (:margin-top 40) (:font-size 18) (:font-family ui/font-fancy)
+              :color $ hsl 0 0 70
         |render-entry $ quote
           defn render-entry (url title)
             div ({})
               a $ {} (:href url) (:inner-text title)
-        |style-title $ quote
-          def style-title $ {} (:margin-top 40) (:font-size 18) (:font-family ui/font-fancy)
-            :color $ hsl 0 0 70
       :ns $ quote
         ns respo-ui.comp.components $ :require
           [] respo.core :refer $ [] defcomp >> div a <> pre code
@@ -202,6 +211,7 @@
           [] respo-ui.comp :refer $ [] comp-tabs comp-placeholder comp-snippet comp-button comp-link
           [] respo-ui.core :as ui
           [] respo.util.format :refer $ [] hsl
+          respo.css :refer $ defstyle
     |respo-ui.comp.container $ {}
       :defs $ {}
         |comp-container $ quote
@@ -213,11 +223,12 @@
                   {}
                 states $ :states store
               div
-                {} $ :style
-                  merge ui/fullscreen ui/row ui/global $ {} (:padding-top 16)
+                {}
+                  :class-name $ str-spaced css/global css/fullscreen css/row
+                  :style $ {} (:padding-top 16)
                 comp-sidebar $ or (:name router) |index.html
                 div
-                  {} $ :style (merge ui/expand style-content)
+                  {} $ :class-name (str-spaced css/expand css-content)
                   case-default (:name router)
                     <> $ pr-str router
                     nil $ comp-home
@@ -229,8 +240,9 @@
                     |lay-out.html $ comp-lay-out-page
                     |fonts.html $ comp-fonts-page
                     |components.html $ comp-components-page (>> states :components)
-        |style-content $ quote
-          def style-content $ {} (:padding 8)
+        |css-content $ quote
+          defstyle css-content $ {}
+            "\"$0" $ {} (:padding 8)
       :ns $ quote
         ns respo-ui.comp.container $ :require
           [] respo.util.format :refer $ [] hsl
@@ -244,6 +256,8 @@
           [] respo-ui.comp.fonts-page :refer $ [] comp-fonts-page
           [] respo-ui.comp.components :refer $ [] comp-components-page
           [] respo-ui.comp.lay-out-page :refer $ [] comp-lay-out-page
+          respo.css :refer $ defstyle
+          respo-ui.css :as css
     |respo-ui.comp.fonts-page $ {}
       :defs $ {}
         |comp-fonts-page $ quote
@@ -271,14 +285,15 @@
             render-font-demo ui/font-code 100
             render-font-demo ui/font-code 300
             render-font-demo ui/font-code 400
+        |css-demo $ quote
+          defstyle css-demo $ {}
+            "\"$0" $ {} (:font-size 16) (:font-weight |bold) (:line-height |32px)
         |render-font-demo $ quote
           defn render-font-demo (family weight)
             div
-              {} $ :style
-                merge style-demo $ {} (:font-family family) (:font-weight weight) (:font-size 16) (:line-height |32px)
+              {} (:class-name css-demo)
+                :style $ {} (:font-family family) (:font-weight weight)
               <> $ str "|This is a demo of the font, guess what you like: " family "| " weight
-        |style-demo $ quote
-          def style-demo $ {} (:font-size 20) (:font-weight |bold) (:line-height |56px)
         |style-section $ quote
           def style-section $ {} (:font-size 24) (:font-family ui/font-fancy) (:line-height |60px)
       :ns $ quote
@@ -287,6 +302,7 @@
           [] respo-ui.core :as ui
           [] respo.comp.space :refer $ [] =<
           [] respo-md.comp.md :refer $ [] comp-md-block
+          respo.css :refer $ defstyle
     |respo-ui.comp.home $ {}
       :defs $ {}
         |comp-home $ quote
@@ -294,10 +310,8 @@
             div
               {} $ :style style-home
               <> "|Styles for Respo"
-              =< 16 nil
-              img $ {} (:src |https://img.shields.io/clojars/v/respo/ui.svg)
             =< nil 32
-            div ({}) (<> "|Find more at: ")
+            div ({})
               comp-md-block "|Respo UI is some minimal style collections for creating small pieces of apps. It includes variables for Flexbox layouts, basic button and input styles, fonts like \"Josefin Sans\" and \"Hind\".\n\nYou may read code on [GitHub](http://github.com/Respo/respo-ui). [Fonts files](https://github.com/tiye/favored-fonts) are hosted separately on my server." $ {}
         |style-home $ quote
           def style-home $ {} (:font-size 32) (:font-family "|Josefin Sans")
@@ -402,21 +416,24 @@
               a $ {} (:href |https://github.com/Respo/respo-ui/blob/master/src/respo_ui/comp/layouts_page.cljs) (:inner-text |Source) (:target |_blank)
             comp-md-block "|Flexbox styles are defined in variables like `ui/row` `ui/center` in flex containers. Here are how they take effects." $ {}
             div
-              {} $ :style
-                merge ui/row $ {} (:flex-wrap :wrap) (:font-family ui/font-code) (:font-size 12)
-              render-demo |ui/center ui/center
-              render-demo |ui/row-center ui/row-center
-              render-demo |ui/row-middle ui/row-middle
-              render-demo |ui/row ui/row
-              render-demo |ui/column ui/column
-              render-demo |ui/row-parted ui/row-parted
-              render-demo |ui/column-parted ui/column-parted
-              render-demo |ui/row-dispersive ui/row-dispersive
-              render-demo |ui/column-dispersive ui/column-dispersive
-              render-demo |ui/row-evenly ui/row-evenly
-              render-demo |ui/column-evenly ui/column-evenly
+              {} (:class-name css/row)
+                :style $ {} (:flex-wrap :wrap) (:font-family ui/font-code) (:font-size 12)
+              render-demo |ui/center css/center
+              render-demo |ui/row-center css/row-center
+              render-demo |ui/row-middle css/row-middle
+              render-demo |ui/row css/row
+              render-demo |ui/column css/column
+              render-demo |ui/row-parted css/row-parted
+              render-demo |ui/column-parted css/column-parted
+              render-demo |ui/row-dispersive css/row-dispersive
+              render-demo |ui/column-dispersive css/column-dispersive
+              render-demo |ui/row-evenly css/row-evenly
+              render-demo |ui/column-evenly css/column-evenly
+        |css-sample $ quote
+          defstyle css-sample $ {}
+            "\"$0" $ {} (:padding "|4px 8px") (:color :white) (:font-size 12) (:font-family ui/font-code)
         |render-demo $ quote
-          defn render-demo (title layout)
+          defn render-demo (title layout-cls)
             div
               {} $ :style
                 {} $ :margin 16
@@ -424,28 +441,26 @@
                 {} $ :style ({})
                 <> title
               div
-                {} $ :style
-                  merge layout $ {}
+                {} (:class-name layout-cls)
+                  :style $ {}
                     :border $ str "|1px solid " (hsl 0 0 86)
                     :width 120
                     :height 120
                 div
-                  {} $ :style
-                    merge style-sample $ {}
+                  {} (:class-name css-sample)
+                    :style $ {}
                       :background-color $ hsl 0 80 70
                   <> |A
                 div
-                  {} $ :style
-                    merge style-sample $ {}
+                  {} (:class-name css-sample)
+                    :style $ {}
                       :background-color $ hsl 120 80 70
                   <> |B
                 div
-                  {} $ :style
-                    merge style-sample $ {}
+                  {} (:class-name css-sample)
+                    :style $ {}
                       :background-color $ hsl 240 80 80
                   <> |C
-        |style-sample $ quote
-          def style-sample $ {} (:padding "|4px 8px") (:color :white) (:font-size 12) (:font-family ui/font-code)
       :ns $ quote
         ns respo-ui.comp.layouts-page $ :require
           [] respo.core :refer $ [] defcomp div a <>
@@ -453,6 +468,8 @@
           [] respo-ui.core :as ui
           [] respo.util.format :refer $ [] hsl
           [] respo-md.comp.md :refer $ [] comp-md-block
+          respo.css :refer $ defstyle
+          respo-ui.css :as css
     |respo-ui.comp.sidebar $ {}
       :defs $ {}
         |comp-sidebar $ quote
@@ -471,25 +488,21 @@
               render-entry |widgets.html |Widgets router-name
               render-entry |fonts.html |Fonts router-name
               render-entry |components.html |Components router-name
+        |css-sidebar-entry $ quote
+          defstyle css-sidebar-entry $ {}
+            "\"$0" $ {} (:line-height |40px) (:font-size 20) (:cursor |pointer) (:font-weight "\"lighter") (:font-family ui/font-fancy) (:text-align :right) (:padding "|0 16px")
+              :color $ hsl 0 0 20
+            "\"$0:hover" $ {}
+              :background-color $ hsl 0 0 97
         |on-route $ quote
           defn on-route (path-name)
             fn (e dispatch!) (dispatch! :router/nav path-name)
         |render-entry $ quote
           defn render-entry (path title router-name)
             div
-              {}
-                :style $ merge
-                  {}
-                    :color $ hsl 0 0 20
-                    :line-height |40px
-                    :font-size 20
-                    :cursor |pointer
-                    :font-weight "\"lighter"
-                    :font-family ui/font-fancy
-                    :text-align :right
-                    :padding "|0 16px"
-                  if (= path router-name)
-                    {} $ :background-color (hsl 0 0 50 0.1)
+              {} (:class-name css-sidebar-entry)
+                :style $ if (= path router-name)
+                  {} $ :background-color (hsl 0 0 50 0.1)
                 :on-click $ on-route path
               <> title
         |style-logo $ quote
@@ -500,6 +513,7 @@
           [] respo-ui.core :as ui
           [] respo.util.format :refer $ [] hsl
           [] respo.comp.space :refer $ [] =<
+          respo.css :refer $ defstyle
     |respo-ui.comp.widgets-page $ {}
       :defs $ {}
         |comp-widgets-page $ quote
@@ -510,54 +524,56 @@
               div ({})
                 div ({}) (<> |Widgets) (=< 8 nil)
                   a $ {} (:href |https://github.com/Respo/respo-ui/blob/master/src/respo_ui/comp/widgets_page.cljs) (:target |_blank) (:inner-text |Source)
-                div ({}) (<> "|Some text as description" ui/text-label) (=< nil 16) (<> |link ui/link)
+                div ({}) (<> "|Some text as description" ui/text-label) (=< nil 16)
+                  a $ {} (:class-name css/link) (:inner-text |link)
                 =< nil 16
                 div ({})
                   button
-                    {} $ :style
-                      merge ui/button $ {}
+                    {} (:class-name css/button)
+                      :style $ {}
                         :border-color $ hsl 220 100 76
                         :color $ hsl 220 100 76
                     <> |Yes
                   =< 16 nil
                   button
-                    {} $ :style
-                      merge ui/button $ {}
+                    {} (:class-name css/button)
+                      :style $ {}
                         :border-color $ hsl 6 100 60
                         :color $ hsl 6 100 60
                     <> |Yes
                   =< 16 nil
                 =< nil 16
                 div ({})
-                  input $ {} (:placeholder "|Some short text") (:value state) (:style ui/input)
+                  input $ {} (:placeholder "|Some short text") (:value state) (:class-name css/input)
                     :on $ {}
                       :input $ fn (e dispatch!)
                         dispatch! cursor $ :value e
                   =< 16 nil
                   button
-                    {} $ :style (merge ui/button)
+                    {} $ :class-name css/button
                     <> |Add
                   =< 16 nil
                   <> |nothing ui/text-label
                 =< nil 16
                 div ({})
                   select
-                    {} $ :style ui/select
+                    {} $ :class-name css/select
                     option $ {} (:selected true) (:inner-text |Haskell)
                     option $ {} (:selected true) (:inner-text |Clojure)
                     option $ {} (:selected false) (:inner-text |OCaml)
                 =< nil 16
                 div ({})
-                  textarea $ {} (:placeholder "|Some long text") (:style ui/textarea)
+                  textarea $ {} (:placeholder "|Some long text") (:class-name css/textarea)
                   =< 16 nil
                   button
-                    {} $ :style (merge ui/button)
+                    {} $ :class-name css/button
                     <> |Add
       :ns $ quote
         ns respo-ui.comp.widgets-page $ :require
           [] respo.core :refer $ [] defcomp div input textarea button span select option a <>
           [] respo.comp.space :refer $ [] =<
           [] respo-ui.core :as ui
+          [] respo-ui.css :as css
           [] respo.util.format :refer $ [] hsl
     |respo-ui.config $ {}
       :defs $ {}
@@ -632,16 +648,8 @@
               :font-family default-fonts
               :vertical-align :top
         |link $ quote
-          def link $ {}
+          def link $ {} (:text-decoration :underline) (:user-select :no-select) (:height 24) (:line-height |24px) (:margin 4) (:display :inline-block) (:cursor :pointer) (:user-select :none)
             :color $ hsl 200 100 76
-            :text-decoration :underline
-            :user-select :no-select
-            :height 24
-            :line-height |24px
-            :margin 4
-            :display :inline-block
-            :cursor :pointer
-            :user-select :none
         |row $ quote
           def row $ {} (:display |flex) (:align-items |stretch) (:flex-direction |row)
         |row-center $ quote
@@ -676,6 +684,84 @@
             :vertical-align :top
       :ns $ quote
         ns respo-ui.core $ :require
+    |respo-ui.css $ {}
+      :defs $ {}
+        |button $ quote
+          defstyle button $ {} ("\"$0" ui/button)
+            "\"$0:hover" $ {}
+              :background-color $ hsl 0 0 98
+            "\"$0:active" $ {} (:transform "\"scale(1.04)") (:transition-duration "\"0ms")
+        |card $ quote
+          defstyle card $ {}
+            "\"$0" $ {} (:padding |16px)
+        |center $ quote
+          defstyle center $ {} ("\"$0" ui/center)
+        |column $ quote
+          defstyle column $ {} ("\"$0" ui/column)
+        |column-dispersive $ quote
+          defstyle column-dispersive $ {} ("\"$0" ui/column-dispersive)
+        |column-evenly $ quote
+          defstyle column-evenly $ {} ("\"$0" ui/column-evenly)
+        |column-parted $ quote
+          defstyle column-parted $ {} ("\"$0" ui/column-parted)
+        |default-fonts $ quote (def default-fonts "|Hind,Verdana,'Hiragino Sans GB','WenQuanYi Micro Hei','Microsoft Yahei',sans-serif")
+        |expand $ quote
+          defstyle expand $ {} ("\"$0" ui/expand)
+        |flex $ quote
+          defstyle flex $ {}
+            "\"$0" $ {} (:flex 1)
+        |font-code $ quote (def font-code "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace")
+        |font-fancy $ quote (def font-fancy "|Josefin Sans, Helvetica neue, Arial, sans-serif")
+        |font-normal $ quote (def font-normal "|Hind, Helvatica, Arial, sans-serif")
+        |fullscreen $ quote
+          defstyle fullscreen $ {}
+            "\"$0" $ {} (:position "\"absolute") (:left 0) (:top 0) (:width "\"100%") (:height "\"100%") (:overflow :auto)
+        |global $ quote
+          defstyle global $ {}
+            "\"$0" $ {} (:line-height "\"2") (:font-size "\"14px") (:font-family default-fonts)
+              :color $ hsl 0 0 20
+        |hsl $ quote
+          defn hsl (h s l ? a)
+            if (some? a) (str "\"hsl(" h "\"," s "\"%," l "\"%," a "\")") (str "\"hsl(" h "\"," s "\"%," l "\"%)")
+        |input $ quote
+          defstyle input $ {} ("\"$0" ui/input)
+            "\"$0:focus" $ {}
+              :border $ str "\"1px solid " (hsl 200 50 75)
+              :box-shadow $ str "\"0 0 4px " (hsl 200 70 50 0.2)
+        |link $ quote
+          defstyle link $ {} ("\"$0" ui/link)
+            "\"$0:hover" $ {}
+              :color $ hsl 200 100 56
+            "\"$0:active" $ {}
+              :color $ hsl 200 100 40
+              :transform "\"scale(1.04)"
+        |row $ quote
+          defstyle row $ {} ("\"$0" ui/row)
+        |row-center $ quote
+          defstyle row-center $ {} ("\"$0" ui/row-center)
+        |row-dispersive $ quote
+          defstyle row-dispersive $ {} ("\"$0" ui/row-dispersive)
+        |row-evenly $ quote
+          defstyle row-evenly $ {} ("\"$0" ui/row-evenly)
+        |row-middle $ quote
+          defstyle row-middle $ {} ("\"$0" ui/row-middle)
+        |row-parted $ quote
+          defstyle row-parted $ {} ("\"$0" ui/row-parted)
+        |select $ quote
+          defstyle select $ {} ("\"$0" ui/select)
+            "\"$0:focus" $ {}
+              :border $ str "\"1px solid " (hsl 200 50 75)
+              :box-shadow $ str "\"0 0 4px " (hsl 200 70 50 0.2)
+        |text-label $ quote
+          defstyle text-label $ {} ("\"$0" ui/text-label)
+        |textarea $ quote
+          defstyle textarea $ {} ("\"$0" ui/textarea)
+            "\"$0:focus" $ {}
+              :border $ str "\"1px solid " (hsl 200 50 75)
+              :box-shadow $ str "\"0 0 4px " (hsl 200 70 50 0.2)
+      :ns $ quote
+        ns respo-ui.css $ :require (respo-ui.core :as ui)
+          respo.css :refer $ defstyle
     |respo-ui.lay-out $ {}
       :defs $ {}
         |add-gap $ quote
@@ -885,11 +971,14 @@
         |mount-target $ quote
           def mount-target $ .querySelector js/document |.app
         |reload! $ quote
-          defn reload! () (remove-watch *store :changes) (remove-watch *store :router-changes) (clear-cache!)
-            add-watch *store :changes $ fn (store prev) (render-app! render!)
-            add-watch *store :router-changes $ fn (store prev) (render-router!)
-            render-app! render!
-            println "|Code updated!"
+          defn reload! () $ if (nil? build-errors) 
+            do (remove-watch *store :changes) (remove-watch *store :router-changes) (clear-cache!)
+              add-watch *store :changes $ fn (store prev) (render-app! render!)
+              add-watch *store :router-changes $ fn (store prev) (render-router!)
+              render-app! render!
+              hud! "\"ok~" "\"Ok"
+              println "|Code updated!"
+            hud! "\"error" build-errors
         |render-app! $ quote
           defn render-app! (renderer)
             renderer mount-target (comp-container @*store) dispatch!
@@ -909,12 +998,13 @@
           [] respo.cursor :refer $ [] update-states
           [] respo-ui.comp.container :refer $ [] comp-container
           [] respo-ui.router :as router
-          [] cljs.reader :refer $ [] read-string
           [] respo-ui.schema :as schema
           [] respo-ui.config :as config
           [] respo-router.parser :refer $ [] parse-address
           [] respo-router.core :refer $ [] render-url!
           [] respo-router.listener :refer $ [] listen!
+          "\"./calcit.build-errors" :default build-errors
+          "\"bottom-tip" :default hud!
     |respo-ui.router $ {}
       :defs $ {}
         |dict $ quote
