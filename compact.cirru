@@ -99,10 +99,10 @@
           def style-link $ css "\"color: hsl(240,80%,70%);\ntext-decoration: underline;\ncursor: pointer;\ntransition-duration: 100ms;\nuser-select: none;\n\n&:hover {\ncolor: hsl(240,80%,80%);\n}\n\n&:active {\ntransition-duration: 0ms;\ntransform: scale(1.05);\ncolor: hsl(240,80%,65%);\n}"
       :ns $ quote
         ns respo-ui.comp $ :require
-          [] respo.core :refer $ [] defcomp div list-> input textarea button span select option a <> pre
-          [] respo.comp.space :refer $ [] =<
-          [] respo-ui.core :as ui
-          [] respo.util.format :refer $ [] hsl
+          respo.core :refer $ defcomp div list-> input textarea button span select option a <> pre
+          respo.comp.space :refer $ =<
+          respo-ui.core :as ui
+          respo.util.format :refer $ hsl
           "\"cirru-color" :refer $ generateHtml
           respo.css :refer $ defstyle
           respo-ui.css :as css
@@ -206,11 +206,11 @@
               a $ {} (:href url) (:inner-text title)
       :ns $ quote
         ns respo-ui.comp.components $ :require
-          [] respo.core :refer $ [] defcomp >> div a <> pre code
-          [] respo.comp.space :refer $ [] =<
-          [] respo-ui.comp :refer $ [] comp-tabs comp-placeholder comp-snippet comp-button comp-link
-          [] respo-ui.core :as ui
-          [] respo.util.format :refer $ [] hsl
+          respo.core :refer $ defcomp >> div a <> pre code
+          respo.comp.space :refer $ =<
+          respo-ui.comp :refer $ comp-tabs comp-placeholder comp-snippet comp-button comp-link
+          respo-ui.core :as ui
+          respo.util.format :refer $ hsl
           respo.css :refer $ defstyle
     |respo-ui.comp.container $ {}
       :defs $ {}
@@ -245,17 +245,17 @@
             "\"$0" $ {} (:padding 8)
       :ns $ quote
         ns respo-ui.comp.container $ :require
-          [] respo.util.format :refer $ [] hsl
-          [] respo.core :refer $ [] defcomp >> div span input <>
-          [] respo.comp.space :refer $ [] =<
-          [] respo-ui.core :as ui
-          [] respo-ui.comp.sidebar :refer $ [] comp-sidebar
-          [] respo-ui.comp.home :refer $ [] comp-home
-          [] respo-ui.comp.widgets-page :refer $ [] comp-widgets-page
-          [] respo-ui.comp.layouts-page :refer $ [] comp-layouts-page
-          [] respo-ui.comp.fonts-page :refer $ [] comp-fonts-page
-          [] respo-ui.comp.components :refer $ [] comp-components-page
-          [] respo-ui.comp.lay-out-page :refer $ [] comp-lay-out-page
+          respo.util.format :refer $ hsl
+          respo.core :refer $ defcomp >> div span input <>
+          respo.comp.space :refer $ =<
+          respo-ui.core :as ui
+          respo-ui.comp.sidebar :refer $ comp-sidebar
+          respo-ui.comp.home :refer $ comp-home
+          respo-ui.comp.widgets-page :refer $ comp-widgets-page
+          respo-ui.comp.layouts-page :refer $ comp-layouts-page
+          respo-ui.comp.fonts-page :refer $ comp-fonts-page
+          respo-ui.comp.components :refer $ comp-components-page
+          respo-ui.comp.lay-out-page :refer $ comp-lay-out-page
           respo.css :refer $ defstyle
           respo-ui.css :as css
     |respo-ui.comp.fonts-page $ {}
@@ -298,10 +298,10 @@
           def style-section $ {} (:font-size 24) (:font-family ui/font-fancy) (:line-height |60px)
       :ns $ quote
         ns respo-ui.comp.fonts-page $ :require
-          [] respo.core :refer $ [] defcomp div <>
-          [] respo-ui.core :as ui
-          [] respo.comp.space :refer $ [] =<
-          [] respo-md.comp.md :refer $ [] comp-md-block
+          respo.core :refer $ defcomp div <>
+          respo-ui.core :as ui
+          respo.comp.space :refer $ =<
+          respo-md.comp.md :refer $ comp-md-block
           respo.css :refer $ defstyle
     |respo-ui.comp.home $ {}
       :defs $ {}
@@ -319,9 +319,9 @@
             :font-weight 100
       :ns $ quote
         ns respo-ui.comp.home $ :require
-          [] respo.core :refer $ [] defcomp div a img <>
-          [] respo.comp.space :refer $ [] =<
-          [] respo.util.format :refer $ [] hsl
+          respo.core :refer $ defcomp div a img <>
+          respo.comp.space :refer $ =<
+          respo.util.format :refer $ hsl
           respo-md.comp.md :refer $ comp-md-block
     |respo-ui.comp.lay-out-page $ {}
       :defs $ {}
@@ -403,11 +403,11 @@
             :display :inline-block
       :ns $ quote
         ns respo-ui.comp.lay-out-page $ :require
-          [] respo.core :refer $ [] defcomp div <>
-          [] respo-ui.core :as ui
-          [] respo.util.format :refer $ [] hsl
-          [] respo.comp.space :refer $ [] =<
-          [] respo-ui.lay-out :refer $ [] lay-out
+          respo.core :refer $ defcomp div <>
+          respo-ui.core :as ui
+          respo.util.format :refer $ hsl
+          respo.comp.space :refer $ =<
+          respo-ui.lay-out :refer $ lay-out
     |respo-ui.comp.layouts-page $ {}
       :defs $ {}
         |comp-layouts-page $ quote
@@ -463,11 +463,11 @@
                   <> |C
       :ns $ quote
         ns respo-ui.comp.layouts-page $ :require
-          [] respo.core :refer $ [] defcomp div a <>
-          [] respo.comp.space :refer $ [] =<
-          [] respo-ui.core :as ui
-          [] respo.util.format :refer $ [] hsl
-          [] respo-md.comp.md :refer $ [] comp-md-block
+          respo.core :refer $ defcomp div a <>
+          respo.comp.space :refer $ =<
+          respo-ui.core :as ui
+          respo.util.format :refer $ hsl
+          respo-md.comp.md :refer $ comp-md-block
           respo.css :refer $ defstyle
           respo-ui.css :as css
     |respo-ui.comp.sidebar $ {}
@@ -509,10 +509,10 @@
           def style-logo $ {} (:background-image "|url(http://cdn.tiye.me/logo/respo.png)") (:width 80) (:height 80) (:background-size :cover) (:display :inline-block) (:vertical-align :text-bottom)
       :ns $ quote
         ns respo-ui.comp.sidebar $ :require
-          [] respo.core :refer $ [] defcomp div <>
-          [] respo-ui.core :as ui
-          [] respo.util.format :refer $ [] hsl
-          [] respo.comp.space :refer $ [] =<
+          respo.core :refer $ defcomp div <>
+          respo-ui.core :as ui
+          respo.util.format :refer $ hsl
+          respo.comp.space :refer $ =<
           respo.css :refer $ defstyle
     |respo-ui.comp.widgets-page $ {}
       :defs $ {}
@@ -570,19 +570,13 @@
                     <> |Add
       :ns $ quote
         ns respo-ui.comp.widgets-page $ :require
-          [] respo.core :refer $ [] defcomp div input textarea button span select option a <>
-          [] respo.comp.space :refer $ [] =<
-          [] respo-ui.core :as ui
-          [] respo-ui.css :as css
-          [] respo.util.format :refer $ [] hsl
+          respo.core :refer $ defcomp div input textarea button span select option a <>
+          respo.comp.space :refer $ =<
+          respo-ui.core :as ui
+          respo-ui.css :as css
+          respo.util.format :refer $ hsl
     |respo-ui.config $ {}
       :defs $ {}
-        |cdn? $ quote
-          def cdn? $ cond
-              exists? js/window
-              , false
-            (exists? js/process) (= "\"true" js/process.env.cdn)
-            :else false
         |dev? $ quote
           def dev? $ let
               debug? $ do "\"TODO" false
@@ -592,7 +586,7 @@
               (exists? js/process) (not= "\"true" js/process.env.release)
               :else true
         |site $ quote
-          def site $ {} (:dev-ui "\"http://localhost:8100/main-fonts.css") (:release-ui "\"http://cdn.tiye.me/favored-fonts/main-fonts.css") (:cdn-url "\"http://cdn.tiye.me/respo-ui/") (:title "\"Respo UI") (:icon "\"http://cdn.tiye.me/logo/respo.png") (:storage-key "\"respo-ui")
+          def site $ {} (:title "\"Respo UI") (:icon "\"http://cdn.tiye.me/logo/respo.png") (:storage-key "\"respo-ui")
       :ns $ quote (ns respo-ui.config)
     |respo-ui.core $ {}
       :defs $ {}
@@ -939,11 +933,11 @@
             :border $ str "\"1px solid " (hsl 0 0 94)
       :ns $ quote
         ns respo-ui.lay-out $ :require
-          [] respo.core :refer $ [] <> list-> div
-          [] respo.comp.space :refer $ [] =<
-          [] respo.util.format :refer $ [] hsl
-          [] respo-ui.core :as ui
-          [] lilac.core :refer $ [] dev-check number+ record+ string+ keyword+ or+ list+ any+ dict+ enum+ tuple+ is+ optional+
+          respo.core :refer $ <> list-> div
+          respo.comp.space :refer $ =<
+          respo.util.format :refer $ hsl
+          respo-ui.core :as ui
+          lilac.core :refer $ dev-check number+ record+ string+ keyword+ or+ list+ any+ dict+ enum+ tuple+ is+ optional+
     |respo-ui.main $ {}
       :defs $ {}
         |*store $ quote
@@ -961,7 +955,6 @@
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
-            if ssr? $ render-app! realize-ssr!
             render-app! render!
             add-watch *store :changes $ fn (store prev) (render-app! render!)
             render-router!
@@ -969,7 +962,7 @@
             add-watch *store :router-changes $ fn (store prev) (render-router!)
             println "|App started!"
         |mount-target $ quote
-          def mount-target $ .querySelector js/document |.app
+          def mount-target $ js/document.querySelector |.app
         |reload! $ quote
           defn reload! () $ if (nil? build-errors) 
             do (remove-watch *store :changes) (remove-watch *store :router-changes) (clear-cache!)
@@ -984,8 +977,6 @@
             renderer mount-target (comp-container @*store) dispatch!
         |render-router! $ quote
           defn render-router! () $ render-url! (:router @*store) router/dict router/mode
-        |ssr? $ quote
-          def ssr? $ some? (.querySelector js/document |meta.respo-ssr)
         |updater $ quote
           defn updater (store op op-data)
             case-default op
@@ -994,15 +985,15 @@
               :router/nav $ assoc store :router (parse-address op-data router/dict)
       :ns $ quote
         ns respo-ui.main $ :require
-          [] respo.core :refer $ [] render! clear-cache! realize-ssr!
-          [] respo.cursor :refer $ [] update-states
-          [] respo-ui.comp.container :refer $ [] comp-container
-          [] respo-ui.router :as router
-          [] respo-ui.schema :as schema
-          [] respo-ui.config :as config
-          [] respo-router.parser :refer $ [] parse-address
-          [] respo-router.core :refer $ [] render-url!
-          [] respo-router.listener :refer $ [] listen!
+          respo.core :refer $ render! clear-cache!
+          respo.cursor :refer $ update-states
+          respo-ui.comp.container :refer $ comp-container
+          respo-ui.router :as router
+          respo-ui.schema :as schema
+          respo-ui.config :as config
+          respo-router.parser :refer $ parse-address
+          respo-router.core :refer $ render-url!
+          respo-router.listener :refer $ listen!
           "\"./calcit.build-errors" :default build-errors
           "\"bottom-tip" :default hud!
     |respo-ui.router $ {}
