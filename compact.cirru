@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.6)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.7)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -266,39 +266,41 @@
               {} $ :style style-section
               <> "|Normal fonts"
             comp-md-block "|which can be used with `ui/font-normal`. It's Hind fonts." $ {}
-            render-font-demo ui/font-normal 300
-            render-font-demo ui/font-normal 400
-            render-font-demo ui/font-normal 500
+            render-font-demo css/font-normal ui/font-normal 300
+            render-font-demo css/font-normal ui/font-normal 400
+            render-font-demo css/font-normal ui/font-normal 500
             =< nil 32
             div
               {} $ :style style-section
               <> "|Fancy fonts"
             comp-md-block "|which can be used with `ui/font-fancy`. Josefin Sans is used here." $ {}
-            render-font-demo ui/font-fancy 100
-            render-font-demo ui/font-fancy 300
-            render-font-demo ui/font-fancy 400
+            render-font-demo css/font-fancy ui/font-fancy 100
+            render-font-demo css/font-fancy ui/font-fancy 300
+            render-font-demo css/font-fancy ui/font-fancy 400
             =< nil 32
             div
               {} $ :style style-section
               <> "|Code fonts"
             comp-md-block "|which can be used with `ui/font-code`." $ {}
-            render-font-demo ui/font-code 100
-            render-font-demo ui/font-code 300
-            render-font-demo ui/font-code 400
+            render-font-demo css/font-code ui/font-code 100
+            render-font-demo css/font-code ui/font-code 300
+            render-font-demo css/font-code ui/font-code 400
         |css-demo $ quote
           defstyle css-demo $ {}
             "\"$0" $ {} (:font-size 16) (:font-weight |bold) (:line-height |32px)
         |render-font-demo $ quote
-          defn render-font-demo (family weight)
+          defn render-font-demo (css-family family weight)
             div
-              {} (:class-name css-demo)
-                :style $ {} (:font-family family) (:font-weight weight)
+              {}
+                :class-name $ str-spaced css-family css-demo
+                :style $ {} (:font-weight weight)
               <> $ str "|This is a demo of the font, guess what you like: " family "| " weight
         |style-section $ quote
           def style-section $ {} (:font-size 24) (:font-family ui/font-fancy) (:line-height |60px)
       :ns $ quote
         ns respo-ui.comp.fonts-page $ :require
           respo.core :refer $ defcomp div <>
+          respo-ui.css :as css
           respo-ui.core :as ui
           respo.comp.space :refer $ =<
           respo-md.comp.md :refer $ comp-md-block
@@ -698,21 +700,26 @@
           defstyle column-evenly $ {} ("\"$0" ui/column-evenly)
         |column-parted $ quote
           defstyle column-parted $ {} ("\"$0" ui/column-parted)
-        |default-fonts $ quote (def default-fonts "|Hind,Verdana,'Hiragino Sans GB','WenQuanYi Micro Hei','Microsoft Yahei',sans-serif")
         |expand $ quote
           defstyle expand $ {} ("\"$0" ui/expand)
         |flex $ quote
           defstyle flex $ {}
             "\"$0" $ {} (:flex 1)
-        |font-code $ quote (def font-code "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace")
-        |font-fancy $ quote (def font-fancy "|Josefin Sans, Helvetica neue, Arial, sans-serif")
-        |font-normal $ quote (def font-normal "|Hind, Helvatica, Arial, sans-serif")
+        |font-code $ quote
+          defstyle font-code $ {}
+            "\"$0" $ {} (:font-family "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace")
+        |font-fancy $ quote
+          defstyle font-fancy $ {}
+            "\"$0" $ {} (:font-family "|Josefin Sans, Helvetica neue, Arial, sans-serif")
+        |font-normal $ quote
+          defstyle font-normal $ {}
+            "\"$0" $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
         |fullscreen $ quote
           defstyle fullscreen $ {}
             "\"$0" $ {} (:position "\"absolute") (:left 0) (:top 0) (:width "\"100%") (:height "\"100%") (:overflow :auto)
         |global $ quote
           defstyle global $ {}
-            "\"$0" $ {} (:line-height "\"2") (:font-size "\"14px") (:font-family default-fonts)
+            "\"$0" $ {} (:line-height "\"2") (:font-size "\"14px") (:font-family ui/default-fonts)
               :color $ hsl 0 0 20
         |hsl $ quote
           defn hsl (h s l ? a)
