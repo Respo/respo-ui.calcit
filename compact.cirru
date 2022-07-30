@@ -6,24 +6,6 @@
   :files $ {}
     |respo-ui.comp $ {}
       :defs $ {}
-        |comp-button $ quote
-          defcomp comp-button (props)
-            div $ {}
-              :class-name $ cx style-button
-                if (:disabled? props) style-button-disabled $ case-default style-button-normal nil (:type props) (:main style-button-main) (:cancel style-button-cancel)
-                :class-name props
-              :style $ :style props
-              :on-click $ if (:disabled? props) nil (:on-click props)
-              :disabled $ :disabled? props
-              :inner-text $ or (:text props) "\"BUTTON"
-        |comp-link $ quote
-          defcomp comp-link (props)
-            a $ {}
-              :href $ :href props
-              :on-click $ :on-click props
-              :class-name $ cx style-link (:class-name props)
-              :style $ :style props
-              :inner-text $ or (:text props) "\"LINK"
         |comp-placeholder $ quote
           defcomp comp-placeholder (text)
             div
@@ -115,35 +97,9 @@
               div
                 {} $ :style
                   {} $ :padding-bottom "\"50vh"
-                div ({}) (<> "|There are also components follow the guidelines of Respo UI:") (render-entry "\"https://github.com/Respo/alerts" "\"alerts") (render-entry "\"https://github.com/Respo/respo-feather" "\"respo-feather") (render-entry |https://github.com/Respo/respo-message "\"respo-message") (render-entry |https://github.com/Respo/respo-markdown "\"respo-markdown") (render-entry |https://github.com/Respo/notifier "\"notifier")
-                =< nil 32
-                div ({}) (<> "|Built-in Components") (=< 8 nil)
-                  a $ {} (:href |https://github.com/Respo/respo-ui/blob/master/src/respo_ui/comp/components.cljs) (:target |_blank) (:inner-text |Source)
+                div ({}) (<> "|There are also components follow the guidelines of Respo UI:") (render-entry "\"https://github.com/Respo/alerts.calcit" "\"alerts") (render-entry "\"https://github.com/Respo/respo-feather.calcit" "\"respo-feather") (render-entry |https://github.com/Respo/respo-message.calcit "\"respo-message") (render-entry |https://github.com/Respo/respo-markdown.calcit "\"respo-markdown") (render-entry |https://github.com/Respo/notifier.calcit "\"notifier")
                 comp-demo-placeholder
                 comp-demo-tabs $ >> states :tabs
-                comp-demo-buttons
-                comp-demo-links
-        |comp-demo-buttons $ quote
-          defcomp comp-demo-buttons () $ div ({})
-            div
-              {} $ :class-name css-title
-              <> "\"Buttons demo"
-            div ({})
-              comp-button $ {} (:text "\"Normal button")
-              comp-button $ {} (:type :main) (:text "\"Main button")
-                :on-click $ fn (e d!) (js/alert "\"Click on main button")
-              comp-button $ {} (:type :cancel) (:text "\"Cancel button")
-              comp-button $ {} (:disabled? true) (:text "\"Button disabled")
-            =< nil 8
-            comp-snippet "\"respo-ui.comp/comp-button\n\ncomp-button $ &{} :type :normal\ncomp-button $ &{} :type :main\ncomp-button $ &{} :type :cancel\ncomp-button $ &{} :disabled? true\n\n" $ {}
-        |comp-demo-links $ quote
-          defcomp comp-demo-links () $ div ({})
-            div
-              {} $ :class-name css-title
-              <> "\"Links demo"
-            comp-link $ {} (:text "\"a link")
-              :on-click $ fn (e d!) (println "\"clicked")
-            comp-snippet "\"respo-ui.comp/comp-link\n\ncomp-link $ &{} :text \"|demo\"\n" $ {}
         |comp-demo-placeholder $ quote
           defcomp comp-demo-placeholder () $ div ({})
             div
