@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.7)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.8)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -485,21 +485,24 @@
                 div ({}) (<> "|Some text as description" ui/text-label) (=< nil 16)
                   a $ {} (:class-name css/link) (:inner-text |link)
                 =< nil 16
-                div ({})
+                div
+                  {} $ :style
+                    merge ui/row $ {} (:gap 16)
                   button
-                    {} (:class-name css/button)
-                      :style $ {}
-                        :border-color $ hsl 220 100 76
-                        :color $ hsl 220 100 76
+                    {} $ :class-name css/button-primary
                     <> |Yes
-                  =< 16 nil
+                  button
+                    {} $ :class-name css/button
+                    <> |Yes
                   button
                     {} (:class-name css/button)
                       :style $ {}
                         :border-color $ hsl 6 100 60
                         :color $ hsl 6 100 60
                     <> |Yes
-                  =< 16 nil
+                  button
+                    {} $ :class-name css/button-danger
+                    <> |Yes
                 =< nil 16
                 div ({})
                   input $ {} (:placeholder "|Some short text") (:value state) (:class-name css/input)
@@ -550,8 +553,8 @@
       :defs $ {}
         |button $ quote
           def button $ {} (:min-width |80px) (:line-height |24px) (:border-radius "\"4px") (:font-size 14) (:text-align |center)
-            :border $ str "\"1px solid " (hsl 200 100 76)
-            :color $ hsl 200 100 76
+            :border $ str "\"1px solid " (hsl 220 100 76)
+            :color $ hsl 220 100 76
             :cursor |pointer
             :display |inline-block
             :padding "|0 8px"
@@ -559,6 +562,17 @@
             :vertical-align :top
             :background-color :white
             :user-select :none
+            :transition-duration "\"300ms"
+        |button-danger $ quote
+          def button-danger $ merge button
+            {} (:color :white)
+              :background-color $ hsl 6 100 60
+              :border-color $ hsl 6 100 60
+        |button-primary $ quote
+          def button-primary $ merge button
+            {} (:color :white)
+              :background-color $ hsl 220 80 60
+              :border-color $ hsl 220 80 60
         |card $ quote
           def card $ {} (:padding |16px)
         |center $ quote
@@ -642,7 +656,23 @@
           defstyle button $ {} ("\"$0" ui/button)
             "\"$0:hover" $ {}
               :background-color $ hsl 0 0 98
-            "\"$0:active" $ {} (:transform "\"scale(1.04)") (:transition-duration "\"0ms")
+            "\"$0:active" $ {} (:transform "\"scale(1.02)") (:transition-duration "\"0ms")
+        |button-danger $ quote
+          defstyle button-danger $ {} ("\"$0" ui/button-danger)
+            "\"$0:hover" $ {}
+              :background-color $ hsl 6 100 64
+              :border-color $ hsl 6 100 64
+            "\"$0:active" $ {} (:transform "\"scale(1.02)") (:transition-duration "\"0ms")
+              :background-color $ hsl 6 100 68
+              :border-color $ hsl 6 100 68
+        |button-primary $ quote
+          defstyle button-primary $ {} ("\"$0" ui/button-primary)
+            "\"$0:hover" $ {}
+              :background-color $ hsl 220 80 64
+              :border-color $ hsl 220 80 64
+            "\"$0:active" $ {} (:transform "\"scale(1.02)") (:transition-duration "\"0ms")
+              :background-color $ hsl 220 80 68
+              :border-color $ hsl 220 80 68
         |card $ quote
           defstyle card $ {}
             "\"$0" $ {} (:padding |16px)
