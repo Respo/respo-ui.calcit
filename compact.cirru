@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.8)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.9)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -13,29 +13,38 @@
                 item-width $ either (&map:get options :item-width) 160
                 item-height $ &map:get options :item-height
                 title $ &map:get options :title
-              list->
-                {}
-                  :class-name $ &map:get options :class-name
-                  :style $ merge
-                    {} (:display :grid)
-                      :grid-template-columns $ str "\"repeat(auto-fill, minmax(" item-width "\"px,1fr))"
-                    &map:get options :style
-                -> items $ map-indexed
-                  fn (idx item)
-                    [] idx $ div
-                      {} $ :style
-                        {} (:min-height 72)
-                          :grid-column $ let
-                              sp $ &map:get (w-js-log item) :span
-                            if (some? sp) (str-spaced "\"span" sp) "\""
-                      div
-                        {} $ :style
-                          {} (:font-weight 300) (:font-family ui/font-fancy) (:font-size 15) (:line-height "\"14px")
-                            :color $ hsl 0 0 60
-                        <> $ &map:get item :label
-                      div
-                        {} $ :style ({})
-                        <> $ &map:get item :value
+                ret $ list->
+                  {}
+                    :class-name $ &map:get options :class-name
+                    :style $ merge
+                      {} (:display :grid)
+                        :grid-template-columns $ str "\"repeat(auto-fit, minmax(" item-width "\"px,1fr))"
+                        :gap 8
+                      &map:get options :style
+                  -> items $ map-indexed
+                    fn (idx item)
+                      [] idx $ div
+                        {}
+                          :style $ {}
+                            :grid-column $ let
+                                sp $ &map:get (w-js-log item) :span
+                              if (some? sp) (str-spaced "\"span" sp) "\""
+                          :class-name $ str-spaced style-item (&map:get options :css-item)
+                        div
+                          {} $ :class-name
+                            str-spaced css-item-label $ &map:get options :css-label
+                          <> $ &map:get item :label
+                        div
+                          {} $ :class-name (&map:get options :css-value)
+                          <> $ &map:get item :value
+              if (some? title)
+                div ({})
+                  div
+                    {} $ :class-name
+                      str-spaced style-attributes-title $ &map:get options :css-title
+                    <> title
+                  , ret
+                , ret
         |comp-placeholder $ quote
           defcomp comp-placeholder (text)
             div
@@ -71,6 +80,10 @@
                               :selected-tab-style options
                         :on-click $ fn (e d!) (on-route info d!)
                       <> $ :title info
+        |css-item-label $ quote
+          defstyle css-item-label $ {}
+            "\"$0" $ {} (:font-weight 300) (:font-family ui/font-fancy) (:font-size 15) (:line-height "\"14px")
+              :color $ hsl 0 0 60
         |css-placeholder $ quote
           defstyle css-placeholder $ {}
             "\"$0" $ merge ui/center
@@ -93,6 +106,19 @@
               :border-radius "\"2px"
             "\"$0:hover" $ {}
               :background-color $ hsl 0 0 98
+        |style-attributes-title $ quote
+          defstyle style-attributes-title $ {}
+            "\"$0" $ {} (:font-size 18) (:margin-bottom 6)
+        |style-item $ quote
+          defstyle style-item $ {}
+            "\"$0" $ {} (:min-height 72)
+              :background-color $ hsl 0 0 99
+              :padding "\"8px"
+              :transition-duration "\"240ms"
+              :border-radius "\"4px"
+            "\"$0:hover" $ {}
+              :background-color $ hsl 0 0 100
+              :box-shadow $ str "\"0 0 4px 1px " (hsl 0 0 0 0.08)
       :ns $ quote
         ns respo-ui.comp $ :require
           respo.core :refer $ defcomp div list-> input textarea button span select option a <> pre
@@ -116,16 +142,18 @@
                 comp-demo-tabs $ >> states :tabs
                 comp-demo-attributes
         |comp-demo-attributes $ quote
-          defcomp comp-demo-attributes () $ div ({})
+          defcomp comp-demo-attributes () $ div
+            {} $ :class-name css/column
             div $ {}
             =< nil 40
-            comp-attributes $ {}
+            comp-attributes $ {} (:title "\"Attributes DEMO")
               :items $ []
                 {} (:label "\"DEMO") (:value "\"content")
                 {} (:label "\"DEMO 2") (:value "\"content 2")
                 {} (:label "\"DEMO 2") (:value "\"content 2") (:span 2)
                 {} (:label "\"DEMO 2") (:value "\"content 2")
                 {} (:label "\"DEMO 2") (:value "\"content 2")
+            =< nil 8
             comp-snippet "\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {}\n  :items $ []\n    {} (:label \"\\\"DEMO\")\n      :value \"\\\"content\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n      :span 2\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n\n" $ {}
         |comp-demo-placeholder $ quote
           defcomp comp-demo-placeholder () $ div ({})
@@ -193,6 +221,7 @@
           respo.comp.space :refer $ =<
           respo-ui.comp :refer $ comp-tabs comp-placeholder comp-snippet comp-button comp-link comp-attributes
           respo-ui.core :as ui
+          respo-ui.css :as css
           respo.util.format :refer $ hsl
           respo.css :refer $ defstyle
     |respo-ui.comp.container $ {}
