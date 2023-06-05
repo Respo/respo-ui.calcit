@@ -909,7 +909,7 @@
             tuple+ $ [] (number+) (number+)
         |lilac-style $ quote
           def lilac-style $ optional+
-            dict+ (keyword+) (any+)
+            dict+ (tag+) (any+)
         |render-fill-item $ quote
           defn render-fill-item (rule child-map options) (dev-check rule lilac-item-rule)
             let
@@ -980,7 +980,7 @@
           respo.comp.space :refer $ =<
           respo.util.format :refer $ hsl
           respo-ui.core :as ui
-          lilac.core :refer $ dev-check number+ record+ string+ keyword+ or+ list+ any+ dict+ enum+ tuple+ is+ optional+
+          lilac.core :refer $ dev-check number+ record+ string+ tag+ or+ list+ any+ dict+ enum+ tuple+ is+ optional+
     |respo-ui.main $ {}
       :defs $ {}
         |*store $ quote
