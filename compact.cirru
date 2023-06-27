@@ -27,7 +27,7 @@
                         {}
                           :style $ {}
                             :grid-column $ let
-                                sp $ &map:get (w-js-log item) :span
+                                sp $ &map:get item :span
                               if (some? sp) (str-spaced "\"span" sp) "\""
                           :class-name $ str-spaced style-item (&map:get options :css-item)
                         div
@@ -861,13 +861,13 @@
               :gap lilac-gap
               :items $ list+
                 or+ $ []
-                  list+ $ {}
+                  record+ $ {}
                     :type $ is+ :item
                     :style lilac-style
                     :fill $ any+
-                  list+ $ {}
+                  record+ $ {}
                     :type $ is+ :flex
-                {} $ :allow-seq? true
+                {}
             {} $ :check-keys? true
         |lilac-gap $ quote
           def lilac-gap $ optional+
@@ -992,9 +992,11 @@
                   , router/dict
                 , nil
         |dispatch! $ quote
-          defn dispatch! (op op-data)
+          defn dispatch! (op ? op-data)
             when config/dev? $ println "\"Dispatch:" op
-            reset! *store $ updater @*store op op-data
+            if (list? op)
+              recur $ :: :states op op-data
+              reset! *store $ updater @*store op
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
@@ -1022,11 +1024,13 @@
         |render-router! $ quote
           defn render-router! () $ render-url! (:router @*store) router/dict router/mode
         |updater $ quote
-          defn updater (store op op-data)
-            case-default op
-              do (println "\"Unknown op:" op) store
-              :states $ update-states store op-data
-              :router/nav $ assoc store :router (parse-address op-data router/dict)
+          defn updater (store op)
+            tag-match op
+                :states cursor s
+                update-states store cursor s
+              (:router/nav t)
+                assoc store :router $ parse-address t router/dict
+              _ $ do (println "\"Unknown op:" op) store
       :ns $ quote
         ns respo-ui.main $ :require
           respo.core :refer $ render! clear-cache!
