@@ -232,26 +232,28 @@
                 router $ either
                   first $ :path
                     either (:router store) ({})
-                  {}
+                  :: :route |home nil
                 states $ :states store
               div
                 {}
                   :class-name $ str-spaced css/global css/fullscreen css/row
                   :style $ {} (:padding-top 16)
-                comp-sidebar $ or (:name router) |index.html
+                comp-sidebar $ or (nth router 1) |index.html
                 div
                   {} $ :class-name (str-spaced css/expand css-content)
-                  case-default (:name router)
-                    <> $ pr-str router
-                    nil $ comp-home
-                    |home $ comp-home
-                    |index.html $ comp-home
-                    |dev.html $ comp-home
-                    |widgets.html $ comp-widgets-page (>> states :widgets)
-                    |layouts.html $ comp-layouts-page
-                    |lay-out.html $ comp-lay-out-page
-                    |fonts.html $ comp-fonts-page
-                    |components.html $ comp-components-page (>> states :components)
+                  tag-match router
+                      :route page options
+                      case-default page (comp-home)
+                        |home $ comp-home
+                        |index.html $ comp-home
+                        |dev.html $ comp-home
+                        |widgets.html $ comp-widgets-page (>> states :widgets)
+                        |layouts.html $ comp-layouts-page
+                        |lay-out.html $ comp-lay-out-page
+                        |fonts.html $ comp-fonts-page
+                        |components.html $ comp-components-page (>> states :components)
+                    (:404 pp)
+                      <> $ pr-str router
         |css-content $ quote
           defstyle css-content $ {}
             "\"$0" $ {} (:padding 8)
@@ -992,11 +994,9 @@
                   , router/dict
                 , nil
         |dispatch! $ quote
-          defn dispatch! (op ? op-data)
+          defn dispatch! (op)
             when config/dev? $ println "\"Dispatch:" op
-            if (list? op)
-              recur $ :: :states op op-data
-              reset! *store $ updater @*store op
+            reset! *store $ updater @*store op
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
