@@ -232,28 +232,29 @@
                 router $ either
                   first $ :path
                     either (:router store) ({})
-                  :: :route |home nil
+                  :: :index
                 states $ :states store
               div
                 {}
                   :class-name $ str-spaced css/global css/fullscreen css/row
                   :style $ {} (:padding-top 16)
-                comp-sidebar $ or (nth router 1) |index.html
+                comp-sidebar $ or (nth router 0) |index.html
                 div
                   {} $ :class-name (str-spaced css/expand css-content)
                   tag-match router
-                      :route page options
-                      case-default page (comp-home)
-                        |home $ comp-home
-                        |index.html $ comp-home
-                        |dev.html $ comp-home
-                        |widgets.html $ comp-widgets-page (>> states :widgets)
-                        |layouts.html $ comp-layouts-page
-                        |lay-out.html $ comp-lay-out-page
-                        |fonts.html $ comp-fonts-page
-                        |components.html $ comp-components-page (>> states :components)
+                      :index
+                      comp-home
+                    (:index) (comp-home)
+                    (:widgets)
+                      comp-widgets-page $ >> states :widgets
+                    (:layouts) (comp-layouts-page)
+                    (:lay-out) (comp-lay-out-page)
+                    (:fonts) (comp-fonts-page)
+                    (:components)
+                      comp-components-page $ >> states :components
                     (:404 pp)
                       <> $ pr-str router
+                    _ $ do (eprintln "\"unknown router" router) (comp-home)
         |css-content $ quote
           defstyle css-content $ {}
             "\"$0" $ {} (:padding 8)
@@ -498,12 +499,12 @@
                   {} $ :text-align :right
                 div $ {} (:style style-logo)
               =< nil 16
-              render-entry |index.html "|Respo UI" router-name
-              render-entry |layouts.html |Layouts router-name
-              render-entry |lay-out.html "|Lay Out" router-name
-              render-entry |widgets.html |Widgets router-name
-              render-entry |fonts.html |Fonts router-name
-              render-entry |components.html |Components router-name
+              render-entry |index.html "|Respo UI" $ = :index router-name
+              render-entry |layouts.html |Layouts $ = :layouts router-name
+              render-entry |lay-out.html "|Lay Out" $ = :lay-out router-name
+              render-entry |widgets.html |Widgets $ = :widgets router-name
+              render-entry |fonts.html |Fonts $ = :fonts router-name
+              render-entry |components.html |Components $ = :components router-name
         |css-sidebar-entry $ quote
           defstyle css-sidebar-entry $ {}
             "\"$0" $ {} (:line-height |40px) (:font-size 20) (:cursor |pointer) (:font-weight "\"lighter") (:font-family ui/font-fancy) (:text-align :right) (:padding "|0 16px")
@@ -514,10 +515,10 @@
           defn on-route (path-name)
             fn (e dispatch!) (dispatch! :router/nav path-name)
         |render-entry $ quote
-          defn render-entry (path title router-name)
+          defn render-entry (path title selected?)
             div
               {} (:class-name css-sidebar-entry)
-                :style $ if (= path router-name)
+                :style $ if selected?
                   {} $ :background-color (hsl 0 0 50 0.1)
                 :on-click $ on-route path
               <> title
@@ -988,19 +989,17 @@
         |*store $ quote
           defatom *store $ merge schema/store
             {} $ :router
-              do
-                ; parse-address
-                  str (.-pathname js/location) (.-search js/location)
-                  , router/dict
-                , nil
+              w-log $ parse-address
+                str (.-pathname js/location) (.-search js/location)
+                , router/dict
         |dispatch! $ quote
           defn dispatch! (op)
             when config/dev? $ println "\"Dispatch:" op
             reset! *store $ updater @*store op
         |main! $ quote
           defn main! ()
-            println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
             if config/dev? $ load-console-formatter!
+            println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
             render-app! render!
             add-watch *store :changes $ fn (store prev) (render-app! render!)
             render-router!
@@ -1030,7 +1029,8 @@
                 update-states store cursor s
               (:router/nav t)
                 assoc store :router $ parse-address t router/dict
-              _ $ do (println "\"Unknown op:" op) store
+              (:router/route r) (assoc store :router r)
+              _ $ do (eprintln "\"Unknown op:" op) store
       :ns $ quote
         ns respo-ui.main $ :require
           respo.core :refer $ render! clear-cache!
@@ -1047,14 +1047,14 @@
     |respo-ui.router $ {}
       :defs $ {}
         |dict $ quote
-          def dict $ {}
-            |index.html $ []
-            |dev.html $ []
-            |fonts.html $ []
-            |widgets.html $ []
-            |layouts.html $ []
-            |lay-out.html $ []
-            |components.html $ []
+          def dict $ []
+            :: :index $ [] |index.html
+            :: :dev $ [] |dev.html
+            :: :fonts $ [] |fonts.html
+            :: :widgeta $ [] |widgets.html
+            :: :layouts $ [] |layouts.html
+            :: :lay-out $ [] |lay-out.html
+            :: :components $ [] |components.html
         |mode $ quote (def mode :hash)
       :ns $ quote (ns respo-ui.router)
     |respo-ui.schema $ {}
