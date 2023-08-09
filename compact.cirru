@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.9)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.4.10)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -289,9 +289,9 @@
               {} $ :style style-section
               <> "|Fancy fonts"
             comp-md-block "|which can be used with `ui/font-fancy`. Josefin Sans is used here." $ {}
-            render-font-demo css/font-fancy ui/font-fancy 100
-            render-font-demo css/font-fancy ui/font-fancy 300
-            render-font-demo css/font-fancy ui/font-fancy 400
+            render-font-demo css/font-fancy! ui/font-fancy 100
+            render-font-demo css/font-fancy! ui/font-fancy 300
+            render-font-demo css/font-fancy! ui/font-fancy 400
             =< nil 32
             div
               {} $ :style style-section
@@ -747,12 +747,21 @@
         |font-code $ quote
           defstyle font-code $ {}
             "\"$0" $ {} (:font-family "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace")
+        |font-code! $ quote
+          defstyle font-code! $ {}
+            "\"$0" $ {} (:font-family "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace !important")
         |font-fancy $ quote
           defstyle font-fancy $ {}
             "\"$0" $ {} (:font-family "|Josefin Sans, Helvetica neue, Arial, sans-serif")
+        |font-fancy! $ quote
+          defstyle font-fancy! $ {}
+            "\"&" $ {} (:font-family "|Josefin Sans, Helvetica neue, Arial, sans-serif !important")
         |font-normal $ quote
           defstyle font-normal $ {}
-            "\"$0" $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
+            "\"&" $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
+        |font-normal! $ quote
+          defstyle font-normal! $ {}
+            "\"&" $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
         |fullscreen $ quote
           defstyle fullscreen $ {}
             "\"$0" $ {} (:position "\"absolute") (:left 0) (:top 0) (:width "\"100%") (:height "\"100%") (:overflow :auto)
@@ -1051,7 +1060,7 @@
             :: :index $ [] |index.html
             :: :dev $ [] |dev.html
             :: :fonts $ [] |fonts.html
-            :: :widgeta $ [] |widgets.html
+            :: :widgets $ [] |widgets.html
             :: :layouts $ [] |layouts.html
             :: :lay-out $ [] |lay-out.html
             :: :components $ [] |components.html
