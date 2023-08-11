@@ -3,6 +3,6 @@
   :dependencies $ {}
     |calcit-lang/lilac |main
     |calcit-lang/memof |main
-    |Respo/respo.calcit |main
-    |Respo/respo-router.calcit |0.7.0
+    |Respo/respo.calcit |0.15.1
+    |Respo/respo-router.calcit |main
     |Respo/respo-markdown.calcit |main
