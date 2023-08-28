@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.0-a2)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.0-a3)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -272,7 +272,7 @@
                       (:components)
                         comp-components-page $ >> states :components
                       (:404 pp)
-                        <> $ pr-str router
+                        <> $ to-lispy-string router
                       _ $ do (eprintln "\"unknown router" router) (comp-home)
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
@@ -972,7 +972,7 @@
                   options $ either (first args) ({})
                 case-default (:type rule)
                   <>
-                    str "\"Unknown rule: " $ pr-str rule
+                    str "\"Unknown rule: " $ to-lispy-string rule
                     , style-todo
                   :flex $ render-layout-flex rule child-map options
                   :list $ render-layout-list rule child-map options
@@ -1052,7 +1052,7 @@
                 cond
                     nil? item
                     <>
-                      str "\"nothing to fill: " $ pr-str rule
+                      str "\"nothing to fill: " $ to-lispy-string rule
                       , style-todo
                   (fn? item)
                     item (merge ui/flex) options
@@ -1063,7 +1063,7 @@
                       merge ui/flex $ :style item
                       , options
                   :else $ <>
-                    str "\"Unknown case: " $ pr-str item
+                    str "\"Unknown case: " $ to-lispy-string item
                     , style-todo
         |render-layout-flex $ %{} :CodeEntry (:doc |)
           :code $ quote

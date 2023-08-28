@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.0-a2)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.0-a3)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -1730,7 +1730,7 @@
                                       |T $ %{} :Leaf (:at 1690724698069) (:by |bjmr3HZle) (:text |<>)
                                       |b $ %{} :Expr (:at 1690724698069) (:by |bjmr3HZle)
                                         :data $ {}
-                                          |T $ %{} :Leaf (:at 1690724698069) (:by |bjmr3HZle) (:text |pr-str)
+                                          |T $ %{} :Leaf (:at 1693243483154) (:by |bjmr3HZle) (:text |to-lispy-string)
                                           |b $ %{} :Leaf (:at 1690724698069) (:by |bjmr3HZle) (:text |router)
                               |w $ %{} :Expr (:at 1690724698069) (:by |bjmr3HZle)
                                 :data $ {}
@@ -5979,7 +5979,7 @@
                               |b $ %{} :Leaf (:at 1645116015393) (:by |bjmr3HZle) (:text "|\"Unknown rule: ")
                               |h $ %{} :Expr (:at 1645116015393) (:by |bjmr3HZle)
                                 :data $ {}
-                                  |T $ %{} :Leaf (:at 1645116015393) (:by |bjmr3HZle) (:text |pr-str)
+                                  |T $ %{} :Leaf (:at 1693243466902) (:by |bjmr3HZle) (:text |to-lispy-string)
                                   |b $ %{} :Leaf (:at 1645116015393) (:by |bjmr3HZle) (:text |rule)
                           |h $ %{} :Leaf (:at 1645116015393) (:by |bjmr3HZle) (:text |style-todo)
                       |r $ %{} :Expr (:at 1600166402422) (:by |bjmr3HZle)
@@ -6391,7 +6391,7 @@
                                   |j $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text "|\"nothing to fill: ")
                                   |r $ %{} :Expr (:at 1600241469792) (:by |bjmr3HZle)
                                     :data $ {}
-                                      |T $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text |pr-str)
+                                      |T $ %{} :Leaf (:at 1693243446325) (:by |bjmr3HZle) (:text |to-lispy-string)
                                       |j $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text |rule)
                               |r $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text |style-todo)
                       |n $ %{} :Expr (:at 1600243770244) (:by |bjmr3HZle)
@@ -6457,7 +6457,7 @@
                                   |j $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text "|\"Unknown case: ")
                                   |r $ %{} :Expr (:at 1600241469792) (:by |bjmr3HZle)
                                     :data $ {}
-                                      |T $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text |pr-str)
+                                      |T $ %{} :Leaf (:at 1693243450467) (:by |bjmr3HZle) (:text |to-lispy-string)
                                       |j $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text |item)
                               |r $ %{} :Leaf (:at 1600241469792) (:by |bjmr3HZle) (:text |style-todo)
         |render-layout-flex $ %{} :CodeEntry (:doc |)
