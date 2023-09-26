@@ -46,6 +46,13 @@
                       <> title
                     , ret
                   , ret
+        |comp-cirru-snippet $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-cirru-snippet (text styles)
+              div
+                {} (:class-name css-snippet) (:style styles)
+                pre $ {}
+                  :innerHTML $ generateHtml text
         |comp-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-placeholder (text)
@@ -54,11 +61,11 @@
                 <> text
         |comp-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
-            defcomp comp-snippet (text styles)
-              div
-                {} (:class-name css-snippet) (:style styles)
-                pre $ {}
-                  :innerHTML $ generateHtml text
+            defcomp comp-snippet (code ? options)
+              pre $ {}
+                :class-name $ str-spaced css-snippet (:class-name options)
+                :style $ :styles options
+                :inner-text code
         |comp-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tabs (options tabs on-route)
@@ -105,6 +112,7 @@
                 :padding "\"4px 6px"
                 :border $ str "\"1px solid " (hsl 0 0 90)
                 :border-radius "\"4px"
+                :margin 0
         |css-tab $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-tab $ {}
@@ -149,34 +157,77 @@
                 div
                   {} $ :style
                     {} $ :padding-bottom "\"50vh"
-                  div ({}) (<> "|There are also components follow the guidelines of Respo UI:") (render-entry "\"https://github.com/Respo/alerts.calcit" "\"alerts") (render-entry "\"https://github.com/Respo/respo-feather.calcit" "\"respo-feather") (render-entry |https://github.com/Respo/respo-message.calcit "\"respo-message") (render-entry |https://github.com/Respo/respo-markdown.calcit "\"respo-markdown") (render-entry |https://github.com/Respo/notifier.calcit "\"notifier")
+                  div ({}) (<> "|There are also components follow the guidelines of Respo UI:") (render-entry "\"https://github.com/Respo/alerts.calcit" "\"alerts") (render-entry "\"https://github.com/Respo/respo-feather.calcit" "\"respo-feather") (render-entry |https://github.com/Respo/respo-message.calcit "\"respo-message") (render-entry |https://github.com/Respo/respo-markdown.calcit "\"respo-markdown") (; render-entry |https://github.com/Respo/notifier.calcit "\"notifier")
                   comp-demo-placeholder
                   comp-demo-tabs $ >> states :tabs
                   comp-demo-attributes
+                  comp-demo-cirru-snippet
+                  comp-demo-snippet
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-attributes () $ div
               {} $ :class-name css/column
-              div $ {}
-              =< nil 40
-              comp-attributes $ {} (:title "\"Attributes DEMO")
-                :items $ []
-                  {} (:label "\"DEMO") (:value "\"content")
-                  {} (:label "\"DEMO 2") (:value "\"content 2")
-                  {} (:label "\"DEMO 2") (:value "\"content 2") (:span 2)
-                  {} (:label "\"DEMO 2") (:value "\"content 2")
-                  {} (:label "\"DEMO 2") (:value "\"content 2")
+              div
+                {} $ :class-name css-title
+                <> "\"Attributes demo"
               =< nil 8
-              comp-snippet "\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {}\n  :items $ []\n    {} (:label \"\\\"DEMO\")\n      :value \"\\\"content\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n      :span 2\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n\n" $ {}
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                comp-cirru-snippet "\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {}\n  :items $ []\n    {} (:label \"\\\"DEMO\")\n      :value \"\\\"content\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n      :span 2\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n\n" $ {} (:flex 1)
+                div
+                  {} $ :class-name css/flex
+                  comp-attributes $ {} (:title "\"Attributes DEMO")
+                    :items $ []
+                      {} (:label "\"DEMO") (:value "\"content")
+                      {} (:label "\"DEMO 2") (:value "\"content 2")
+                      {} (:label "\"DEMO 2") (:value "\"content 2") (:span 2)
+                      {} (:label "\"DEMO 2") (:value "\"content 2")
+                      {} (:label "\"DEMO 2") (:value "\"content 2")
+        |comp-demo-cirru-snippet $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-cirru-snippet () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Cirru snippet demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-cirru-snippet\n\ncomp-cirru-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n" $ {}
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"defn f (a b)\n  + a b" $ {}
         |comp-demo-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-placeholder () $ div ({})
               div
                 {} $ :class-name css-title
                 <> "\"Placeholder demo"
-              comp-placeholder "\"This is a demo"
-              comp-placeholder "\"中文 Demo"
-              comp-snippet "\"respo-ui.comp/comp-placeholder\n\ncomp-placeholder \"|demo\"\ncomp-placeholder \"|中文\"" $ {}
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                comp-cirru-snippet "\"respo-ui.comp/comp-placeholder\n\ncomp-placeholder \"|demo\"\ncomp-placeholder \"|中文\"" $ {} (:flex 1)
+                div
+                  {} $ :class-name css/flex
+                  comp-placeholder "\"This is a demo"
+                  comp-placeholder "\"中文 Demo"
+        |comp-demo-snippet $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-snippet () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Snippet demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-snippet\n\ncomp-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n" $ {}
+                div
+                  {} $ :class-name css/flex
+                  comp-snippet "\"defn f (a b)\n  + a b" $ {}
         |comp-demo-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-tabs (states)
@@ -192,41 +243,49 @@
                   div
                     {} $ :class-name css-title
                     <> "\"Tabs demo"
-                  comp-tabs
-                    {} $ :selected (:selected state)
-                    , en-tabs $ fn (info d!) (println "\"selected" info)
-                      d! cursor $ assoc state :selected (:name info)
-                  comp-tabs
-                    {} $ :selected (:selected state)
-                    []
-                      {} (:name :book) (:title "\"书本")
-                      {} (:name :card) (:title "\"纸牌")
-                      {} (:name :pl) (:title "\"编程语言")
-                    fn (info d!) (println "\"selected" info)
-                      d! cursor $ assoc state :selected (:name info)
-                  comp-tabs
-                    {}
-                      :selected $ :selected state
-                      :style $ {}
-                        :border-bottom $ str "\"1px solid " (hsl 0 0 90)
-                    , en-tabs $ fn (info d!) (println "\"selected" info)
-                      d! cursor $ assoc state :selected (:name info)
+                  div
+                    {} $ :class-name (str-spaced css/row css/gap8)
+                    comp-cirru-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  {}\n    :selected (:selected state)\n    :style {}\n  []\n    &{} :name :book :title |Book\n    &{} :name :card :title |Card\n    &{} :name :pl :title \"|Programming language\"\n  fn (info d!)\n    println |selected info\n    d! cursor $ assoc state :selected $ :name info" $ {} (:flex 1)
+                    div
+                      {} $ :class-name css/flex
+                      comp-tabs
+                        {} $ :selected (:selected state)
+                        , en-tabs $ fn (info d!) (println "\"selected" info)
+                          d! cursor $ assoc state :selected (:name info)
+                      comp-tabs
+                        {} $ :selected (:selected state)
+                        []
+                          {} (:name :book) (:title "\"书本")
+                          {} (:name :card) (:title "\"纸牌")
+                          {} (:name :pl) (:title "\"编程语言")
+                        fn (info d!) (println "\"selected" info)
+                          d! cursor $ assoc state :selected (:name info)
+                      comp-tabs
+                        {}
+                          :selected $ :selected state
+                          :style $ {}
+                            :border-bottom $ str "\"1px solid " (hsl 0 0 90)
+                        , en-tabs $ fn (info d!) (println "\"selected" info)
+                          d! cursor $ assoc state :selected (:name info)
                   =< nil 8
-                  comp-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  {}\n    :selected (:selected state)\n    :style {}\n  []\n    &{} :name :book :title |Book\n    &{} :name :card :title |Card\n    &{} :name :pl :title \"|Programming language\"\n  fn (info d!)\n    println |selected info\n    d! cursor $ assoc state :selected $ :name info" $ {}
-                  comp-tabs
-                    {}
-                      :selected $ :selected state
-                      :vertical? true
-                      :width 200
-                      :style $ {}
-                    , en-tabs $ fn (info d!) (println "\"selected" info)
-                      d! cursor $ assoc state :selected (:name info)
-                  comp-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  &{} :selected (:selected state) :style ({}) :vertical? true :width 200\n  , tabs\n  fn (info d!)" $ {}
+                  div
+                    {} $ :class-name (str-spaced css/row css/gap8)
+                    comp-cirru-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  &{} :selected (:selected state) :style ({}) :vertical? true :width 200\n  , tabs\n  fn (info d!)" $ {} (:flex 1)
+                    div
+                      {} $ :class-name css/flex
+                      comp-tabs
+                        {}
+                          :selected $ :selected state
+                          :vertical? true
+                          :width 200
+                          :style $ {}
+                        , en-tabs $ fn (info d!) (println "\"selected" info)
+                          d! cursor $ assoc state :selected (:name info)
         |css-title $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-title $ {}
-              "\"$0" $ {} (:margin-top 40) (:font-size 18) (:font-family ui/font-fancy)
-                :color $ hsl 0 0 70
+              "\"$0" $ {} (:margin-top 40) (:font-size 18) (:font-weight :bold)
+                :color $ hsl 0 0 10
         |render-entry $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn render-entry (url title)
@@ -237,7 +296,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-snippet comp-button comp-link comp-attributes
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
@@ -860,6 +919,14 @@
           :code $ quote
             defstyle fullscreen $ {}
               "\"$0" $ {} (:position "\"absolute") (:left 0) (:top 0) (:width "\"100%") (:height "\"100%") (:overflow :auto)
+        |gap16 $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle gap16 $ {}
+              "\"&" $ {} (:gap 16)
+        |gap8 $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle gap8 $ {}
+              "\"&" $ {} (:gap 8)
         |global $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle global $ {}
