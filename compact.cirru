@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.0-a3)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.0)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -326,7 +326,6 @@
                       (:widgets)
                         comp-widgets-page $ >> states :widgets
                       (:layouts) (comp-layouts-page)
-                      (:lay-out) (comp-lay-out-page)
                       (:fonts) (comp-fonts-page)
                       (:components)
                         comp-components-page $ >> states :components
@@ -350,7 +349,6 @@
             respo-ui.comp.layouts-page :refer $ comp-layouts-page
             respo-ui.comp.fonts-page :refer $ comp-fonts-page
             respo-ui.comp.components :refer $ comp-components-page
-            respo-ui.comp.lay-out-page :refer $ comp-lay-out-page
             respo.css :refer $ defstyle
             respo-ui.css :as css
     |respo-ui.comp.fonts-page $ %{} :FileEntry
@@ -428,101 +426,12 @@
             respo.comp.space :refer $ =<
             respo.util.format :refer $ hsl
             respo-md.comp.md :refer $ comp-md-block
-    |respo-ui.comp.lay-out-page $ %{} :FileEntry
-      :defs $ {}
-        |comp-lay-out-page $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defcomp comp-lay-out-page () $ div ({}) (<> "\"Flex layout" style-title)
-              lay-out
-                {} (:type :flex)
-                  :style $ {}
-                    :border $ str "\"1px solid " (hsl 0 0 80)
-                  :layout :row
-                  :gap 10
-                  :items $ []
-                    {} (:type :flex) (:layout :column) (:gap 4)
-                      :items $ []
-                        {} (:type :item) (:fill :a)
-                        {} (:type :item) (:fill :a)
-                    {} (:type :item) (:fill :b)
-                    {} (:type :item) (:fill :c)
-                {}
-                  :a $ \ div
-                    {} $ :style %
-                    <> "\"TODO A"
-                  :b $ \ div
-                    {} $ :style %
-                    <> "\"TODO BB"
-                  :c $ \ div
-                    {} $ :style %
-                    <> "\"TODO CCC"
-              <> "\"Flex flow layout" style-title
-              lay-out
-                {} (:type :flex)
-                  :style $ {}
-                    :border $ str "\"1px solid " (hsl 0 0 80)
-                  :layout :flow
-                  :gap $ [] 4 4
-                  :items $ []
-                    {} (:type :item) (:fill :a)
-                    {} (:type :item) (:fill :b)
-                    {} (:type :item) (:fill :c)
-                {}
-                  :a $ \ div
-                    {} $ :style %
-                    <> "\"TODO A"
-                  :b $ \ div
-                    {} $ :style %
-                    <> "\"TODO BB"
-                  :c $ \ div
-                    {} $ :style %
-                    <> "\"TODO CCC"
-              <> "\"Flex layout" style-title
-              lay-out
-                {} (:type :list)
-                  :style $ {}
-                    :border $ str "\"1px solid " (hsl 0 0 80)
-                  :layout :column
-                  :size 4
-                  :gap 10
-                fn (idx styles ? arg)
-                  div
-                    {} $ :style styles
-                    <> "\"TODO list"
-              <> "\"Flex list layout" style-title
-              lay-out
-                {} (:type :list)
-                  :style $ {}
-                    :border $ str "\"1px solid " (hsl 0 0 80)
-                  :layout :flow
-                  :size 4
-                  :gap $ [] 4 4
-                fn (idx styles ? arg)
-                  div
-                    {} $ :style
-                      merge styles $ {} (:display :inline-block)
-                    <> "\"TODO list"
-        |style-title $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def style-title $ {} (:font-size 24) (:font-family ui/font-fancy) (:font-weight 300)
-              :color $ hsl 0 0 80
-              :margin "\"16px 0"
-              :display :inline-block
-      :ns $ %{} :CodeEntry (:doc |)
-        :code $ quote
-          ns respo-ui.comp.lay-out-page $ :require
-            respo.core :refer $ defcomp div <>
-            respo-ui.core :as ui
-            respo.util.format :refer $ hsl
-            respo.comp.space :refer $ =<
-            respo-ui.lay-out :refer $ lay-out
     |respo-ui.comp.layouts-page $ %{} :FileEntry
       :defs $ {}
         |comp-layouts-page $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-layouts-page () $ div ({})
-              div ({}) (<> |Layouts) (=< 8 nil)
-                a $ {} (:href |https://github.com/Respo/respo-ui/blob/master/src/respo_ui/comp/layouts_page.cljs) (:inner-text |Source) (:target |_blank)
+              div ({}) (<> |Layouts)
               comp-md-block "|Flexbox styles are defined in variables like `ui/row` `ui/center` in flex containers. Here are how they take effects." $ {}
               div
                 {} (:class-name css/row)
@@ -597,7 +506,6 @@
                 =< nil 16
                 render-entry |index.html "|Respo UI" $ = :index router-name
                 render-entry |layouts.html |Layouts $ = :layouts router-name
-                render-entry |lay-out.html "|Lay Out" $ = :lay-out router-name
                 render-entry |widgets.html |Widgets $ = :widgets router-name
                 render-entry |fonts.html |Fonts $ = :fonts router-name
                 render-entry |components.html |Components $ = :components router-name
@@ -641,8 +549,7 @@
                   cursor $ :cursor states
                   state $ :data states
                 div ({})
-                  div ({}) (<> |Widgets) (=< 8 nil)
-                    a $ {} (:href |https://github.com/Respo/respo-ui/blob/master/src/respo_ui/comp/widgets_page.cljs) (:target |_blank) (:inner-text |Source)
+                  div ({}) (<> |Widgets)
                   div ({}) (<> "|Some text as description" ui/text-label) (=< nil 16)
                     a $ {} (:class-name css/link) (:inner-text |link)
                   =< nil 16
@@ -987,207 +894,6 @@
         :code $ quote
           ns respo-ui.css $ :require (respo-ui.core :as ui)
             respo.css :refer $ defstyle
-    |respo-ui.lay-out $ %{} :FileEntry
-      :defs $ {}
-        |add-gap $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn add-gap (xs f)
-              add-gap-iter ([]) 0 f xs
-        |add-gap-iter $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn add-gap-iter (acc n f xs)
-              if (empty? xs) acc $ recur
-                if (empty? acc)
-                  [] $ first xs
-                  -> acc
-                    conj $ f n
-                    conj $ first xs
-                inc n
-                , f (rest xs)
-        |gen-gap-fn $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn gen-gap-fn (rule)
-              fn (idx)
-                [] (str idx "\"-gap")
-                  cond
-                      includes? (#{} :row :row-parted :row-middle :row-center) (:layout rule)
-                      =< (:gap rule) nil
-                    (= :flow (:layout rule))
-                      =<
-                        let
-                            gap $ :gap rule
-                          cond
-                              list? gap
-                              first gap
-                            (number? gap) gap
-                            true nil
-                        , nil
-                    (includes? (#{} :column :column-parted :center) (:layout rule))
-                      =< nil $ :gap rule
-                    true $ div
-                      {} $ :style
-                        {} (:background-color :red) (:width 4) (:height 4)
-        |get-layout-style $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn get-layout-style (layout-name)
-              case-default layout-name style-no-match (:row ui/row) (:column ui/column) (:center ui/center) (:row-middle ui/row-middle) (:row-center ui/row-center) (:row-parted ui/row-parted) (:column-parted ui/column-parted)
-                :flow $ {}
-        |lay-out $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn lay-out (rule child-map & args)
-              let
-                  options $ either (first args) ({})
-                case-default (:type rule)
-                  <>
-                    str "\"Unknown rule: " $ to-lispy-string rule
-                    , style-todo
-                  :flex $ render-layout-flex rule child-map options
-                  :list $ render-layout-list rule child-map options
-                  :grid $ <> "\"TODO grid" style-todo
-                  :item $ render-fill-item rule child-map options
-        |lilac-flex-rule $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-flex-rule $ record+
-              {}
-                :type $ is+ :flex
-                :layout lilac-layout-names
-                :style lilac-style
-                :gap lilac-gap
-                :items $ list+
-                  or+ $ []
-                    record+ $ {}
-                      :type $ is+ :item
-                      :style lilac-style
-                      :fill $ any+
-                    record+ $ {}
-                      :type $ is+ :flex
-                  {}
-              {} $ :check-keys? true
-        |lilac-gap $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-gap $ optional+
-              or+ $ [] (number+)
-                tuple+ $ [] (number+) (number+)
-        |lilac-grid-rule $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-grid-rule $ record+
-              {}
-                :type $ is+ :grid
-                :style lilac-style
-                :size lilac-number-pair
-                :gap lilac-gap
-                :items $ list+
-                  record+ $ {} (:from lilac-number-pair) (:size lilac-number-pair)
-                    :item $ record+
-                      {}
-                        :type $ enum+ (#{} :item)
-                        :fill $ any+
-        |lilac-item-rule $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-item-rule $ record+
-              {}
-                :type $ is+ :item
-                :style lilac-style
-                :fill $ optional+ (any+)
-              {} $ :check-keys? true
-        |lilac-layout-names $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-layout-names $ optional+
-              enum+ $ #{} :column :row :row-parted :column-parted :center :row-center :row-middle :flow
-        |lilac-list-rule $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-list-rule $ record+
-              {}
-                :type $ is+ :list
-                :layout lilac-layout-names
-                :style lilac-style
-                :size $ number+
-                :gap lilac-gap
-        |lilac-number-pair $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-number-pair $ optional+
-              tuple+ $ [] (number+) (number+)
-        |lilac-style $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def lilac-style $ optional+
-              dict+ (tag+) (any+)
-        |render-fill-item $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn render-fill-item (rule child-map options) (dev-check rule lilac-item-rule)
-              let
-                  item $ get child-map (:fill rule)
-                cond
-                    nil? item
-                    <>
-                      str "\"nothing to fill: " $ to-lispy-string rule
-                      , style-todo
-                  (fn? item)
-                    item (merge ui/flex) options
-                  (some? (:item item))
-                    :item item
-                  (fn? (:render item))
-                    (:render item)
-                      merge ui/flex $ :style item
-                      , options
-                  :else $ <>
-                    str "\"Unknown case: " $ to-lispy-string item
-                    , style-todo
-        |render-layout-flex $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn render-layout-flex (rule child-map options) (dev-check rule lilac-flex-rule)
-              list->
-                {} $ :style
-                  merge
-                    get-layout-style $ :layout rule
-                    :style rule
-                -> (:items rule)
-                  map-indexed $ fn (idx item)
-                    [] (str idx)
-                      let
-                          custom-style $ if
-                            = :flow $ :layout rule
-                            {} $ :margin-bottom
-                              last $ :gap rule
-                            , ui/flex
-                        lay-out (assoc item :style custom-style) child-map options
-                  add-gap $ gen-gap-fn rule
-        |render-layout-list $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            defn render-layout-list (rule item-renderer options) (dev-check rule lilac-list-rule)
-              list->
-                {} $ :style
-                  merge
-                    get-layout-style $ :layout rule
-                    :style rule
-                ->
-                  range $ :size rule
-                  map-indexed $ fn (idx item)
-                    [] (str idx)
-                      let
-                          custom-style $ if
-                            = :flow $ :layout rule
-                            {} $ :margin-bottom
-                              last $ :gap rule
-                            , ui/flex
-                        item-renderer idx custom-style options
-                  add-gap $ gen-gap-fn rule
-        |style-no-match $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def style-no-match $ {}
-              :outline $ str "\"1px solid red"
-        |style-todo $ %{} :CodeEntry (:doc |)
-          :code $ quote
-            def style-todo $ {}
-              :color $ hsl 0 80 80
-              :border $ str "\"1px solid " (hsl 0 0 94)
-      :ns $ %{} :CodeEntry (:doc |)
-        :code $ quote
-          ns respo-ui.lay-out $ :require
-            respo.core :refer $ <> list-> div
-            respo.comp.space :refer $ =<
-            respo.util.format :refer $ hsl
-            respo-ui.core :as ui
-            lilac.core :refer $ dev-check number+ record+ string+ tag+ or+ list+ any+ dict+ enum+ tuple+ is+ optional+
     |respo-ui.main $ %{} :FileEntry
       :defs $ {}
         |*store $ %{} :CodeEntry (:doc |)
@@ -1267,7 +973,6 @@
               :: :fonts $ [] |fonts.html
               :: :widgets $ [] |widgets.html
               :: :layouts $ [] |layouts.html
-              :: :lay-out $ [] |lay-out.html
               :: :components $ [] |components.html
         |mode $ %{} :CodeEntry (:doc |)
           :code $ quote (def mode :hash)
