@@ -432,25 +432,27 @@
           :code $ quote
             defcomp comp-layouts-page () $ div ({})
               div ({}) (<> |Layouts)
-              comp-md-block "|Flexbox styles are defined in variables like `ui/row` `ui/center` in flex containers. Here are how they take effects." $ {}
+              comp-md-block "|Flexbox styles are defined in variables like `css/row` `css/center` in flex containers. Here are how they take effects." $ {}
               div
                 {} (:class-name css/row)
                   :style $ {} (:flex-wrap :wrap) (:font-family ui/font-code) (:font-size 12)
-                render-demo |ui/center css/center
-                render-demo |ui/row-center css/row-center
-                render-demo |ui/row-middle css/row-middle
-                render-demo |ui/row css/row
-                render-demo |ui/column css/column
-                render-demo |ui/row-parted css/row-parted
-                render-demo |ui/column-parted css/column-parted
-                render-demo |ui/row-dispersive css/row-dispersive
-                render-demo |ui/column-dispersive css/column-dispersive
-                render-demo |ui/row-evenly css/row-evenly
-                render-demo |ui/column-evenly css/column-evenly
+                render-demo |center css/center
+                render-demo |row-center css/row-center
+                render-demo |row-middle css/row-middle
+                render-demo |row css/row
+                render-demo |column css/column
+                render-demo |row-parted css/row-parted
+                render-demo |column-parted css/column-parted
+                render-demo |row-dispersive css/row-dispersive
+                render-demo |column-dispersive css/column-dispersive
+                render-demo |row-evenly css/row-evenly
+                render-demo |column-evenly css/column-evenly
         |css-sample $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-sample $ {}
-              "\"$0" $ {} (:padding "|4px 8px") (:color :white) (:font-size 12) (:font-family ui/font-code)
+              "\"$0" $ {} (:padding "|4px 8px") (:font-size 12) (:line-height "\"20px") (:font-family ui/font-code) (:border-radius "\"4px")
+                :border $ str "\"1px solid " (hsl 0 0 80)
+                :color $ hsl 0 0 30
         |render-demo $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn render-demo (title layout-cls)
@@ -469,17 +471,17 @@
                   div
                     {} (:class-name css-sample)
                       :style $ {}
-                        :background-color $ hsl 0 80 70
+                        ; :background-color $ hsl 0 80 70
                     <> |A
                   div
                     {} (:class-name css-sample)
                       :style $ {}
-                        :background-color $ hsl 120 80 70
+                        ; :background-color $ hsl 120 80 70
                     <> |B
                   div
                     {} (:class-name css-sample)
                       :style $ {}
-                        :background-color $ hsl 240 80 80
+                        ; :background-color $ hsl 240 80 80
                     <> |C
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
@@ -531,7 +533,7 @@
                 <> title
         |style-logo $ %{} :CodeEntry (:doc |)
           :code $ quote
-            def style-logo $ {} (:background-image "|url(http://cdn.tiye.me/logo/respo.png)") (:width 80) (:height 80) (:background-size :cover) (:display :inline-block) (:vertical-align :text-bottom)
+            def style-logo $ {} (:background-image "|url(https://cos-sh.tiye.me/cos-up/bb4c2755050318e864b56f59145d726e-SubstractRespo.png)") (:width 80) (:height 80) (:background-size :cover) (:display :inline-block) (:vertical-align :text-bottom)
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-ui.comp.sidebar $ :require
