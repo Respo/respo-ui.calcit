@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.0)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.1)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -53,6 +53,16 @@
                 {} (:class-name css-snippet) (:style styles)
                 pre $ {}
                   :innerHTML $ generateHtml text
+                comp-copy $ fn () (copy! text)
+        |comp-copy $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-copy (f)
+              div
+                {}
+                  :class-name $ str-spaced style-copy-outline style-copy-container
+                  :on-click $ fn (e d!) (f)
+                div $ {} (:class-name style-copy-outline)
+                  :style $ {} (:top -5) (:right -5)
         |comp-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-placeholder (text)
@@ -62,10 +72,13 @@
         |comp-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-snippet (code ? options)
-              pre $ {}
-                :class-name $ str-spaced css-snippet (:class-name options)
-                :style $ :styles options
-                :inner-text code
+              div
+                {} $ :class-name
+                  str-spaced css-snippet $ :class-name options
+                pre $ {}
+                  :style $ :styles options
+                  :inner-text code
+                comp-copy $ fn () (copy! code)
         |comp-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tabs (options tabs on-route)
@@ -107,12 +120,14 @@
         |css-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-snippet $ {}
-              "\"$0" $ {} (:font-family ui/font-code) (:white-space :pre) (:font-size 12) (:line-height "\"20px")
+              "\"&" $ {} (:font-family ui/font-code) (:white-space :pre) (:font-size 12) (:line-height "\"20px")
                 :color $ hsl 0 0 40
                 :padding "\"4px 6px"
                 :border $ str "\"1px solid " (hsl 0 0 90)
                 :border-radius "\"4px"
                 :margin 0
+                :position :relative
+              "\"& > pre" $ {} (:margin 0)
         |css-tab $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-tab $ {}
@@ -126,6 +141,20 @@
           :code $ quote
             defstyle style-attributes-title $ {}
               "\"$0" $ {} (:font-size 18) (:margin-bottom 6)
+        |style-copy-container $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-copy-container $ {}
+              "\"&:hover" $ {} (:transition-duration "\"200ms") (:transform "\"scale(1.06)")
+        |style-copy-outline $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-copy-outline $ {}
+              "\"&" $ {} (:position :absolute) (:top 10) (:right 10) (:width 13) (:height 13) (:border-radius "\"2px")
+                :border $ str "\"1.5px solid " (hsl 0 0 80)
+                :cursor :pointer
+                :outline "\"1px solid white"
+              "\"&:active" $ {}
+                :border-color $ hsl 0 0 50
+                :transition-duration "\"0ms"
         |style-item $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-item $ {}
@@ -147,6 +176,7 @@
             "\"cirru-color" :refer $ generateHtml
             respo.css :refer $ defstyle
             respo-ui.css :as css
+            "\"copy-text-to-clipboard" :default copy!
     |respo-ui.comp.components $ %{} :FileEntry
       :defs $ {}
         |comp-components-page $ %{} :CodeEntry (:doc |)
