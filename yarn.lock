@@ -159,6 +159,11 @@ cirru-color@^0.2.3:
   resolved "https://registry.yarnpkg.com/cirru-color/-/cirru-color-0.2.3.tgz#7a3d228c1dda03fca529aa6fce387c557b936c13"
   integrity sha512-B5nf7BgSBZdt3U+rzgAjd9LQDqzNonEt7CpafmCrPDStgmjqUQ2qEJnsgR68owAgWvEoKrlK2b8hbWPk8cNpGg==
 
+copy-text-to-clipboard@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/copy-text-to-clipboard/-/copy-text-to-clipboard-3.2.0.tgz#0202b2d9bdae30a49a53f898626dcc3b49ad960b"
+  integrity sha512-RnJFp1XR/LOBDckxTib5Qjr/PMfkatD0MUCQgdpqS8MdKiNUzBjAQBEN6oUy+jW7LI93BBG3DtMB2KOOKpGs2Q==
+
 dom-walk@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/dom-walk/-/dom-walk-0.1.2.tgz#0c548bef048f4d1f2a97249002236060daa3fd84"
