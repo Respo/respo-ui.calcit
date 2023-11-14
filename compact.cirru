@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.1)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.2)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -37,7 +37,9 @@
                             <> $ &map:get item :label
                           div
                             {} $ :class-name (&map:get options :css-value)
-                            <> $ &map:get item :value
+                            let
+                                v $ &map:get item :value
+                              if (string? v) (<> v) v
                 if (some? title)
                   div ({})
                     div
@@ -50,8 +52,10 @@
           :code $ quote
             defcomp comp-cirru-snippet (text styles)
               div
-                {} (:class-name css-snippet) (:style styles)
-                pre $ {}
+                {}
+                  :class-name $ str-spaced css/row css-snippet
+                  :style styles
+                pre $ {} (:class-name css/expand)
                   :innerHTML $ generateHtml text
                 comp-copy $ fn () (copy! text)
         |comp-copy $ %{} :CodeEntry (:doc |)
@@ -74,8 +78,8 @@
             defcomp comp-snippet (code ? options)
               div
                 {} $ :class-name
-                  str-spaced css-snippet $ :class-name options
-                pre $ {}
+                  str-spaced css/row css-snippet $ :class-name options
+                pre $ {} (:class-name css/expand)
                   :style $ :styles options
                   :inner-text code
                 comp-copy $ fn () (copy! code)
@@ -213,6 +217,9 @@
                       {} (:label "\"DEMO 2") (:value "\"content 2") (:span 2)
                       {} (:label "\"DEMO 2") (:value "\"content 2")
                       {} (:label "\"DEMO 2") (:value "\"content 2")
+                      {} (:label "\"DEMO 3")
+                        :value $ a
+                          {} (:inner-text "\"Demo") (:href "\"https://respo-mvc.org") (:target "\"_blank")
         |comp-demo-cirru-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-cirru-snippet () $ div
@@ -389,7 +396,7 @@
               div
                 {} $ :style style-section
                 <> "|Normal fonts"
-              comp-md-block "|which can be used with `ui/font-normal`. It's Hind fonts." $ {}
+              comp-md-block "|which can be used with `css/font-normal`. It's Hind fonts." $ {}
               render-font-demo css/font-normal ui/font-normal 300
               render-font-demo css/font-normal ui/font-normal 400
               render-font-demo css/font-normal ui/font-normal 500
@@ -397,7 +404,7 @@
               div
                 {} $ :style style-section
                 <> "|Fancy fonts"
-              comp-md-block "|which can be used with `ui/font-fancy`. Josefin Sans is used here." $ {}
+              comp-md-block "|which can be used with `css/font-fancy`. Josefin Sans is used here." $ {}
               render-font-demo css/font-fancy! ui/font-fancy 100
               render-font-demo css/font-fancy! ui/font-fancy 300
               render-font-demo css/font-fancy! ui/font-fancy 400
@@ -405,7 +412,7 @@
               div
                 {} $ :style style-section
                 <> "|Code fonts"
-              comp-md-block "|which can be used with `ui/font-code`." $ {}
+              comp-md-block "|which can be used with `css/font-code`." $ {}
               render-font-demo css/font-code ui/font-code 100
               render-font-demo css/font-code ui/font-code 300
               render-font-demo css/font-code ui/font-code 400

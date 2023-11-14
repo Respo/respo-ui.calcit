@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@calcit/procs@^0.8.4":
-  version "0.8.4"
-  resolved "https://registry.yarnpkg.com/@calcit/procs/-/procs-0.8.4.tgz#4cda88519b17baf308c6fae01703b4efac82209d"
-  integrity sha512-0Q+XIeQfzEmK0F9iD320dd8lk/12rTacb4ea9szErrFuY1iu4CkuAE5iTZUdBpWzneMQEwPReGoAVq6dE+9M5w==
+"@calcit/procs@^0.8.9":
+  version "0.8.9"
+  resolved "https://registry.yarnpkg.com/@calcit/procs/-/procs-0.8.9.tgz#090d18aba5a9f3d20fa562d34f5640de764934f1"
+  integrity sha512-xG7gmTZv+FUwNd592n84Lo2jTjvVSY18fJwPy9R55qP3AJFnKQkD+UjqNo9EKffWZKWEF3jAkkOMfuRNQMmeag==
   dependencies:
     "@calcit/ternary-tree" "0.0.23"
     "@cirru/parser.ts" "^0.0.6"
@@ -244,9 +244,9 @@ min-document@^2.19.0:
     dom-walk "^0.1.0"
 
 nanoid@^3.3.6:
-  version "3.3.6"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.6.tgz#443380c856d6e9f9824267d960b4236ad583ea4c"
-  integrity sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==
+  version "3.3.7"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.7.tgz#d0c301a691bc8d54efa0a2226ccf3fe2fd656bd8"
+  integrity sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==
 
 nanoid@^4.0.1:
   version "4.0.2"
@@ -308,10 +308,10 @@ virtual-dom@^2.1.1:
     x-is-array "0.1.0"
     x-is-string "0.1.0"
 
-vite@^4.4.9:
-  version "4.4.9"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.9.tgz#1402423f1a2f8d66fd8d15e351127c7236d29d3d"
-  integrity sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==
+vite@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.5.0.tgz#ec406295b4167ac3bc23e26f9c8ff559287cff26"
+  integrity sha512-ulr8rNLA6rkyFAlVWw2q5YJ91v098AFQ2R0PRFwPzREXOUJQPtFUG0t+/ZikhaOCDqFoDhN6/v8Sq0o4araFAw==
   dependencies:
     esbuild "^0.18.10"
     postcss "^8.4.27"
