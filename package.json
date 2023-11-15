@@ -1,5 +1,5 @@
 {
-  "version": "0.5.2",
+  "version": "0.5.3",
   "dependencies": {
     "@calcit/procs": "^0.8.9",
     "copy-text-to-clipboard": "^3.2.0"

@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.2)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.3)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -39,7 +39,7 @@
                             {} $ :class-name (&map:get options :css-value)
                             let
                                 v $ &map:get item :value
-                              if (string? v) (<> v) v
+                              if (literal? v) (<> v) v
                 if (some? title)
                   div ({})
                     div
@@ -141,6 +141,10 @@
                 :border-radius "\"2px"
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 98
+        |literal? $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defn literal? (v)
+              or (string? v) (tag? v) (number? v) (bool? v)
         |style-attributes-title $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-attributes-title $ {}
