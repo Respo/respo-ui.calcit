@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.3)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.4)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -630,6 +630,90 @@
                                             :data $ {}
                                               |T $ %{} :Leaf (:at 1592799089998) (:by |bjmr3HZle) (:text |:title)
                                               |j $ %{} :Leaf (:at 1592799089998) (:by |bjmr3HZle) (:text |info)
+        |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
+          :code $ %{} :Expr (:at 1700193896881) (:by |bjmr3HZle)
+            :data $ {}
+              |T $ %{} :Leaf (:at 1700193902368) (:by |bjmr3HZle) (:text |defcomp)
+              |b $ %{} :Leaf (:at 1700193896881) (:by |bjmr3HZle) (:text |comp-time)
+              |h $ %{} :Expr (:at 1700193896881) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1700193910150) (:by |bjmr3HZle) (:text |time)
+                  |b $ %{} :Leaf (:at 1700194114625) (:by |bjmr3HZle) (:text |&)
+                  |h $ %{} :Leaf (:at 1700194115690) (:by |bjmr3HZle) (:text |options)
+              |j $ %{} :Expr (:at 1700194203543) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1700194206248) (:by |bjmr3HZle) (:text |.!extend)
+                  |b $ %{} :Leaf (:at 1700194207231) (:by |bjmr3HZle) (:text |dayjs)
+                  |h $ %{} :Leaf (:at 1700194208061) (:by |bjmr3HZle) (:text |is-today)
+              |l $ %{} :Expr (:at 1700194145570) (:by |bjmr3HZle)
+                :data $ {}
+                  |D $ %{} :Leaf (:at 1700194146522) (:by |bjmr3HZle) (:text |let)
+                  |L $ %{} :Expr (:at 1700194146760) (:by |bjmr3HZle)
+                    :data $ {}
+                      |D $ %{} :Expr (:at 1700202078829) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700202079475) (:by |bjmr3HZle) (:text |now)
+                          |b $ %{} :Expr (:at 1700202080071) (:by |bjmr3HZle)
+                            :data $ {}
+                              |b $ %{} :Leaf (:at 1700202080071) (:by |bjmr3HZle) (:text |dayjs)
+                              |h $ %{} :Leaf (:at 1700202266818) (:by |bjmr3HZle) (:text |time)
+                      |T $ %{} :Expr (:at 1700194147603) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194148107) (:by |bjmr3HZle) (:text |mark)
+                          |b $ %{} :Expr (:at 1700202056964) (:by |bjmr3HZle)
+                            :data $ {}
+                              |D $ %{} :Leaf (:at 1700202057543) (:by |bjmr3HZle) (:text |if)
+                              |L $ %{} :Expr (:at 1700202060485) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700202065246) (:by |bjmr3HZle) (:text |.!isToday)
+                                  |b $ %{} :Leaf (:at 1700202081796) (:by |bjmr3HZle) (:text |now)
+                              |V $ %{} :Expr (:at 1700202158924) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |D $ %{} :Leaf (:at 1700202161492) (:by |bjmr3HZle) (:text |str)
+                                  |L $ %{} :Leaf (:at 1700202167930) (:by |bjmr3HZle) (:text "|\"Today ")
+                                  |T $ %{} :Expr (:at 1700202142490) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1700202144104) (:by |bjmr3HZle) (:text |.!format)
+                                      |b $ %{} :Leaf (:at 1700202146371) (:by |bjmr3HZle) (:text |now)
+                                      |h $ %{} :Leaf (:at 1700202150321) (:by |bjmr3HZle) (:text "|\"HH:mm")
+                              |c $ %{} :Expr (:at 1700202092321) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700202094650) (:by |bjmr3HZle) (:text |.!format)
+                                  |b $ %{} :Leaf (:at 1700202105433) (:by |bjmr3HZle) (:text |now)
+                                  |h $ %{} :Leaf (:at 1700202132079) (:by |bjmr3HZle) (:text "|\"MM-DD ddd")
+                  |T $ %{} :Expr (:at 1700193931370) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1700193936412) (:by |bjmr3HZle) (:text |span)
+                      |b $ %{} :Expr (:at 1700193937241) (:by |bjmr3HZle)
+                        :data $ {}
+                          |D $ %{} :Leaf (:at 1700193938526) (:by |bjmr3HZle) (:text |{})
+                          |L $ %{} :Expr (:at 1700194132127) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700194134262) (:by |bjmr3HZle) (:text |:class-name)
+                              |b $ %{} :Leaf (:at 1700194136563) (:by |bjmr3HZle) (:text |css/font-fancy)
+                          |P $ %{} :Expr (:at 1700202283813) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700202286151) (:by |bjmr3HZle) (:text |:title)
+                              |b $ %{} :Leaf (:at 1700202286684) (:by |bjmr3HZle) (:text |time)
+                          |T $ %{} :Expr (:at 1700193938942) (:by |bjmr3HZle)
+                            :data $ {}
+                              |D $ %{} :Leaf (:at 1700193940788) (:by |bjmr3HZle) (:text |:inner-text)
+                              |P $ %{} :Leaf (:at 1700194144148) (:by |bjmr3HZle) (:text |mark)
+                          |b $ %{} :Expr (:at 1700193979093) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700193982668) (:by |bjmr3HZle) (:text |:on-click)
+                              |b $ %{} :Expr (:at 1700193982928) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700193983170) (:by |bjmr3HZle) (:text |fn)
+                                  |b $ %{} :Expr (:at 1700193983406) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1700193983576) (:by |bjmr3HZle) (:text |e)
+                                      |b $ %{} :Leaf (:at 1700193984046) (:by |bjmr3HZle) (:text |d!)
+                                  |h $ %{} :Expr (:at 1700193984563) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1700193988401) (:by |bjmr3HZle) (:text |js/console.log)
+                                      |b $ %{} :Leaf (:at 1700193990595) (:by |bjmr3HZle) (:text |:time)
+                                      |h $ %{} :Leaf (:at 1700193992179) (:by |bjmr3HZle) (:text |time)
         |css-item-label $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1678305298933) (:by |bjmr3HZle)
             :data $ {}
@@ -1142,6 +1226,16 @@
                     |T $ %{} :Leaf (:at 1696701690590) (:by |bjmr3HZle) (:text "|\"copy-text-to-clipboard")
                     |b $ %{} :Leaf (:at 1696701694988) (:by |bjmr3HZle) (:text |:default)
                     |h $ %{} :Leaf (:at 1696701697323) (:by |bjmr3HZle) (:text |copy!)
+                |zY $ %{} :Expr (:at 1700193925024) (:by |bjmr3HZle)
+                  :data $ {}
+                    |T $ %{} :Leaf (:at 1700193927178) (:by |bjmr3HZle) (:text "|\"dayjs")
+                    |b $ %{} :Leaf (:at 1700193928252) (:by |bjmr3HZle) (:text |:default)
+                    |h $ %{} :Leaf (:at 1700193929056) (:by |bjmr3HZle) (:text |dayjs)
+                |ze $ %{} :Expr (:at 1700194187638) (:by |bjmr3HZle)
+                  :data $ {}
+                    |T $ %{} :Leaf (:at 1700194191416) (:by |bjmr3HZle) (:text "|\"dayjs/plugin/isToday")
+                    |b $ %{} :Leaf (:at 1700194195092) (:by |bjmr3HZle) (:text |:default)
+                    |h $ %{} :Leaf (:at 1700194199833) (:by |bjmr3HZle) (:text |is-today)
     |respo-ui.comp.components $ %{} :FileEntry
       :defs $ {}
         |comp-components-page $ %{} :CodeEntry (:doc |)
@@ -1240,6 +1334,9 @@
                       |zP $ %{} :Expr (:at 1695747097156) (:by |bjmr3HZle)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1695747100265) (:by |bjmr3HZle) (:text |comp-demo-snippet)
+                      |zY $ %{} :Expr (:at 1695747097156) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194009798) (:by |bjmr3HZle) (:text |comp-demo-time)
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1678209528939) (:by |bjmr3HZle)
             :data $ {}
@@ -2047,6 +2144,115 @@
                                                 :data $ {}
                                                   |T $ %{} :Leaf (:at 1592800316773) (:by |bjmr3HZle) (:text |:name)
                                                   |j $ %{} :Leaf (:at 1592800316773) (:by |bjmr3HZle) (:text |info)
+        |comp-demo-time $ %{} :CodeEntry (:doc |)
+          :code $ %{} :Expr (:at 1700194013318) (:by |bjmr3HZle)
+            :data $ {}
+              |T $ %{} :Leaf (:at 1700194015008) (:by |bjmr3HZle) (:text |defcomp)
+              |b $ %{} :Leaf (:at 1700194013318) (:by |bjmr3HZle) (:text |comp-demo-time)
+              |h $ %{} :Expr (:at 1700194013318) (:by |bjmr3HZle)
+                :data $ {}
+              |l $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |div)
+                  |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
+                      |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |:class-name)
+                          |b $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |css/column)
+                  |h $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |div)
+                      |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
+                          |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |:class-name)
+                              |b $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |css-title)
+                      |h $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |<>)
+                          |b $ %{} :Leaf (:at 1700194020939) (:by |bjmr3HZle) (:text "|\"Time demo")
+                  |l $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |=<)
+                      |b $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |nil)
+                      |h $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |8)
+                  |o $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |div)
+                      |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
+                          |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |:class-name)
+                              |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |str-spaced)
+                                  |b $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |css/row)
+                                  |h $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |css/gap8)
+                      |h $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |div)
+                          |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
+                              |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |:class-name)
+                                  |b $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |css/flex)
+                          |h $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
+                              |b $ %{} :Leaf (:at 1700194077078) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-time\n\ncomp-time |2023-11-17T04:07:18.435Z $ {}\n  :class-name |demo\n  :on-click $ fn ()")
+                              |h $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
+                      |l $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |div)
+                          |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
+                              |b $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |:class-name)
+                                  |b $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |css/flex)
+                          |h $ %{} :Expr (:at 1700202214434) (:by |bjmr3HZle)
+                            :data $ {}
+                              |D $ %{} :Leaf (:at 1700202215139) (:by |bjmr3HZle) (:text |div)
+                              |L $ %{} :Expr (:at 1700202215357) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700202215647) (:by |bjmr3HZle) (:text |{})
+                              |T $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700194083414) (:by |bjmr3HZle) (:text |comp-time)
+                                  |b $ %{} :Expr (:at 1700194097505) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |D $ %{} :Leaf (:at 1700194102178) (:by |bjmr3HZle) (:text |.!toISOString)
+                                      |T $ %{} :Expr (:at 1700194087237) (:by |bjmr3HZle)
+                                        :data $ {}
+                                          |T $ %{} :Leaf (:at 1700194095632) (:by |bjmr3HZle) (:text |new)
+                                          |b $ %{} :Leaf (:at 1700194096868) (:by |bjmr3HZle) (:text |js/Date)
+                                  |h $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
+                          |l $ %{} :Expr (:at 1700202216583) (:by |bjmr3HZle)
+                            :data $ {}
+                              |D $ %{} :Leaf (:at 1700202217721) (:by |bjmr3HZle) (:text |div)
+                              |L $ %{} :Expr (:at 1700202217904) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700202218214) (:by |bjmr3HZle) (:text |{})
+                              |T $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1700194083414) (:by |bjmr3HZle) (:text |comp-time)
+                                  |a $ %{} :Leaf (:at 1700202256572) (:by |bjmr3HZle) (:text "|\"2023-11-07T06:23:49.688Z")
+                                  |h $ %{} :Expr (:at 1700194016273) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1700194016273) (:by |bjmr3HZle) (:text |{})
         |css-title $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1592799594134) (:by |bjmr3HZle)
             :data $ {}
@@ -2151,6 +2357,7 @@
                         |x $ %{} :Leaf (:at 1593170668443) (:by |bjmr3HZle) (:text |comp-button)
                         |z $ %{} :Leaf (:at 1678209543653) (:by |bjmr3HZle) (:text |comp-attributes)
                         |zD $ %{} :Leaf (:at 1695747130630) (:by |bjmr3HZle) (:text |comp-snippet)
+                        |zP $ %{} :Leaf (:at 1700194107862) (:by |bjmr3HZle) (:text |comp-time)
                 |y $ %{} :Expr (:at 1592799640169) (:by |bjmr3HZle)
                   :data $ {}
                     |j $ %{} :Leaf (:at 1592799644095) (:by |bjmr3HZle) (:text |respo-ui.core)

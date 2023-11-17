@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.3)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.4)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -108,6 +108,16 @@
                                 :selected-tab-style options
                           :on-click $ fn (e d!) (on-route info d!)
                         <> $ :title info
+        |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
+          :code $ quote
+            defcomp comp-time (time & options) (.!extend dayjs is-today)
+              let
+                  now $ dayjs time
+                  mark $ if (.!isToday now)
+                    str "\"Today " $ .!format now "\"HH:mm"
+                    .!format now "\"MM-DD ddd"
+                span $ {} (:class-name css/font-fancy) (:title time) (:inner-text mark)
+                  :on-click $ fn (e d!) (js/console.log :time time)
         |css-item-label $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-item-label $ {}
@@ -185,6 +195,8 @@
             respo.css :refer $ defstyle
             respo-ui.css :as css
             "\"copy-text-to-clipboard" :default copy!
+            "\"dayjs" :default dayjs
+            "\"dayjs/plugin/isToday" :default is-today
     |respo-ui.comp.components $ %{} :FileEntry
       :defs $ {}
         |comp-components-page $ %{} :CodeEntry (:doc |)
@@ -201,6 +213,7 @@
                   comp-demo-attributes
                   comp-demo-cirru-snippet
                   comp-demo-snippet
+                  comp-demo-time
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-attributes () $ div
@@ -322,6 +335,27 @@
                           :style $ {}
                         , en-tabs $ fn (info d!) (println "\"selected" info)
                           d! cursor $ assoc state :selected (:name info)
+        |comp-demo-time $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-time () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Time demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-time\n\ncomp-time |2023-11-17T04:07:18.435Z $ {}\n  :class-name |demo\n  :on-click $ fn ()" $ {}
+                div
+                  {} $ :class-name css/flex
+                  div ({})
+                    comp-time
+                      .!toISOString $ new js/Date
+                      {}
+                  div ({})
+                    comp-time "\"2023-11-07T06:23:49.688Z" $ {}
         |css-title $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-title $ {}
@@ -337,7 +371,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
