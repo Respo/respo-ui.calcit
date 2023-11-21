@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.4)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.5)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -108,6 +108,17 @@
                                 :selected-tab-style options
                           :on-click $ fn (e d!) (on-route info d!)
                         <> $ :title info
+        |comp-tag $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-tag (kind content ? options)
+              div
+                {}
+                  :class-name $ str-spaced style-tag
+                    case-default kind nil (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error)
+                    :class-name options
+                  :style $ :style options
+                  :on-click $ :on-click options
+                <> content
         |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
           :code $ quote
             defcomp comp-time (time & options) (.!extend dayjs is-today)
@@ -184,6 +195,50 @@
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 100
                 :box-shadow $ str "\"0 0 4px 1px " (hsl 0 0 0 0.08)
+        |style-tag $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag $ {}
+              "\"&" $ {} (:display :inline-block)
+                :background-color $ hsl 0 0 96
+                :border $ str "\"1px solid " (hsl 0 0 92)
+                :border-radius "\"4px"
+                :height "\"20px"
+                :line-height "\"20px"
+                :font-size 12
+                :padding "\"0px 8px"
+                :color $ hsl 0 0 56
+                :cursor :default
+              "\"&:hover" $ {}
+                :background-color $ hsl 0 0 94
+              "\"&:active" $ {} (:transform "\"translate(1px,1px)")
+        |style-tag-error $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-error $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 0 90 80
+              "\"div&:hover" $ {}
+                :background-color $ hsl 0 90 74
+        |style-tag-info $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-info $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 240 99 85
+              "\"div&:hover" $ {}
+                :background-color $ hsl 240 99 80
+        |style-tag-success $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-success $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 120 99 85
+              "\"div&:hover" $ {}
+                :background-color $ hsl 120 99 80
+        |style-tag-warning $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-warning $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 56 98 60
+              "\"div&:hover" $ {}
+                :background-color $ hsl 56 98 48
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-ui.comp $ :require
@@ -214,6 +269,7 @@
                   comp-demo-cirru-snippet
                   comp-demo-snippet
                   comp-demo-time
+                  comp-demo-tags
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-attributes () $ div
@@ -335,6 +391,28 @@
                           :style $ {}
                         , en-tabs $ fn (info d!) (println "\"selected" info)
                           d! cursor $ assoc state :selected (:name info)
+        |comp-demo-tags $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-tags () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Tags demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-tag\n\ncomp-tag :info \"demo\"\n" $ {}
+                div
+                  {}
+                    :class-name $ str-spaced css/flex css/row
+                    :style $ {} (:gap "\"8px")
+                  comp-tag :info "\"info demo"
+                  comp-tag :success "\"info demo"
+                  comp-tag :warning "\"warning demo"
+                  comp-tag :error "\"error demo"
+                  comp-tag :default "\"default demo"
         |comp-demo-time $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-time () $ div
@@ -371,7 +449,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
