@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.1)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.5)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -37,7 +37,9 @@
                             <> $ &map:get item :label
                           div
                             {} $ :class-name (&map:get options :css-value)
-                            <> $ &map:get item :value
+                            let
+                                v $ &map:get item :value
+                              if (literal? v) (<> v) v
                 if (some? title)
                   div ({})
                     div
@@ -50,8 +52,10 @@
           :code $ quote
             defcomp comp-cirru-snippet (text styles)
               div
-                {} (:class-name css-snippet) (:style styles)
-                pre $ {}
+                {}
+                  :class-name $ str-spaced css/row css-snippet
+                  :style styles
+                pre $ {} (:class-name css/expand)
                   :innerHTML $ generateHtml text
                 comp-copy $ fn () (copy! text)
         |comp-copy $ %{} :CodeEntry (:doc |)
@@ -74,8 +78,8 @@
             defcomp comp-snippet (code ? options)
               div
                 {} $ :class-name
-                  str-spaced css-snippet $ :class-name options
-                pre $ {}
+                  str-spaced css/row css-snippet $ :class-name options
+                pre $ {} (:class-name css/expand)
                   :style $ :styles options
                   :inner-text code
                 comp-copy $ fn () (copy! code)
@@ -104,6 +108,27 @@
                                 :selected-tab-style options
                           :on-click $ fn (e d!) (on-route info d!)
                         <> $ :title info
+        |comp-tag $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-tag (kind content ? options)
+              div
+                {}
+                  :class-name $ str-spaced style-tag
+                    case-default kind nil (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error)
+                    :class-name options
+                  :style $ :style options
+                  :on-click $ :on-click options
+                <> content
+        |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
+          :code $ quote
+            defcomp comp-time (time & options) (.!extend dayjs is-today)
+              let
+                  now $ dayjs time
+                  mark $ if (.!isToday now)
+                    str "\"Today " $ .!format now "\"HH:mm"
+                    .!format now "\"MM-DD ddd"
+                span $ {} (:class-name css/font-fancy) (:title time) (:inner-text mark)
+                  :on-click $ fn (e d!) (js/console.log :time time)
         |css-item-label $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-item-label $ {}
@@ -137,6 +162,10 @@
                 :border-radius "\"2px"
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 98
+        |literal? $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defn literal? (v)
+              or (string? v) (tag? v) (number? v) (bool? v)
         |style-attributes-title $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-attributes-title $ {}
@@ -166,6 +195,50 @@
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 100
                 :box-shadow $ str "\"0 0 4px 1px " (hsl 0 0 0 0.08)
+        |style-tag $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag $ {}
+              "\"&" $ {} (:display :inline-block)
+                :background-color $ hsl 0 0 96
+                :border $ str "\"1px solid " (hsl 0 0 92)
+                :border-radius "\"4px"
+                :height "\"20px"
+                :line-height "\"20px"
+                :font-size 12
+                :padding "\"0px 8px"
+                :color $ hsl 0 0 56
+                :cursor :default
+              "\"&:hover" $ {}
+                :background-color $ hsl 0 0 94
+              "\"&:active" $ {} (:transform "\"translate(1px,1px)")
+        |style-tag-error $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-error $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 0 90 80
+              "\"div&:hover" $ {}
+                :background-color $ hsl 0 90 74
+        |style-tag-info $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-info $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 240 99 85
+              "\"div&:hover" $ {}
+                :background-color $ hsl 240 99 80
+        |style-tag-success $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-success $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 120 99 85
+              "\"div&:hover" $ {}
+                :background-color $ hsl 120 99 80
+        |style-tag-warning $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tag-warning $ {}
+              "\"div&" $ {} (:color :white) (:border :none)
+                :background-color $ hsl 56 98 60
+              "\"div&:hover" $ {}
+                :background-color $ hsl 56 98 48
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-ui.comp $ :require
@@ -177,6 +250,8 @@
             respo.css :refer $ defstyle
             respo-ui.css :as css
             "\"copy-text-to-clipboard" :default copy!
+            "\"dayjs" :default dayjs
+            "\"dayjs/plugin/isToday" :default is-today
     |respo-ui.comp.components $ %{} :FileEntry
       :defs $ {}
         |comp-components-page $ %{} :CodeEntry (:doc |)
@@ -193,6 +268,8 @@
                   comp-demo-attributes
                   comp-demo-cirru-snippet
                   comp-demo-snippet
+                  comp-demo-time
+                  comp-demo-tags
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-attributes () $ div
@@ -213,6 +290,9 @@
                       {} (:label "\"DEMO 2") (:value "\"content 2") (:span 2)
                       {} (:label "\"DEMO 2") (:value "\"content 2")
                       {} (:label "\"DEMO 2") (:value "\"content 2")
+                      {} (:label "\"DEMO 3")
+                        :value $ a
+                          {} (:inner-text "\"Demo") (:href "\"https://respo-mvc.org") (:target "\"_blank")
         |comp-demo-cirru-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-cirru-snippet () $ div
@@ -311,6 +391,49 @@
                           :style $ {}
                         , en-tabs $ fn (info d!) (println "\"selected" info)
                           d! cursor $ assoc state :selected (:name info)
+        |comp-demo-tags $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-tags () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Tags demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-tag\n\ncomp-tag :info \"demo\"\n" $ {}
+                div
+                  {}
+                    :class-name $ str-spaced css/flex css/row
+                    :style $ {} (:gap "\"8px")
+                  comp-tag :info "\"info demo"
+                  comp-tag :success "\"info demo"
+                  comp-tag :warning "\"warning demo"
+                  comp-tag :error "\"error demo"
+                  comp-tag :default "\"default demo"
+        |comp-demo-time $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-time () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Time demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-time\n\ncomp-time |2023-11-17T04:07:18.435Z $ {}\n  :class-name |demo\n  :on-click $ fn ()" $ {}
+                div
+                  {} $ :class-name css/flex
+                  div ({})
+                    comp-time
+                      .!toISOString $ new js/Date
+                      {}
+                  div ({})
+                    comp-time "\"2023-11-07T06:23:49.688Z" $ {}
         |css-title $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-title $ {}
@@ -326,7 +449,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
@@ -389,7 +512,7 @@
               div
                 {} $ :style style-section
                 <> "|Normal fonts"
-              comp-md-block "|which can be used with `ui/font-normal`. It's Hind fonts." $ {}
+              comp-md-block "|which can be used with `css/font-normal`. It's Hind fonts." $ {}
               render-font-demo css/font-normal ui/font-normal 300
               render-font-demo css/font-normal ui/font-normal 400
               render-font-demo css/font-normal ui/font-normal 500
@@ -397,7 +520,7 @@
               div
                 {} $ :style style-section
                 <> "|Fancy fonts"
-              comp-md-block "|which can be used with `ui/font-fancy`. Josefin Sans is used here." $ {}
+              comp-md-block "|which can be used with `css/font-fancy`. Josefin Sans is used here." $ {}
               render-font-demo css/font-fancy! ui/font-fancy 100
               render-font-demo css/font-fancy! ui/font-fancy 300
               render-font-demo css/font-fancy! ui/font-fancy 400
@@ -405,7 +528,7 @@
               div
                 {} $ :style style-section
                 <> "|Code fonts"
-              comp-md-block "|which can be used with `ui/font-code`." $ {}
+              comp-md-block "|which can be used with `css/font-code`." $ {}
               render-font-demo css/font-code ui/font-code 100
               render-font-demo css/font-code ui/font-code 300
               render-font-demo css/font-code ui/font-code 400
