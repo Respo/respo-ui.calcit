@@ -6,6 +6,10 @@ Respo UI for calcit-js
 
 Find details in https://ui.respo-mvc.org/ .
 
+```cirru
+@import url(cirru-color/assets/cirru.css);
+```
+
 ### License
 
 MIT

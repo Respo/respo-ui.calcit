@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.5)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.6)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -307,7 +307,9 @@
                   {} $ :class-name css/flex
                   comp-cirru-snippet "\"respo-ui.comp/comp-cirru-snippet\n\ncomp-cirru-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n" $ {}
                 div
-                  {} $ :class-name css/flex
+                  {} $ :class-name (str-spaced css/flex css/column)
+                  comp-snippet "\"@import url(cirru-color/assets/cirru.css);" $ {}
+                  =< nil 8
                   comp-cirru-snippet "\"defn f (a b)\n  + a b" $ {}
         |comp-demo-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
@@ -337,7 +339,7 @@
                   comp-cirru-snippet "\"respo-ui.comp/comp-snippet\n\ncomp-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n" $ {}
                 div
                   {} $ :class-name css/flex
-                  comp-snippet "\"defn f (a b)\n  + a b" $ {}
+                  comp-cirru-snippet "\"defn f (a b)\n  + a b" $ {}
         |comp-demo-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-tabs (states)
@@ -467,7 +469,7 @@
                   states $ :states store
                 div
                   {}
-                    :class-name $ str-spaced css/global css/fullscreen css/row
+                    :class-name $ str-spaced css/preset css/global css/fullscreen css/row
                     :style $ {} (:padding-top 16)
                   comp-sidebar $ or (nth router 0) |index.html
                   div
@@ -1012,6 +1014,18 @@
               "\"$0:active" $ {}
                 :color $ hsl 200 100 40
                 :transform "\"scale(1.04)"
+        |preset $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle preset $ {}
+              "\"body" $ {} (:margin 0) (:overscroll-behavior-x :none) (:overscroll-behavior-y :none)
+              "\"body *" $ {} (:box-sizing :border-box)
+              "\"::-webkit-scrollbar" $ {} (:width 4) (:height 4)
+              "\"::-webkit-scrollbar-track" $ {}
+                :background-color $ hsl 0 0 100
+              "\"::-webkit-scrollbar-thumb" $ {}
+                :background-color $ hsl 180 40 76 0.8
+              "\"::-webkit-scrollbar-corner" $ {} (:background-color :transparent)
+              "\"::-webkit-resizer" $ {} (:background-color :transparent)
         |row $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle row $ {} ("\"$0" ui/row)
@@ -1049,6 +1063,7 @@
         :code $ quote
           ns respo-ui.css $ :require (respo-ui.core :as ui)
             respo.css :refer $ defstyle
+            respo.util.format :refer $ hsl
     |respo-ui.main $ %{} :FileEntry
       :defs $ {}
         |*store $ %{} :CodeEntry (:doc |)
