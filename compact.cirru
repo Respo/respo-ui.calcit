@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.6)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.7)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -117,7 +117,8 @@
                     case-default kind nil (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error)
                     :class-name options
                   :style $ :style options
-                  :on-click $ :on-click options
+                  :on-click $ either (:on-click options)
+                    fn $ e d!
                 <> content
         |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
           :code $ quote
@@ -177,7 +178,7 @@
         |style-copy-outline $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-copy-outline $ {}
-              "\"&" $ {} (:position :absolute) (:top 10) (:right 10) (:width 13) (:height 13) (:border-radius "\"2px")
+              "\"&" $ {} (:position :absolute) (:top 10) (:right 10) (:width 12) (:height 12) (:border-radius "\"2px")
                 :border $ str "\"1.5px solid " (hsl 0 0 80)
                 :cursor :pointer
                 :outline "\"1px solid white"
@@ -206,7 +207,7 @@
                 :line-height "\"20px"
                 :font-size 12
                 :padding "\"0px 8px"
-                :color $ hsl 0 0 56
+                :color $ hsl 0 0 64
                 :cursor :default
               "\"&:hover" $ {}
                 :background-color $ hsl 0 0 94
@@ -215,30 +216,32 @@
           :code $ quote
             defstyle style-tag-error $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 0 90 80
+                :background-color $ hsl 0 90 76
               "\"div&:hover" $ {}
-                :background-color $ hsl 0 90 74
+                :background-color $ hsl 0 90 72
         |style-tag-info $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag-info $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 240 99 85
+                :background-color $ hsl 240 99 86
               "\"div&:hover" $ {}
-                :background-color $ hsl 240 99 80
+                :background-color $ hsl 240 99 84
         |style-tag-success $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag-success $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 120 99 85
+                :color $ hsl 120 99 40
+                :background-color $ hsl 120 99 92
               "\"div&:hover" $ {}
-                :background-color $ hsl 120 99 80
+                :background-color $ hsl 120 99 88
         |style-tag-warning $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag-warning $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 56 98 60
+                :color $ hsl 60 90 30
+                :background-color $ hsl 60 98 58
               "\"div&:hover" $ {}
-                :background-color $ hsl 56 98 48
+                :background-color $ hsl 60 98 49
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-ui.comp $ :require
@@ -411,7 +414,7 @@
                     :class-name $ str-spaced css/flex css/row
                     :style $ {} (:gap "\"8px")
                   comp-tag :info "\"info demo"
-                  comp-tag :success "\"info demo"
+                  comp-tag :success "\"success demo"
                   comp-tag :warning "\"warning demo"
                   comp-tag :error "\"error demo"
                   comp-tag :default "\"default demo"
