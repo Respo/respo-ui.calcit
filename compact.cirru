@@ -490,6 +490,8 @@
                       (:404 pp)
                         <> $ to-lispy-string router
                       _ $ do (eprintln "\"unknown router" router) (comp-home)
+                  if dev? $ comp-inspect "\"Store" store
+                    {} $ :bottom 0
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-content $ {}
@@ -500,6 +502,7 @@
             respo.util.format :refer $ hsl
             respo.core :refer $ defcomp >> div span input <>
             respo.comp.space :refer $ =<
+            respo.comp.inspect :refer $ comp-inspect
             respo-ui.core :as ui
             respo-ui.comp.sidebar :refer $ comp-sidebar
             respo-ui.comp.home :refer $ comp-home
@@ -509,6 +512,7 @@
             respo-ui.comp.components :refer $ comp-components-page
             respo.css :refer $ defstyle
             respo-ui.css :as css
+            respo-ui.config :refer $ dev?
     |respo-ui.comp.fonts-page $ %{} :FileEntry
       :defs $ {}
         |comp-fonts-page $ %{} :CodeEntry (:doc |)
@@ -1073,24 +1077,24 @@
           :code $ quote
             defatom *store $ merge schema/store
               {} $ :router
-                w-log $ parse-address
-                  str (.-pathname js/location) (.-search js/location)
+                parse-address
+                  .!slice (.-hash js/location) 1
                   , router/dict
         |dispatch! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn dispatch! (op)
-              when config/dev? $ println "\"Dispatch:" op
+              when config/dev? $ js/console.log "\"Dispatch:" op
               reset! *store $ updater @*store op
         |main! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn main! ()
               if config/dev? $ load-console-formatter!
               println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
-              render-app! render!
-              add-watch *store :changes $ fn (store prev) (render-app! render!)
               render-router!
+              add-watch *store :changes $ fn (store prev) (render-app!)
               listen! router/dict dispatch! router/mode
               add-watch *store :router-changes $ fn (store prev) (render-router!)
+              render-app!
               println "|App started!"
         |mount-target $ %{} :CodeEntry (:doc |)
           :code $ quote
@@ -1099,16 +1103,15 @@
           :code $ quote
             defn reload! () $ if (nil? build-errors) 
               do (remove-watch *store :changes) (remove-watch *store :router-changes) (clear-cache!)
-                add-watch *store :changes $ fn (store prev) (render-app! render!)
+                add-watch *store :changes $ fn (store prev) (render-app!)
                 add-watch *store :router-changes $ fn (store prev) (render-router!)
-                render-app! render!
+                render-app!
                 hud! "\"ok~" "\"Ok"
                 println "|Code updated!"
               hud! "\"error" build-errors
         |render-app! $ %{} :CodeEntry (:doc |)
           :code $ quote
-            defn render-app! (renderer)
-              renderer mount-target (comp-container @*store) dispatch!
+            defn render-app! () $ render! mount-target (comp-container @*store) dispatch!
         |render-router! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn render-router! () $ render-url! (:router @*store) router/dict router/mode
@@ -1158,4 +1161,7 @@
             def store $ {} (:router nil)
               :states $ {}
       :ns $ %{} :CodeEntry (:doc |)
-        :code $ quote (ns respo-ui.schema)
+        :code $ quote
+          ns respo-ui.schema $ :require
+            respo-ui.router :refer $ dict
+            respo-router.parser :refer $ parse-address
