@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.7)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.8)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -58,6 +58,13 @@
                 pre $ {} (:class-name css/expand)
                   :innerHTML $ generateHtml text
                 comp-copy $ fn () (copy! text)
+        |comp-close $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-close (? options)
+              span $ {} (:inner-text "\"✕")
+                :style $ get options :style
+                :class-name $ str-spaced style-close (get options :class-name)
+                :on-click $ get options :on-click
         |comp-copy $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-copy (f)
@@ -171,6 +178,17 @@
           :code $ quote
             defstyle style-attributes-title $ {}
               "\"$0" $ {} (:font-size 18) (:margin-bottom 6)
+        |style-close $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-close $ {}
+              "\"&" $ {} (:font-size 16) (:line-height "\"16px") (:height "\"16px") (:font-weight 100)
+                :color $ hsl 0 90 70
+                :opacity 0.5
+                :cursor :pointer
+                :transition-duration "\"200ms"
+                :user-select :none
+              "\"&:hover" $ {} (:opacity 1)
+              "\"&:active" $ {} (:transform "\"scale(1.1)") (:transition-duration "\"0ms")
         |style-copy-container $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-copy-container $ {}
@@ -266,13 +284,14 @@
                   {} $ :style
                     {} $ :padding-bottom "\"50vh"
                   div ({}) (<> "|There are also components follow the guidelines of Respo UI:") (render-entry "\"https://github.com/Respo/alerts.calcit" "\"alerts") (render-entry "\"https://github.com/Respo/respo-feather.calcit" "\"respo-feather") (render-entry |https://github.com/Respo/respo-message.calcit "\"respo-message") (render-entry |https://github.com/Respo/respo-markdown.calcit "\"respo-markdown") (; render-entry |https://github.com/Respo/notifier.calcit "\"notifier")
-                  comp-demo-placeholder
-                  comp-demo-tabs $ >> states :tabs
                   comp-demo-attributes
+                  comp-demo-tabs $ >> states :tabs
                   comp-demo-cirru-snippet
                   comp-demo-snippet
                   comp-demo-time
                   comp-demo-tags
+                  comp-demo-close
+                  comp-demo-placeholder
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-attributes () $ div
@@ -314,6 +333,24 @@
                   comp-snippet "\"@import url(cirru-color/assets/cirru.css);" $ {}
                   =< nil 8
                   comp-cirru-snippet "\"defn f (a b)\n  + a b" $ {}
+        |comp-demo-close $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-close () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Tags demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-close\n\ncomp-tag $ {}\n  :style $ {}\n" $ {}
+                div
+                  {}
+                    :class-name $ str-spaced css/flex css/row
+                    :style $ {} (:gap "\"8px")
+                  comp-close
         |comp-demo-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-placeholder () $ div ({})
@@ -454,7 +491,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
