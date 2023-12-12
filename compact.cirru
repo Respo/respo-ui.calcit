@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.8)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.9)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -93,28 +93,29 @@
         |comp-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tabs (options tabs on-route)
-              list->
-                {}
-                  :class-name $ if (:vertical? options) css/column css/row
-                  :style $ merge
-                    {} (:padding "\"4px 16px")
-                      :width $ :width options
-                    :style options
-                -> tabs $ map
-                  fn (info)
-                    [] (:name info)
-                      div
-                        {} (:class-name css-tab)
-                          :style $ merge (:tab-style options)
-                            if
-                              = (:selected options) (:name info)
-                              merge
-                                {}
-                                  :color $ hsl 0 0 100
-                                  :background-color $ hsl 200 80 70
-                                :selected-tab-style options
-                          :on-click $ fn (e d!) (on-route info d!)
-                        <> $ :title info
+              let
+                  selected $ :selected options
+                  vertical? $ :vertical? options
+                [] (effect-tab-highlight selected vertical?)
+                  div
+                    {}
+                      :class-name $ str-spaced style-tabs (if vertical? css/column css/row) (get options :class-name)
+                      :style $ merge
+                        {} $ :width (:width options)
+                        get options :style
+                    div $ {} (:class-name style-tab-highlight)
+                    , & $ -> tabs
+                      map $ fn (info)
+                        let
+                            selected? $ = selected
+                              or (:value info) (:name info)
+                          div
+                            {}
+                              :class-name $ str-spaced css-tab (get options :tab-class-name) (if selected? style-selected-tab)
+                              :style $ merge (:tab-style options)
+                                if selected? $ :selected-tab-style options
+                              :on-click $ fn (e d!) (on-route info d!)
+                            <> $ or (:display info) (:title info)
         |comp-tag $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tag (kind content ? options)
@@ -170,6 +171,30 @@
                 :border-radius "\"2px"
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 98
+        |effect-tab-highlight $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defeffect effect-tab-highlight (selected vertical?) (action el at?)
+              when
+                or (= action :mount) (= action :update)
+                let
+                    target $ .!querySelector el (str "\"." style-selected-tab)
+                    cursor $ .!querySelector el (str "\"." style-tab-highlight)
+                  if (some? target)
+                    let
+                        left $ - (.-offsetLeft target) 0
+                        width $ .-clientWidth target
+                      if vertical?
+                        do
+                          -> cursor .-style .-top $ set!
+                            str
+                              + (.-offsetTop target) (.-offsetHeight target)
+                              , "\"px"
+                          -> cursor .-style .-bottom $ set! (str 0 "\"px")
+                          -> cursor .-style .-width $ set! (str width "\"px")
+                        do
+                          -> cursor .-style .-left $ set! (str left "\"px")
+                          -> cursor .-style .-width $ set! (str width "\"px")
+                    -> cursor .-style .-width $ set! (str 0 "\"px")
         |literal? $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn literal? (v)
@@ -214,6 +239,22 @@
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 100
                 :box-shadow $ str "\"0 0 4px 1px " (hsl 0 0 0 0.08)
+        |style-selected-tab $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-selected-tab $ {}
+              "\"&" $ {}
+        |style-tab-highlight $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tab-highlight $ {}
+              "\"&" $ {} (:min-width 0) (:left 0) (:height 2)
+                :background-color $ hsl 200 80 70
+                :bottom 0
+                :position :absolute
+                :transition-duration "\"200ms"
+        |style-tabs $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tabs $ {}
+              "\"&" $ {} (:position :relative)
         |style-tag $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag $ {}
@@ -263,7 +304,7 @@
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-ui.comp $ :require
-            respo.core :refer $ defcomp div list-> input textarea button span select option a <> pre
+            respo.core :refer $ defcomp defeffect div list-> input textarea button span select option a <> pre
             respo.comp.space :refer $ =<
             respo-ui.core :as ui
             respo.util.format :refer $ hsl
@@ -388,9 +429,9 @@
                   state $ or (:data states)
                     {} $ :selected nil
                   en-tabs $ []
-                    {} (:name :book) (:title "\"Book")
-                    {} (:name :card) (:title "\"Card")
-                    {} (:name :pl) (:title "\"Programming language")
+                    {} (:value :book) (:display "\"Book")
+                    {} (:value :card) (:display "\"Card")
+                    {} (:value :pl) (:display "\"Programming language")
                 div ({})
                   div
                     {} $ :class-name css-title
@@ -402,23 +443,23 @@
                       {} $ :class-name css/flex
                       comp-tabs
                         {} $ :selected (:selected state)
-                        , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                        , en-tabs $ fn (info d!)
+                          d! cursor $ assoc state :selected (:value info)
                       comp-tabs
                         {} $ :selected (:selected state)
                         []
-                          {} (:name :book) (:title "\"书本")
-                          {} (:name :card) (:title "\"纸牌")
-                          {} (:name :pl) (:title "\"编程语言")
-                        fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                          {} (:value :book) (:display "\"书本")
+                          {} (:value :card) (:display "\"纸牌")
+                          {} (:value :pl) (:display "\"编程语言")
+                        fn (info d!)
+                          d! cursor $ assoc state :selected (:value info)
                       comp-tabs
                         {}
                           :selected $ :selected state
                           :style $ {}
                             :border-bottom $ str "\"1px solid " (hsl 0 0 90)
                         , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                          d! cursor $ assoc state :selected (:value info)
                   =< nil 8
                   div
                     {} $ :class-name (str-spaced css/row css/gap8)
@@ -432,7 +473,7 @@
                           :width 200
                           :style $ {}
                         , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                          d! cursor $ assoc state :selected (:value info)
         |comp-demo-tags $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-tags () $ div
