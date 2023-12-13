@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.6)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.9)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -58,6 +58,13 @@
                 pre $ {} (:class-name css/expand)
                   :innerHTML $ generateHtml text
                 comp-copy $ fn () (copy! text)
+        |comp-close $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-close (? options)
+              span $ {} (:inner-text "\"✕")
+                :style $ get options :style
+                :class-name $ str-spaced style-close (get options :class-name)
+                :on-click $ get options :on-click
         |comp-copy $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-copy (f)
@@ -86,28 +93,29 @@
         |comp-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tabs (options tabs on-route)
-              list->
-                {}
-                  :class-name $ if (:vertical? options) css/column css/row
-                  :style $ merge
-                    {} (:padding "\"4px 16px")
-                      :width $ :width options
-                    :style options
-                -> tabs $ map
-                  fn (info)
-                    [] (:name info)
-                      div
-                        {} (:class-name css-tab)
-                          :style $ merge (:tab-style options)
-                            if
-                              = (:selected options) (:name info)
-                              merge
-                                {}
-                                  :color $ hsl 0 0 100
-                                  :background-color $ hsl 200 80 70
-                                :selected-tab-style options
-                          :on-click $ fn (e d!) (on-route info d!)
-                        <> $ :title info
+              let
+                  selected $ :selected options
+                  vertical? $ :vertical? options
+                [] (effect-tab-highlight selected vertical?)
+                  div
+                    {}
+                      :class-name $ str-spaced style-tabs (if vertical? css/column css/row) (get options :class-name)
+                      :style $ merge
+                        {} $ :width (:width options)
+                        get options :style
+                    div $ {} (:class-name style-tab-highlight)
+                    , & $ -> tabs
+                      map $ fn (info)
+                        let
+                            selected? $ = selected
+                              or (:value info) (:name info)
+                          div
+                            {}
+                              :class-name $ str-spaced css-tab (get options :tab-class-name) (if selected? style-selected-tab)
+                              :style $ merge (:tab-style options)
+                                if selected? $ :selected-tab-style options
+                              :on-click $ fn (e d!) (on-route info d!)
+                            <> $ or (:display info) (:title info)
         |comp-tag $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tag (kind content ? options)
@@ -117,7 +125,8 @@
                     case-default kind nil (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error)
                     :class-name options
                   :style $ :style options
-                  :on-click $ :on-click options
+                  :on-click $ either (:on-click options)
+                    fn $ e d!
                 <> content
         |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
           :code $ quote
@@ -162,6 +171,30 @@
                 :border-radius "\"2px"
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 98
+        |effect-tab-highlight $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defeffect effect-tab-highlight (selected vertical?) (action el at?)
+              when
+                or (= action :mount) (= action :update)
+                let
+                    target $ .!querySelector el (str "\"." style-selected-tab)
+                    cursor $ .!querySelector el (str "\"." style-tab-highlight)
+                  if (some? target)
+                    let
+                        left $ - (.-offsetLeft target) 0
+                        width $ .-clientWidth target
+                      if vertical?
+                        do
+                          -> cursor .-style .-top $ set!
+                            str
+                              + (.-offsetTop target) (.-offsetHeight target)
+                              , "\"px"
+                          -> cursor .-style .-bottom $ set! (str 0 "\"px")
+                          -> cursor .-style .-width $ set! (str width "\"px")
+                        do
+                          -> cursor .-style .-left $ set! (str left "\"px")
+                          -> cursor .-style .-width $ set! (str width "\"px")
+                    -> cursor .-style .-width $ set! (str 0 "\"px")
         |literal? $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn literal? (v)
@@ -170,6 +203,17 @@
           :code $ quote
             defstyle style-attributes-title $ {}
               "\"$0" $ {} (:font-size 18) (:margin-bottom 6)
+        |style-close $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-close $ {}
+              "\"&" $ {} (:font-size 16) (:line-height "\"16px") (:height "\"16px") (:font-weight 100)
+                :color $ hsl 0 90 70
+                :opacity 0.5
+                :cursor :pointer
+                :transition-duration "\"200ms"
+                :user-select :none
+              "\"&:hover" $ {} (:opacity 1)
+              "\"&:active" $ {} (:transform "\"scale(1.1)") (:transition-duration "\"0ms")
         |style-copy-container $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-copy-container $ {}
@@ -177,7 +221,7 @@
         |style-copy-outline $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-copy-outline $ {}
-              "\"&" $ {} (:position :absolute) (:top 10) (:right 10) (:width 13) (:height 13) (:border-radius "\"2px")
+              "\"&" $ {} (:position :absolute) (:top 10) (:right 10) (:width 12) (:height 12) (:border-radius "\"2px")
                 :border $ str "\"1.5px solid " (hsl 0 0 80)
                 :cursor :pointer
                 :outline "\"1px solid white"
@@ -195,6 +239,22 @@
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 100
                 :box-shadow $ str "\"0 0 4px 1px " (hsl 0 0 0 0.08)
+        |style-selected-tab $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-selected-tab $ {}
+              "\"&" $ {}
+        |style-tab-highlight $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tab-highlight $ {}
+              "\"&" $ {} (:min-width 0) (:left 0) (:height 2)
+                :background-color $ hsl 200 80 70
+                :bottom 0
+                :position :absolute
+                :transition-duration "\"200ms"
+        |style-tabs $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tabs $ {}
+              "\"&" $ {} (:position :relative)
         |style-tag $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag $ {}
@@ -206,7 +266,7 @@
                 :line-height "\"20px"
                 :font-size 12
                 :padding "\"0px 8px"
-                :color $ hsl 0 0 56
+                :color $ hsl 0 0 64
                 :cursor :default
               "\"&:hover" $ {}
                 :background-color $ hsl 0 0 94
@@ -215,34 +275,36 @@
           :code $ quote
             defstyle style-tag-error $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 0 90 80
+                :background-color $ hsl 0 90 76
               "\"div&:hover" $ {}
-                :background-color $ hsl 0 90 74
+                :background-color $ hsl 0 90 72
         |style-tag-info $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag-info $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 240 99 85
+                :background-color $ hsl 240 99 86
               "\"div&:hover" $ {}
-                :background-color $ hsl 240 99 80
+                :background-color $ hsl 240 99 84
         |style-tag-success $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag-success $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 120 99 85
+                :color $ hsl 120 99 40
+                :background-color $ hsl 120 99 92
               "\"div&:hover" $ {}
-                :background-color $ hsl 120 99 80
+                :background-color $ hsl 120 99 88
         |style-tag-warning $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tag-warning $ {}
               "\"div&" $ {} (:color :white) (:border :none)
-                :background-color $ hsl 56 98 60
+                :color $ hsl 60 90 30
+                :background-color $ hsl 60 98 58
               "\"div&:hover" $ {}
-                :background-color $ hsl 56 98 48
+                :background-color $ hsl 60 98 49
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-ui.comp $ :require
-            respo.core :refer $ defcomp div list-> input textarea button span select option a <> pre
+            respo.core :refer $ defcomp defeffect div list-> input textarea button span select option a <> pre
             respo.comp.space :refer $ =<
             respo-ui.core :as ui
             respo.util.format :refer $ hsl
@@ -263,13 +325,14 @@
                   {} $ :style
                     {} $ :padding-bottom "\"50vh"
                   div ({}) (<> "|There are also components follow the guidelines of Respo UI:") (render-entry "\"https://github.com/Respo/alerts.calcit" "\"alerts") (render-entry "\"https://github.com/Respo/respo-feather.calcit" "\"respo-feather") (render-entry |https://github.com/Respo/respo-message.calcit "\"respo-message") (render-entry |https://github.com/Respo/respo-markdown.calcit "\"respo-markdown") (; render-entry |https://github.com/Respo/notifier.calcit "\"notifier")
-                  comp-demo-placeholder
-                  comp-demo-tabs $ >> states :tabs
                   comp-demo-attributes
+                  comp-demo-tabs $ >> states :tabs
                   comp-demo-cirru-snippet
                   comp-demo-snippet
                   comp-demo-time
                   comp-demo-tags
+                  comp-demo-close
+                  comp-demo-placeholder
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-attributes () $ div
@@ -311,6 +374,24 @@
                   comp-snippet "\"@import url(cirru-color/assets/cirru.css);" $ {}
                   =< nil 8
                   comp-cirru-snippet "\"defn f (a b)\n  + a b" $ {}
+        |comp-demo-close $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-close () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Tags demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-close\n\ncomp-tag $ {}\n  :style $ {}\n" $ {}
+                div
+                  {}
+                    :class-name $ str-spaced css/flex css/row
+                    :style $ {} (:gap "\"8px")
+                  comp-close
         |comp-demo-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-placeholder () $ div ({})
@@ -348,9 +429,9 @@
                   state $ or (:data states)
                     {} $ :selected nil
                   en-tabs $ []
-                    {} (:name :book) (:title "\"Book")
-                    {} (:name :card) (:title "\"Card")
-                    {} (:name :pl) (:title "\"Programming language")
+                    {} (:value :book) (:display "\"Book")
+                    {} (:value :card) (:display "\"Card")
+                    {} (:value :pl) (:display "\"Programming language")
                 div ({})
                   div
                     {} $ :class-name css-title
@@ -362,23 +443,23 @@
                       {} $ :class-name css/flex
                       comp-tabs
                         {} $ :selected (:selected state)
-                        , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                        , en-tabs $ fn (info d!)
+                          d! cursor $ assoc state :selected (:value info)
                       comp-tabs
                         {} $ :selected (:selected state)
                         []
-                          {} (:name :book) (:title "\"书本")
-                          {} (:name :card) (:title "\"纸牌")
-                          {} (:name :pl) (:title "\"编程语言")
-                        fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                          {} (:value :book) (:display "\"书本")
+                          {} (:value :card) (:display "\"纸牌")
+                          {} (:value :pl) (:display "\"编程语言")
+                        fn (info d!)
+                          d! cursor $ assoc state :selected (:value info)
                       comp-tabs
                         {}
                           :selected $ :selected state
                           :style $ {}
                             :border-bottom $ str "\"1px solid " (hsl 0 0 90)
                         , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                          d! cursor $ assoc state :selected (:value info)
                   =< nil 8
                   div
                     {} $ :class-name (str-spaced css/row css/gap8)
@@ -392,7 +473,7 @@
                           :width 200
                           :style $ {}
                         , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:name info)
+                          d! cursor $ assoc state :selected (:value info)
         |comp-demo-tags $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-tags () $ div
@@ -411,7 +492,7 @@
                     :class-name $ str-spaced css/flex css/row
                     :style $ {} (:gap "\"8px")
                   comp-tag :info "\"info demo"
-                  comp-tag :success "\"info demo"
+                  comp-tag :success "\"success demo"
                   comp-tag :warning "\"warning demo"
                   comp-tag :error "\"error demo"
                   comp-tag :default "\"default demo"
@@ -451,7 +532,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
@@ -487,6 +568,8 @@
                       (:404 pp)
                         <> $ to-lispy-string router
                       _ $ do (eprintln "\"unknown router" router) (comp-home)
+                  if dev? $ comp-inspect "\"Store" store
+                    {} $ :bottom 0
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-content $ {}
@@ -497,6 +580,7 @@
             respo.util.format :refer $ hsl
             respo.core :refer $ defcomp >> div span input <>
             respo.comp.space :refer $ =<
+            respo.comp.inspect :refer $ comp-inspect
             respo-ui.core :as ui
             respo-ui.comp.sidebar :refer $ comp-sidebar
             respo-ui.comp.home :refer $ comp-home
@@ -506,6 +590,7 @@
             respo-ui.comp.components :refer $ comp-components-page
             respo.css :refer $ defstyle
             respo-ui.css :as css
+            respo-ui.config :refer $ dev?
     |respo-ui.comp.fonts-page $ %{} :FileEntry
       :defs $ {}
         |comp-fonts-page $ %{} :CodeEntry (:doc |)
@@ -1070,24 +1155,24 @@
           :code $ quote
             defatom *store $ merge schema/store
               {} $ :router
-                w-log $ parse-address
-                  str (.-pathname js/location) (.-search js/location)
+                parse-address
+                  .!slice (.-hash js/location) 1
                   , router/dict
         |dispatch! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn dispatch! (op)
-              when config/dev? $ println "\"Dispatch:" op
+              when config/dev? $ js/console.log "\"Dispatch:" op
               reset! *store $ updater @*store op
         |main! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn main! ()
               if config/dev? $ load-console-formatter!
               println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
-              render-app! render!
-              add-watch *store :changes $ fn (store prev) (render-app! render!)
               render-router!
+              add-watch *store :changes $ fn (store prev) (render-app!)
               listen! router/dict dispatch! router/mode
               add-watch *store :router-changes $ fn (store prev) (render-router!)
+              render-app!
               println "|App started!"
         |mount-target $ %{} :CodeEntry (:doc |)
           :code $ quote
@@ -1096,16 +1181,15 @@
           :code $ quote
             defn reload! () $ if (nil? build-errors) 
               do (remove-watch *store :changes) (remove-watch *store :router-changes) (clear-cache!)
-                add-watch *store :changes $ fn (store prev) (render-app! render!)
+                add-watch *store :changes $ fn (store prev) (render-app!)
                 add-watch *store :router-changes $ fn (store prev) (render-router!)
-                render-app! render!
+                render-app!
                 hud! "\"ok~" "\"Ok"
                 println "|Code updated!"
               hud! "\"error" build-errors
         |render-app! $ %{} :CodeEntry (:doc |)
           :code $ quote
-            defn render-app! (renderer)
-              renderer mount-target (comp-container @*store) dispatch!
+            defn render-app! () $ render! mount-target (comp-container @*store) dispatch!
         |render-router! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn render-router! () $ render-url! (:router @*store) router/dict router/mode
@@ -1155,4 +1239,7 @@
             def store $ {} (:router nil)
               :states $ {}
       :ns $ %{} :CodeEntry (:doc |)
-        :code $ quote (ns respo-ui.schema)
+        :code $ quote
+          ns respo-ui.schema $ :require
+            respo-ui.router :refer $ dict
+            respo-router.parser :refer $ parse-address
