@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.10)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.11)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -110,7 +110,8 @@
                       :style $ merge
                         {} $ :width (:width options)
                         get options :style
-                    div $ {} (:class-name style-tab-highlight)
+                    div $ {}
+                      :class-name $ str-spaced style-tab-highlight (if vertical? style-tab-vertical-highlight)
                     , & $ -> tabs
                       map $ fn (info)
                         let
@@ -196,14 +197,13 @@
                     let
                         left $ - (.-offsetLeft target) 0
                         width $ .-clientWidth target
+                        height $ .-clientHeight target
                       if vertical?
                         do
                           -> cursor .-style .-top $ set!
-                            str
-                              + (.-offsetTop target) (.-offsetHeight target)
-                              , "\"px"
+                            str (.-offsetTop target) "\"px"
                           -> cursor .-style .-bottom $ set! (str 0 "\"px")
-                          -> cursor .-style .-width $ set! (str width "\"px")
+                          -> cursor .-style .-height $ set! (str height "\"px")
                         do
                           -> cursor .-style .-left $ set! (str left "\"px")
                           -> cursor .-style .-width $ set! (str width "\"px")
@@ -263,11 +263,20 @@
         |style-tab-highlight $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tab-highlight $ {}
-              "\"&" $ {} (:min-width 0) (:left 0) (:height 2)
-                :background-color $ hsl 200 80 70
+              "\"&" $ {} (:min-width 0) (:left 0) (:height 1)
+                :background-color $ hsl 200 60 80
                 :bottom 0
                 :position :absolute
                 :transition-duration "\"200ms"
+                :border-radius "\"2px"
+              (str "\"." style-tabs "\":hover &")
+                {} $ :height 3
+        |style-tab-vertical-highlight $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-tab-vertical-highlight $ {}
+              "\"div&" $ {} (:width 2) (:left 0)
+              (str "\"." style-tabs "\":hover div&")
+                {} $ :width 4
         |style-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-tabs $ {}
@@ -493,7 +502,7 @@
                         {}
                           :selected $ :selected state
                           :style $ {}
-                            :border-bottom $ str "\"1px solid " (hsl 0 0 90)
+                            :border-bottom $ str "\"1px solid " (hsl 0 0 94)
                         , en-tabs $ fn (info d!) (println "\"selected" info)
                           d! cursor $ assoc state :selected (:value info)
                   =< nil 8
