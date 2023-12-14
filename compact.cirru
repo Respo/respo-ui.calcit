@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.9)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.10)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -48,6 +48,13 @@
                       <> title
                     , ret
                   , ret
+        |comp-catoptric-text $ %{} :CodeEntry (:doc "|by \"catoptric text\" I mean text added with CSS content, thus unsearchable from browser search or select. The text can still be grabbed from DOM tree though.")
+          :code $ quote
+            defcomp comp-catoptric-text (text ? options)
+              [] (effect-dataset-text text)
+                span $ {}
+                  :class-name $ str-spaced style-catoptric (get options :class-name)
+                  :style $ get options :style
         |comp-cirru-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-cirru-snippet (text styles)
@@ -171,6 +178,12 @@
                 :border-radius "\"2px"
               "\"$0:hover" $ {}
                 :background-color $ hsl 0 0 98
+        |effect-dataset-text $ %{} :CodeEntry (:doc "|Respo does not support dataset from attribute, write with effect")
+          :code $ quote
+            defeffect effect-dataset-text (text) (action el at?)
+              if
+                or (= action :update) (= action :mount)
+                -> el .-dataset .-text $ set! text
         |effect-tab-highlight $ %{} :CodeEntry (:doc |)
           :code $ quote
             defeffect effect-tab-highlight (selected vertical?) (action el at?)
@@ -203,6 +216,10 @@
           :code $ quote
             defstyle style-attributes-title $ {}
               "\"$0" $ {} (:font-size 18) (:margin-bottom 6)
+        |style-catoptric $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-catoptric $ {}
+              "\"&::before" $ {} (:content "\"attr(data-text)")
         |style-close $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-close $ {}
@@ -332,6 +349,7 @@
                   comp-demo-time
                   comp-demo-tags
                   comp-demo-close
+                  comp-demo-catoptric-text
                   comp-demo-placeholder
         |comp-demo-attributes $ %{} :CodeEntry (:doc |)
           :code $ quote
@@ -356,6 +374,24 @@
                       {} (:label "\"DEMO 3")
                         :value $ a
                           {} (:inner-text "\"Demo") (:href "\"https://respo-mvc.org") (:target "\"_blank")
+        |comp-demo-catoptric-text $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-demo-catoptric-text () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Tags demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                div
+                  {} $ :class-name css/flex
+                  comp-cirru-snippet "\"respo-ui.comp/comp-catoptric-tex\n\ncomp-catoptric \"|Demo Text\" $ {}\n  :style $ {}\n  :class-name $ {}\n" $ {}
+                div
+                  {}
+                    :class-name $ str-spaced css/flex css/row
+                    :style $ {} (:gap "\"8px")
+                  comp-catoptric-text "\"DEMO Text"
         |comp-demo-cirru-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-cirru-snippet () $ div
@@ -532,7 +568,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl

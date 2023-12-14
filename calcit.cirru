@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.9)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.10)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -276,6 +276,49 @@
                                   |b $ %{} :Leaf (:at 1678305449664) (:by |bjmr3HZle) (:text |title)
                           |l $ %{} :Leaf (:at 1678305452973) (:by |bjmr3HZle) (:text |ret)
                       |l $ %{} :Leaf (:at 1678305454788) (:by |bjmr3HZle) (:text |ret)
+        |comp-catoptric-text $ %{} :CodeEntry (:doc "|by \"catoptric text\" I mean text added with CSS content, thus unsearchable from browser search or select. The text can still be grabbed from DOM tree though.")
+          :code $ %{} :Expr (:at 1702490308575) (:by |bjmr3HZle)
+            :data $ {}
+              |T $ %{} :Leaf (:at 1702490317703) (:by |bjmr3HZle) (:text |defcomp)
+              |b $ %{} :Leaf (:at 1702490308575) (:by |bjmr3HZle) (:text |comp-catoptric-text)
+              |h $ %{} :Expr (:at 1702490308575) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1702490334717) (:by |bjmr3HZle) (:text |text)
+                  |X $ %{} :Leaf (:at 1702490337600) (:by |bjmr3HZle) (:text |?)
+                  |b $ %{} :Leaf (:at 1702490336111) (:by |bjmr3HZle) (:text |options)
+              |l $ %{} :Expr (:at 1702490750976) (:by |bjmr3HZle)
+                :data $ {}
+                  |D $ %{} :Leaf (:at 1702490754466) (:by |bjmr3HZle) (:text |[])
+                  |L $ %{} :Expr (:at 1702490755838) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490766808) (:by |bjmr3HZle) (:text |effect-dataset-text)
+                      |b $ %{} :Leaf (:at 1702490767991) (:by |bjmr3HZle) (:text |text)
+                  |T $ %{} :Expr (:at 1702490338947) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490345981) (:by |bjmr3HZle) (:text |span)
+                      |b $ %{} :Expr (:at 1702490347307) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490347662) (:by |bjmr3HZle) (:text |{})
+                          |X $ %{} :Expr (:at 1702490352479) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490354022) (:by |bjmr3HZle) (:text |:class-name)
+                              |b $ %{} :Expr (:at 1702490411973) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |D $ %{} :Leaf (:at 1702490414584) (:by |bjmr3HZle) (:text |str-spaced)
+                                  |T $ %{} :Leaf (:at 1702490359287) (:by |bjmr3HZle) (:text |style-catoptric)
+                                  |b $ %{} :Expr (:at 1702490416395) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1702490416798) (:by |bjmr3HZle) (:text |get)
+                                      |b $ %{} :Leaf (:at 1702490428635) (:by |bjmr3HZle) (:text |options)
+                                      |h $ %{} :Leaf (:at 1702490420539) (:by |bjmr3HZle) (:text |:class-name)
+                          |Y $ %{} :Expr (:at 1702490422462) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490423416) (:by |bjmr3HZle) (:text |:style)
+                              |b $ %{} :Expr (:at 1702490423653) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1702490424227) (:by |bjmr3HZle) (:text |get)
+                                  |b $ %{} :Leaf (:at 1702490425115) (:by |bjmr3HZle) (:text |options)
+                                  |h $ %{} :Leaf (:at 1702490426996) (:by |bjmr3HZle) (:text |:style)
         |comp-cirru-snippet $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1593161556909) (:by |bjmr3HZle)
             :data $ {}
@@ -1107,6 +1150,45 @@
                                   |b $ %{} :Leaf (:at 1651248158204) (:by |bjmr3HZle) (:text |0)
                                   |h $ %{} :Leaf (:at 1651248158455) (:by |bjmr3HZle) (:text |0)
                                   |l $ %{} :Leaf (:at 1651248159236) (:by |bjmr3HZle) (:text |98)
+        |effect-dataset-text $ %{} :CodeEntry (:doc "|Respo does not support dataset from attribute, write with effect")
+          :code $ %{} :Expr (:at 1702490779833) (:by |bjmr3HZle)
+            :data $ {}
+              |T $ %{} :Leaf (:at 1702490782470) (:by |bjmr3HZle) (:text |defeffect)
+              |b $ %{} :Leaf (:at 1702490779833) (:by |bjmr3HZle) (:text |effect-dataset-text)
+              |h $ %{} :Expr (:at 1702490779833) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1702490784903) (:by |bjmr3HZle) (:text |text)
+              |l $ %{} :Expr (:at 1702490785526) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1702490787712) (:by |bjmr3HZle) (:text |action)
+                  |b $ %{} :Leaf (:at 1702490789592) (:by |bjmr3HZle) (:text |el)
+                  |h $ %{} :Leaf (:at 1702490791000) (:by |bjmr3HZle) (:text |at?)
+              |o $ %{} :Expr (:at 1702490792013) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1702490794788) (:by |bjmr3HZle) (:text |if)
+                  |b $ %{} :Expr (:at 1702490795873) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490796566) (:by |bjmr3HZle) (:text |or)
+                      |b $ %{} :Expr (:at 1702490797288) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490797360) (:by |bjmr3HZle) (:text |=)
+                          |b $ %{} :Leaf (:at 1702490799369) (:by |bjmr3HZle) (:text |action)
+                          |h $ %{} :Leaf (:at 1702490800298) (:by |bjmr3HZle) (:text |:update)
+                      |h $ %{} :Expr (:at 1702490797288) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490797360) (:by |bjmr3HZle) (:text |=)
+                          |b $ %{} :Leaf (:at 1702490799369) (:by |bjmr3HZle) (:text |action)
+                          |h $ %{} :Leaf (:at 1702490804330) (:by |bjmr3HZle) (:text |:mount)
+                  |h $ %{} :Expr (:at 1702490805711) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490810130) (:by |bjmr3HZle) (:text |->)
+                      |b $ %{} :Leaf (:at 1702490811181) (:by |bjmr3HZle) (:text |el)
+                      |h $ %{} :Leaf (:at 1702490814743) (:by |bjmr3HZle) (:text |.-dataset)
+                      |j $ %{} :Leaf (:at 1702490829293) (:by |bjmr3HZle) (:text |.-text)
+                      |l $ %{} :Expr (:at 1702490817032) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490822810) (:by |bjmr3HZle) (:text |set!)
+                          |b $ %{} :Leaf (:at 1702490831672) (:by |bjmr3HZle) (:text |text)
         |effect-tab-highlight $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1702404401158) (:by |bjmr3HZle)
             :data $ {}
@@ -1349,6 +1431,24 @@
                             :data $ {}
                               |T $ %{} :Leaf (:at 1678305553124) (:by |bjmr3HZle) (:text |:margin-bottom)
                               |b $ %{} :Leaf (:at 1678305557908) (:by |bjmr3HZle) (:text |6)
+        |style-catoptric $ %{} :CodeEntry (:doc |)
+          :code $ %{} :Expr (:at 1702490376376) (:by |bjmr3HZle)
+            :data $ {}
+              |T $ %{} :Leaf (:at 1702490377628) (:by |bjmr3HZle) (:text |defstyle)
+              |b $ %{} :Leaf (:at 1702490376376) (:by |bjmr3HZle) (:text |style-catoptric)
+              |h $ %{} :Expr (:at 1702490376376) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1702490379245) (:by |bjmr3HZle) (:text |{})
+                  |b $ %{} :Expr (:at 1702490379604) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490624902) (:by |bjmr3HZle) (:text "|\"&::before")
+                      |b $ %{} :Expr (:at 1702490390425) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490390739) (:by |bjmr3HZle) (:text |{})
+                          |b $ %{} :Expr (:at 1702490391029) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490392807) (:by |bjmr3HZle) (:text |:content)
+                              |b $ %{} :Leaf (:at 1702490837494) (:by |bjmr3HZle) (:text "|\"attr(data-text)")
         |style-close $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1702317238455) (:by |bjmr3HZle)
             :data $ {}
@@ -2159,6 +2259,9 @@
                       |ze $ %{} :Expr (:at 1700586867926) (:by |bjmr3HZle)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1702317277354) (:by |bjmr3HZle) (:text |comp-demo-close)
+                      |zg $ %{} :Expr (:at 1702490449087) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490454917) (:by |bjmr3HZle) (:text |comp-demo-catoptric-text)
                       |zj $ %{} :Expr (:at 1702317570147) (:by |bjmr3HZle)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1702317570147) (:by |bjmr3HZle) (:text |comp-demo-placeholder)
@@ -2336,6 +2439,101 @@
                                                             :data $ {}
                                                               |T $ %{} :Leaf (:at 1699981851859) (:by |bjmr3HZle) (:text |:target)
                                                               |b $ %{} :Leaf (:at 1699981856421) (:by |bjmr3HZle) (:text "|\"_blank")
+        |comp-demo-catoptric-text $ %{} :CodeEntry (:doc |)
+          :code $ %{} :Expr (:at 1702490456698) (:by |bjmr3HZle)
+            :data $ {}
+              |T $ %{} :Leaf (:at 1702490459858) (:by |bjmr3HZle) (:text |defcomp)
+              |b $ %{} :Leaf (:at 1702490456698) (:by |bjmr3HZle) (:text |comp-demo-catoptric-text)
+              |h $ %{} :Expr (:at 1702490456698) (:by |bjmr3HZle)
+                :data $ {}
+              |o $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                :data $ {}
+                  |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |div)
+                  |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
+                      |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |:class-name)
+                          |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |css/column)
+                  |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |div)
+                      |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
+                          |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |:class-name)
+                              |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |css-title)
+                      |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |<>)
+                          |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text "|\"Tags demo")
+                  |l $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |=<)
+                      |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |nil)
+                      |h $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |8)
+                  |o $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                    :data $ {}
+                      |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |div)
+                      |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
+                          |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |:class-name)
+                              |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |str-spaced)
+                                  |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |css/row)
+                                  |h $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |css/gap8)
+                      |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |div)
+                          |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
+                              |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |:class-name)
+                                  |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |css/flex)
+                          |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
+                              |b $ %{} :Leaf (:at 1702490527532) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-catoptric-tex\n\ncomp-catoptric \"|Demo Text\" $ {}\n  :style $ {}\n  :class-name $ {}\n")
+                              |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
+                      |l $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                        :data $ {}
+                          |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |div)
+                          |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
+                              |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |:class-name)
+                                  |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |str-spaced)
+                                      |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |css/flex)
+                                      |h $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |css/row)
+                              |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |:style)
+                                  |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
+                                      |b $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
+                                        :data $ {}
+                                          |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |:gap)
+                                          |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text "|\"8px")
+                          |h $ %{} :Expr (:at 1702490487011) (:by |bjmr3HZle)
+                            :data $ {}
+                              |T $ %{} :Leaf (:at 1702490487011) (:by |bjmr3HZle) (:text |comp-catoptric-text)
+                              |b $ %{} :Leaf (:at 1702490854579) (:by |bjmr3HZle) (:text "|\"DEMO Text")
         |comp-demo-cirru-snippet $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1695746350054) (:by |bjmr3HZle)
             :data $ {}
@@ -3401,6 +3599,7 @@
                         |zM $ %{} :Leaf (:at 1700194107862) (:by |bjmr3HZle) (:text |comp-time)
                         |zP $ %{} :Leaf (:at 1700586913010) (:by |bjmr3HZle) (:text |comp-tag)
                         |zY $ %{} :Leaf (:at 1702317301200) (:by |bjmr3HZle) (:text |comp-close)
+                        |ze $ %{} :Leaf (:at 1702490468468) (:by |bjmr3HZle) (:text |comp-catoptric-text)
                 |y $ %{} :Expr (:at 1592799640169) (:by |bjmr3HZle)
                   :data $ {}
                     |j $ %{} :Leaf (:at 1592799644095) (:by |bjmr3HZle) (:text |respo-ui.core)
