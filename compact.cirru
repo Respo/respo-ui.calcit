@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.11)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.12)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -64,7 +64,9 @@
                   :style styles
                 pre $ {} (:class-name css/expand)
                   :innerHTML $ generateHtml text
-                comp-copy $ fn () (copy! text)
+                span
+                  {} $ :class-name style-copy-wrapper
+                  comp-copy text $ fn (e d!) (copy! text)
         |comp-close $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-close (? options)
@@ -74,13 +76,14 @@
                 :on-click $ get options :on-click
         |comp-copy $ %{} :CodeEntry (:doc |)
           :code $ quote
-            defcomp comp-copy (f)
+            defcomp comp-copy (code ? f)
               div
                 {}
                   :class-name $ str-spaced style-copy-outline style-copy-container
-                  :on-click $ fn (e d!) (f)
+                  :on-click $ either f
+                    fn (e d!) (copy! code)
                 div $ {} (:class-name style-copy-outline)
-                  :style $ {} (:top -5) (:right -5)
+                  :style $ {} (:top -5) (:right -2)
         |comp-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-placeholder (text)
@@ -96,7 +99,9 @@
                 pre $ {} (:class-name css/expand)
                   :style $ :styles options
                   :inner-text code
-                comp-copy $ fn () (copy! code)
+                span
+                  {} $ :class-name style-copy-wrapper
+                  comp-copy code $ fn (e d!) (copy! code)
         |comp-tabs $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tabs (options tabs on-route)
@@ -207,7 +212,8 @@
                         do
                           -> cursor .-style .-left $ set! (str left "\"px")
                           -> cursor .-style .-width $ set! (str width "\"px")
-                    -> cursor .-style .-width $ set! (str 0 "\"px")
+                    if (not vertical?)
+                      -> cursor .-style .-width $ set! (str 0 "\"px")
         |literal? $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn literal? (v)
@@ -234,17 +240,22 @@
         |style-copy-container $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-copy-container $ {}
+              "\"&" $ {} (:display :inline-block) (:margin "\"0 8px 0 4px")
               "\"&:hover" $ {} (:transition-duration "\"200ms") (:transform "\"scale(1.06)")
         |style-copy-outline $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-copy-outline $ {}
-              "\"&" $ {} (:position :absolute) (:top 10) (:right 10) (:width 12) (:height 12) (:border-radius "\"2px")
+              "\"&" $ {} (:position :relative) (:width 12) (:height 12) (:border-radius "\"2px")
                 :border $ str "\"1.5px solid " (hsl 0 0 80)
                 :cursor :pointer
                 :outline "\"1px solid white"
               "\"&:active" $ {}
                 :border-color $ hsl 0 0 50
                 :transition-duration "\"0ms"
+        |style-copy-wrapper $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle style-copy-wrapper $ {}
+              "\"&" $ {} (:position :absolute) (:top 10) (:right 2)
         |style-item $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle style-item $ {}
@@ -355,6 +366,7 @@
                   comp-demo-tabs $ >> states :tabs
                   comp-demo-cirru-snippet
                   comp-demo-snippet
+                  comp-demo-copy
                   comp-demo-time
                   comp-demo-tags
                   comp-demo-close
@@ -437,6 +449,22 @@
                     :class-name $ str-spaced css/flex css/row
                     :style $ {} (:gap "\"8px")
                   comp-close
+        |comp-demo-copy $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defn comp-demo-copy () $ div
+              {} $ :class-name css/column
+              div
+                {} $ :class-name css-title
+                <> "\"Copy demo"
+              =< nil 8
+              div
+                {} $ :class-name (str-spaced css/row css/gap8)
+                comp-cirru-snippet "\"respo-ui.comp/comp-copy\n\ncomp-copy \"|demo\"\ncomp-copy \"|demo\" $ fn (e d!)" $ {} (:flex 1)
+                div
+                  {} $ :class-name css/flex
+                  <> "\"demo demo"
+                  comp-copy "\"DEMO TO COPY"
+                  <> "\"demo demo"
         |comp-demo-placeholder $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-placeholder () $ div ({})
@@ -577,7 +605,7 @@
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
