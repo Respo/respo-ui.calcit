@@ -164,7 +164,7 @@
             defstyle css-snippet $ {}
               "\"&" $ {} (:font-family ui/font-code) (:white-space :pre) (:font-size 12) (:line-height "\"20px")
                 :color $ hsl 0 0 40
-                :padding "\"4px 6px"
+                :padding "\"4px 32px 4px 6px"
                 :border $ str "\"1px solid " (hsl 0 0 90)
                 :border-radius "\"4px"
                 :margin 0
@@ -610,11 +610,29 @@
                       (:fonts) (comp-fonts-page)
                       (:components)
                         comp-components-page $ >> states :components
+                      (:utils) (comp-utils-page)
                       (:404 pp)
                         <> $ to-lispy-string router
                       _ $ do (eprintln "\"unknown router" router) (comp-home)
                   if dev? $ comp-inspect "\"Store" store
                     {} $ :bottom 0
+        |comp-utils-page $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-utils-page () $ div ({})
+              div ({}) (<> "\"Utils")
+              div ({})
+                div ({}) (<> "\"tab-echo! to open new tab and show EDN data.")
+                div
+                  {} $ :class-name (str-spaced css/row css/gap8)
+                  div
+                    {} $ :class-name (str-spaced css/row css/gap8)
+                    button $ {} (:inner-text "\"Echo") (:class-name css/button)
+                      :on-click $ fn (e d!)
+                        tab-echo! $ {} (:type :message)
+                          :demo $ {} (:a 1)
+                          :vv $ range
+                            js/Math.floor $ * 100 (js/Math.random)
+                  comp-cirru-snippet "\"respo-ui.utils/tab-echo! data" $ {}
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-content $ {}
@@ -623,7 +641,7 @@
         :code $ quote
           ns respo-ui.comp.container $ :require
             respo.util.format :refer $ hsl
-            respo.core :refer $ defcomp >> div span input <>
+            respo.core :refer $ defcomp >> div span input button <>
             respo.comp.space :refer $ =<
             respo.comp.inspect :refer $ comp-inspect
             respo-ui.core :as ui
@@ -636,6 +654,8 @@
             respo.css :refer $ defstyle
             respo-ui.css :as css
             respo-ui.config :refer $ dev?
+            respo-ui.util :refer $ tab-echo!
+            respo-ui.comp :refer $ comp-cirru-snippet
     |respo-ui.comp.fonts-page $ %{} :FileEntry
       :defs $ {}
         |comp-fonts-page $ %{} :CodeEntry (:doc |)
@@ -796,6 +816,7 @@
                 render-entry |widgets.html |Widgets $ = :widgets router-name
                 render-entry |fonts.html |Fonts $ = :fonts router-name
                 render-entry |components.html |Components $ = :components router-name
+                render-entry |utils.html |Utils $ = :utils router-name
         |css-sidebar-entry $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-sidebar-entry $ {}
@@ -1273,6 +1294,7 @@
               :: :widgets $ [] |widgets.html
               :: :layouts $ [] |layouts.html
               :: :components $ [] |components.html
+              :: :utils $ [] |utils.html
         |mode $ %{} :CodeEntry (:doc |)
           :code $ quote (def mode :hash)
       :ns $ %{} :CodeEntry (:doc |)
@@ -1288,3 +1310,16 @@
           ns respo-ui.schema $ :require
             respo-ui.router :refer $ dict
             respo-router.parser :refer $ parse-address
+    |respo-ui.util $ %{} :FileEntry
+      :defs $ {}
+        |tab-echo! $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defn tab-echo! (data)
+              let
+                  content $ format-cirru-edn (:: :tab-echo data)
+                  app "\"https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev"
+                  w $ js/window.open app "\"_target"
+                flipped js/setTimeout 20 $ fn () (.!postMessage w content "\"https://r.tiye.me")
+                flipped js/setTimeout 200 $ fn () (.!postMessage w content "\"https://r.tiye.me")
+      :ns $ %{} :CodeEntry (:doc |)
+        :code $ quote (ns respo-ui.util)
