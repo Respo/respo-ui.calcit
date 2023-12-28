@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.13)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.14)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -674,6 +674,18 @@
                             :html "\"code <code> cc c cc </code>"
                           , :json
                   comp-cirru-snippet "\"respo-ui.utils/tab-echo! data :json" $ {}
+                div
+                  {} $ :class-name (str-spaced css/row css/gap8)
+                  div
+                    {} $ :class-name (str-spaced css/row css/gap8)
+                    button $ {} (:inner-text "\"Echo") (:class-name css/button)
+                      :on-click $ fn (e d!)
+                        tab-echo!
+                          {} (:type :message)
+                            :demo $ {} (:a 1)
+                            :html "\"code <code> cc c cc </code>"
+                          , :edn
+                  comp-cirru-snippet "\"respo-ui.utils/tab-echo! data :edn" $ {}
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-content $ {}
@@ -1353,6 +1365,10 @@
             respo-router.parser :refer $ parse-address
     |respo-ui.util $ %{} :FileEntry
       :defs $ {}
+        |santinize-html-text $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defn santinize-html-text (content)
+              -> content (.replace "\"<" "\"&lt;") (.replace "\">" "\"&gt;") (.replace "\" " "\"&nbsp;")
         |tab-echo! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn tab-echo! (data ? format)
@@ -1367,8 +1383,11 @@
                     content $ js/JSON.stringify (to-js-data data) nil 2
                     w $ js/window.open "\"about:blank" "\"_blank"
                   -> w .-document .-body .-innerHTML $ set!
-                    str "\"<pre>"
-                      -> content (.replace "\"<" "\"&lt;") (.replace "\">" "\"&gt;") (.replace "\" " "\"&nbsp;")
-                      , "\"</pre>"
+                    str "\"<pre>" (santinize-html-text content) "\"</pre>"
+                :edn $ let
+                    content $ format-cirru-edn data
+                    w $ js/window.open "\"about:blank" "\"_blank"
+                  -> w .-document .-body .-innerHTML $ set!
+                    str "\"<pre>" (santinize-html-text content) "\"</pre>"
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote (ns respo-ui.util)
