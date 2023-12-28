@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.12)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.13)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -648,7 +648,8 @@
           :code $ quote
             defcomp comp-utils-page () $ div ({})
               div ({}) (<> "\"Utils")
-              div ({})
+              div
+                {} $ :class-name (str-spaced css/column css/gap8)
                 div ({}) (<> "\"tab-echo! to open new tab and show EDN data.")
                 div
                   {} $ :class-name (str-spaced css/row css/gap8)
@@ -661,6 +662,18 @@
                           :vv $ range
                             js/Math.floor $ * 100 (js/Math.random)
                   comp-cirru-snippet "\"respo-ui.utils/tab-echo! data" $ {}
+                div
+                  {} $ :class-name (str-spaced css/row css/gap8)
+                  div
+                    {} $ :class-name (str-spaced css/row css/gap8)
+                    button $ {} (:inner-text "\"Echo") (:class-name css/button)
+                      :on-click $ fn (e d!)
+                        tab-echo!
+                          {} (:type :message)
+                            :demo $ {} (:a 1)
+                            :html "\"code <code> cc c cc </code>"
+                          , :json
+                  comp-cirru-snippet "\"respo-ui.utils/tab-echo! data :json" $ {}
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-content $ {}
@@ -1342,12 +1355,20 @@
       :defs $ {}
         |tab-echo! $ %{} :CodeEntry (:doc |)
           :code $ quote
-            defn tab-echo! (data)
-              let
-                  content $ format-cirru-edn (:: :tab-echo data)
-                  app "\"https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev"
-                  w $ js/window.open app "\"_target"
-                flipped js/setTimeout 20 $ fn () (.!postMessage w content "\"https://r.tiye.me")
-                flipped js/setTimeout 200 $ fn () (.!postMessage w content "\"https://r.tiye.me")
+            defn tab-echo! (data ? format)
+              case-default format
+                let
+                    content $ format-cirru-edn (:: :tab-echo data)
+                    app "\"https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev"
+                    w $ js/window.open app "\"_target"
+                  flipped js/setTimeout 20 $ fn () (.!postMessage w content "\"https://r.tiye.me")
+                  flipped js/setTimeout 200 $ fn () (.!postMessage w content "\"https://r.tiye.me")
+                :json $ let
+                    content $ js/JSON.stringify (to-js-data data) nil 2
+                    w $ js/window.open "\"about:blank" "\"_blank"
+                  -> w .-document .-body .-innerHTML $ set!
+                    str "\"<pre>"
+                      -> content (.replace "\"<" "\"&lt;") (.replace "\">" "\"&gt;") (.replace "\" " "\"&nbsp;")
+                      , "\"</pre>"
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote (ns respo-ui.util)
