@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.14)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:output |src) (:port 6001) (:reload-fn |respo-ui.main/reload!) (:storage-key |calcit.cirru) (:version |0.5.15)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -327,7 +327,8 @@
               |r $ %{} :Expr (:at 1593161556909) (:by |bjmr3HZle)
                 :data $ {}
                   |T $ %{} :Leaf (:at 1593161566336) (:by |bjmr3HZle) (:text |text)
-                  |j $ %{} :Leaf (:at 1593161567554) (:by |bjmr3HZle) (:text |styles)
+                  |b $ %{} :Leaf (:at 1704535271114) (:by |bjmr3HZle) (:text |?)
+                  |j $ %{} :Leaf (:at 1704534963897) (:by |bjmr3HZle) (:text |options)
               |v $ %{} :Expr (:at 1593161567991) (:by |bjmr3HZle)
                 :data $ {}
                   |T $ %{} :Leaf (:at 1593161568559) (:by |bjmr3HZle) (:text |div)
@@ -342,10 +343,19 @@
                               |D $ %{} :Leaf (:at 1699981994815) (:by |bjmr3HZle) (:text |str-spaced)
                               |L $ %{} :Leaf (:at 1699981996950) (:by |bjmr3HZle) (:text |css/row)
                               |T $ %{} :Leaf (:at 1651248378515) (:by |bjmr3HZle) (:text |css-snippet)
+                              |b $ %{} :Expr (:at 1704534972483) (:by |bjmr3HZle)
+                                :data $ {}
+                                  |T $ %{} :Leaf (:at 1704534973598) (:by |bjmr3HZle) (:text |get)
+                                  |b $ %{} :Leaf (:at 1704535152617) (:by |bjmr3HZle) (:text |options)
+                                  |h $ %{} :Leaf (:at 1704534976147) (:by |bjmr3HZle) (:text |:class-name)
                       |r $ %{} :Expr (:at 1593161579964) (:by |bjmr3HZle)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1593161581563) (:by |bjmr3HZle) (:text |:style)
-                          |j $ %{} :Leaf (:at 1593161584772) (:by |bjmr3HZle) (:text |styles)
+                          |j $ %{} :Expr (:at 1704534965813) (:by |bjmr3HZle)
+                            :data $ {}
+                              |D $ %{} :Leaf (:at 1704534966658) (:by |bjmr3HZle) (:text |get)
+                              |L $ %{} :Leaf (:at 1704534967095) (:by |bjmr3HZle) (:text |options)
+                              |T $ %{} :Leaf (:at 1704534968705) (:by |bjmr3HZle) (:text |:style)
                   |r $ %{} :Expr (:at 1593161962470) (:by |bjmr3HZle)
                     :data $ {}
                       |T $ %{} :Leaf (:at 1644509679567) (:by |bjmr3HZle) (:text |pre)
@@ -566,7 +576,7 @@
                               |T $ %{} :Leaf (:at 1695747007292) (:by |bjmr3HZle) (:text |:style)
                               |b $ %{} :Expr (:at 1695747029613) (:by |bjmr3HZle)
                                 :data $ {}
-                                  |T $ %{} :Leaf (:at 1695747030431) (:by |bjmr3HZle) (:text |:styles)
+                                  |T $ %{} :Leaf (:at 1704535175717) (:by |bjmr3HZle) (:text |:style)
                                   |b $ %{} :Leaf (:at 1695747030895) (:by |bjmr3HZle) (:text |options)
                           |l $ %{} :Expr (:at 1695747073442) (:by |bjmr3HZle)
                             :data $ {}
@@ -2458,13 +2468,19 @@
                         :data $ {}
                           |T $ %{} :Leaf (:at 1695746765292) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
                           |b $ %{} :Leaf (:at 1695746765292) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {}\n  :items $ []\n    {} (:label \"\\\"DEMO\")\n      :value \"\\\"content\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n      :span 2\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n\n")
-                          |h $ %{} :Expr (:at 1695746765292) (:by |bjmr3HZle)
+                          |h $ %{} :Expr (:at 1704535030455) (:by |bjmr3HZle)
                             :data $ {}
-                              |T $ %{} :Leaf (:at 1695746765292) (:by |bjmr3HZle) (:text |{})
-                              |b $ %{} :Expr (:at 1695746767352) (:by |bjmr3HZle)
+                              |D $ %{} :Leaf (:at 1704535031461) (:by |bjmr3HZle) (:text |{})
+                              |T $ %{} :Expr (:at 1704535031894) (:by |bjmr3HZle)
                                 :data $ {}
-                                  |T $ %{} :Leaf (:at 1695746769782) (:by |bjmr3HZle) (:text |:flex)
-                                  |b $ %{} :Leaf (:at 1695746770245) (:by |bjmr3HZle) (:text |1)
+                                  |D $ %{} :Leaf (:at 1704535032921) (:by |bjmr3HZle) (:text |:style)
+                                  |T $ %{} :Expr (:at 1695746765292) (:by |bjmr3HZle)
+                                    :data $ {}
+                                      |T $ %{} :Leaf (:at 1695746765292) (:by |bjmr3HZle) (:text |{})
+                                      |b $ %{} :Expr (:at 1695746767352) (:by |bjmr3HZle)
+                                        :data $ {}
+                                          |T $ %{} :Leaf (:at 1695746769782) (:by |bjmr3HZle) (:text |:flex)
+                                          |b $ %{} :Leaf (:at 1695746770245) (:by |bjmr3HZle) (:text |1)
                       |T $ %{} :Expr (:at 1695746751628) (:by |bjmr3HZle)
                         :data $ {}
                           |D $ %{} :Leaf (:at 1695746752274) (:by |bjmr3HZle) (:text |div)
@@ -2736,10 +2752,7 @@
                           |T $ %{} :Expr (:at 1695746798516) (:by |bjmr3HZle)
                             :data $ {}
                               |T $ %{} :Leaf (:at 1695746798516) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
-                              |b $ %{} :Leaf (:at 1695746798516) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-cirru-snippet\n\ncomp-cirru-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n")
-                              |h $ %{} :Expr (:at 1695746798516) (:by |bjmr3HZle)
-                                :data $ {}
-                                  |T $ %{} :Leaf (:at 1695746798516) (:by |bjmr3HZle) (:text |{})
+                              |b $ %{} :Leaf (:at 1704535299204) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-cirru-snippet\n\ncomp-cirru-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n  :style $ {}\n  :class-name style-demo")
                       |h $ %{} :Expr (:at 1695747173080) (:by |bjmr3HZle)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1695747173080) (:by |bjmr3HZle) (:text |div)
@@ -2758,9 +2771,6 @@
                             :data $ {}
                               |T $ %{} :Leaf (:at 1701535206596) (:by |bjmr3HZle) (:text |comp-snippet)
                               |b $ %{} :Leaf (:at 1701535224588) (:by |bjmr3HZle) (:text "|\"@import url(cirru-color/assets/cirru.css);")
-                              |h $ %{} :Expr (:at 1701535206596) (:by |bjmr3HZle)
-                                :data $ {}
-                                  |T $ %{} :Leaf (:at 1701535206596) (:by |bjmr3HZle) (:text |{})
                           |f $ %{} :Expr (:at 1701535230166) (:by |bjmr3HZle)
                             :data $ {}
                               |T $ %{} :Leaf (:at 1701535231286) (:by |bjmr3HZle) (:text |=<)
@@ -2770,9 +2780,6 @@
                             :data $ {}
                               |T $ %{} :Leaf (:at 1695747173080) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
                               |b $ %{} :Leaf (:at 1695747173080) (:by |bjmr3HZle) (:text "|\"defn f (a b)\n  + a b")
-                              |h $ %{} :Expr (:at 1695747173080) (:by |bjmr3HZle)
-                                :data $ {}
-                                  |T $ %{} :Leaf (:at 1695747173080) (:by |bjmr3HZle) (:text |{})
         |comp-demo-close $ %{} :CodeEntry (:doc |)
           :code $ %{} :Expr (:at 1702317279278) (:by |bjmr3HZle)
             :data $ {}
@@ -3083,7 +3090,7 @@
                           |h $ %{} :Expr (:at 1695747164217) (:by |bjmr3HZle)
                             :data $ {}
                               |T $ %{} :Leaf (:at 1695747164217) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
-                              |b $ %{} :Leaf (:at 1695747164217) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-snippet\n\ncomp-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n")
+                              |b $ %{} :Leaf (:at 1704535339333) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-snippet\n\ncomp-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n  :class-name style-demo\n  :style $ {}")
                               |h $ %{} :Expr (:at 1695747164217) (:by |bjmr3HZle)
                                 :data $ {}
                                   |T $ %{} :Leaf (:at 1695747164217) (:by |bjmr3HZle) (:text |{})
