@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.13)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.15)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -57,11 +57,11 @@
                   :style $ get options :style
         |comp-cirru-snippet $ %{} :CodeEntry (:doc |)
           :code $ quote
-            defcomp comp-cirru-snippet (text styles)
+            defcomp comp-cirru-snippet (text ? options)
               div
                 {}
-                  :class-name $ str-spaced css/row css-snippet
-                  :style styles
+                  :class-name $ str-spaced css/row css-snippet (get options :class-name)
+                  :style $ get options :style
                 pre $ {} (:class-name css/expand)
                   :innerHTML $ generateHtml text
                 span
@@ -97,7 +97,7 @@
                 {} $ :class-name
                   str-spaced css/row css-snippet $ :class-name options
                 pre $ {} (:class-name css/expand)
-                  :style $ :styles options
+                  :style $ :style options
                   :inner-text code
                 span
                   {} $ :class-name style-copy-wrapper
@@ -382,7 +382,8 @@
               =< nil 8
               div
                 {} $ :class-name (str-spaced css/row css/gap8)
-                comp-cirru-snippet "\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {}\n  :items $ []\n    {} (:label \"\\\"DEMO\")\n      :value \"\\\"content\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n      :span 2\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n\n" $ {} (:flex 1)
+                comp-cirru-snippet "\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {}\n  :items $ []\n    {} (:label \"\\\"DEMO\")\n      :value \"\\\"content\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n      :span 2\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n\n" $ {}
+                  :style $ {} (:flex 1)
                 div
                   {} $ :class-name css/flex
                   comp-attributes $ {} (:title "\"Attributes DEMO")
@@ -425,12 +426,12 @@
                 {} $ :class-name (str-spaced css/row css/gap8)
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "\"respo-ui.comp/comp-cirru-snippet\n\ncomp-cirru-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n" $ {}
+                  comp-cirru-snippet "\"respo-ui.comp/comp-cirru-snippet\n\ncomp-cirru-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n  :style $ {}\n  :class-name style-demo"
                 div
                   {} $ :class-name (str-spaced css/flex css/column)
-                  comp-snippet "\"@import url(cirru-color/assets/cirru.css);" $ {}
+                  comp-snippet "\"@import url(cirru-color/assets/cirru.css);"
                   =< nil 8
-                  comp-cirru-snippet "\"defn f (a b)\n  + a b" $ {}
+                  comp-cirru-snippet "\"defn f (a b)\n  + a b"
         |comp-demo-close $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-close () $ div
@@ -490,7 +491,7 @@
                 {} $ :class-name (str-spaced css/row css/gap8)
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "\"respo-ui.comp/comp-snippet\n\ncomp-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n" $ {}
+                  comp-cirru-snippet "\"respo-ui.comp/comp-snippet\n\ncomp-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n  :class-name style-demo\n  :style $ {}" $ {}
                 div
                   {} $ :class-name css/flex
                   comp-cirru-snippet "\"defn f (a b)\n  + a b" $ {}
@@ -674,6 +675,18 @@
                             :html "\"code <code> cc c cc </code>"
                           , :json
                   comp-cirru-snippet "\"respo-ui.utils/tab-echo! data :json" $ {}
+                div
+                  {} $ :class-name (str-spaced css/row css/gap8)
+                  div
+                    {} $ :class-name (str-spaced css/row css/gap8)
+                    button $ {} (:inner-text "\"Echo") (:class-name css/button)
+                      :on-click $ fn (e d!)
+                        tab-echo!
+                          {} (:type :message)
+                            :demo $ {} (:a 1)
+                            :html "\"code <code> cc c cc </code>"
+                          , :edn
+                  comp-cirru-snippet "\"respo-ui.utils/tab-echo! data :edn" $ {}
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-content $ {}
@@ -1353,6 +1366,10 @@
             respo-router.parser :refer $ parse-address
     |respo-ui.util $ %{} :FileEntry
       :defs $ {}
+        |santinize-html-text $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defn santinize-html-text (content)
+              -> content (.replace "\"<" "\"&lt;") (.replace "\">" "\"&gt;") (.replace "\" " "\"&nbsp;")
         |tab-echo! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn tab-echo! (data ? format)
@@ -1367,8 +1384,11 @@
                     content $ js/JSON.stringify (to-js-data data) nil 2
                     w $ js/window.open "\"about:blank" "\"_blank"
                   -> w .-document .-body .-innerHTML $ set!
-                    str "\"<pre>"
-                      -> content (.replace "\"<" "\"&lt;") (.replace "\">" "\"&gt;") (.replace "\" " "\"&nbsp;")
-                      , "\"</pre>"
+                    str "\"<pre>" (santinize-html-text content) "\"</pre>"
+                :edn $ let
+                    content $ format-cirru-edn data
+                    w $ js/window.open "\"about:blank" "\"_blank"
+                  -> w .-document .-body .-innerHTML $ set!
+                    str "\"<pre>" (santinize-html-text content) "\"</pre>"
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote (ns respo-ui.util)
