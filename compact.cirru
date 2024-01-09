@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.5.15)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.0)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -23,23 +23,34 @@
                           :gap 8
                         &map:get options :style
                     -> items $ map-indexed
-                      fn (idx item)
-                        [] idx $ div
-                          {}
-                            :style $ {}
-                              :grid-column $ let
-                                  sp $ &map:get item :span
-                                if (some? sp) (str-spaced "\"span" sp) "\""
-                            :class-name $ str-spaced style-item (&map:get options :css-item)
+                      fn (idx info)
+                        [] idx $ let
+                            item $ cond
+                                map? info
+                                , info
+                              (tuple? info)
+                                tag-match info
+                                    :attr l v
+                                    {} (:value v) (:label l)
+                                  (:attr-span l v s)
+                                    {} (:value v) (:label l) (:span s)
+                              true $ raise "\"unknown attribute info"
                           div
-                            {} $ :class-name
-                              str-spaced css-item-label $ &map:get options :css-label
-                            <> $ &map:get item :label
-                          div
-                            {} $ :class-name (&map:get options :css-value)
-                            let
-                                v $ &map:get item :value
-                              if (literal? v) (<> v) v
+                            {}
+                              :style $ {}
+                                :grid-column $ let
+                                    sp $ &map:get item :span
+                                  if (some? sp) (str-spaced "\"span" sp) "\""
+                              :class-name $ str-spaced style-item (&map:get options :css-item)
+                            div
+                              {} $ :class-name
+                                str-spaced css-item-label $ &map:get options :css-label
+                              <> $ &map:get item :label
+                            div
+                              {} $ :class-name (&map:get options :css-value)
+                              let
+                                  v $ &map:get item :value
+                                if (literal? v) (<> v) v
                 if (some? title)
                   div ({})
                     div
@@ -120,15 +131,25 @@
                     , & $ -> tabs
                       map $ fn (info)
                         let
-                            selected? $ = selected
-                              or (:value info) (:name info)
-                          div
-                            {}
-                              :class-name $ str-spaced css-tab (get options :tab-class-name) (if selected? style-selected-tab)
-                              :style $ merge (:tab-style options)
-                                if selected? $ :selected-tab-style options
-                              :on-click $ fn (e d!) (on-route info d!)
-                            <> $ or (:display info) (:title info)
+                            item $ cond
+                                tuple? info
+                                , info
+                              (map? info)
+                                :: :tab
+                                  or (&map:get info :value) (&map:get info :name)
+                                  or (&map:get info :display) (&map:get info :title)
+                              true $ raise "\"Unknown tab value"
+                          tag-match item $ 
+                            :tab value display
+                            let
+                                selected? $ = selected value
+                              div
+                                {}
+                                  :class-name $ str-spaced css-tab (get options :tab-class-name) (if selected? style-selected-tab)
+                                  :style $ merge (:tab-style options)
+                                    if selected? $ :selected-tab-style options
+                                  :on-click $ fn (e d!) (on-route item d!)
+                                <> display
         |comp-tag $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-tag (kind content ? options)
@@ -382,20 +403,14 @@
               =< nil 8
               div
                 {} $ :class-name (str-spaced css/row css/gap8)
-                comp-cirru-snippet "\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {}\n  :items $ []\n    {} (:label \"\\\"DEMO\")\n      :value \"\\\"content\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n      :span 2\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n    {} (:label \"\\\"DEMO 2\")\n      :value \"\\\"content 2\"\n\n" $ {}
+                comp-cirru-snippet "\"respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {} (:title \"\\\"Attributes DEMO\")\n  :items $ [] (:: :attr \"\\\"Demo\" \"\\\"content\")\n    :: :attr \"\\\"Demo 2\" \"\\\"content 2\"\n    :: :attr-span \"\\\"DEMO 2\" \"\\\"content 2\" 2\n    :: :attr \"\\\"Demo 2\" \"\\\"content 2\"\n    :: :attr \"\\\"Demo 2\" \"\\\"content 2\"\n    :: :attr \"\\\"DEMO 3\" $ a\n      {} (:inner-text \"\\\"Demo\")\n        :href \"\\\"https://respo-mvc.org\"\n        :target \"\\\"_blank\"\n" $ {}
                   :style $ {} (:flex 1)
                 div
                   {} $ :class-name css/flex
                   comp-attributes $ {} (:title "\"Attributes DEMO")
-                    :items $ []
-                      {} (:label "\"DEMO") (:value "\"content")
-                      {} (:label "\"DEMO 2") (:value "\"content 2")
-                      {} (:label "\"DEMO 2") (:value "\"content 2") (:span 2)
-                      {} (:label "\"DEMO 2") (:value "\"content 2")
-                      {} (:label "\"DEMO 2") (:value "\"content 2")
-                      {} (:label "\"DEMO 3")
-                        :value $ a
-                          {} (:inner-text "\"Demo") (:href "\"https://respo-mvc.org") (:target "\"_blank")
+                    :items $ [] (:: :attr "\"Demo" "\"content") (:: :attr "\"Demo 2" "\"content 2") (:: :attr-span "\"DEMO 2" "\"content 2" 2) (:: :attr "\"Demo 2" "\"content 2") (:: :attr "\"Demo 2" "\"content 2")
+                      :: :attr "\"DEMO 3" $ a
+                        {} (:inner-text "\"Demo") (:href "\"https://respo-mvc.org") (:target "\"_blank")
         |comp-demo-catoptric-text $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-catoptric-text () $ div
@@ -502,38 +517,32 @@
                   cursor $ :cursor states
                   state $ or (:data states)
                     {} $ :selected nil
-                  en-tabs $ []
-                    {} (:value :book) (:display "\"Book")
-                    {} (:value :card) (:display "\"Card")
-                    {} (:value :pl) (:display "\"Programming language")
+                  en-tabs $ [] (:: :tab :book "\"Book") (:: :tab :card "\"Card") (:: :tab :pl "\"Programming language")
                 div ({})
                   div
                     {} $ :class-name css-title
                     <> "\"Tabs demo"
                   div
                     {} $ :class-name (str-spaced css/row css/gap8)
-                    comp-cirru-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  {}\n    :selected (:selected state)\n    :style {}\n  []\n    &{} :name :book :title |Book\n    &{} :name :card :title |Card\n    &{} :name :pl :title \"|Programming language\"\n  fn (info d!)\n    println |selected info\n    d! cursor $ assoc state :selected $ :name info" $ {} (:flex 1)
+                    comp-cirru-snippet "\"respo-ui.comp/comp-tabs\n\ncomp-tabs\n  {}\n    :selected (:selected state)\n    :style {}\n  []\n    :: :tab :book |Book\n    :: :tab :card |Card\n    :: :tab :pl \"|Programming language\"\n  fn (info d!)\n    println |selected info\n    d! cursor $ assoc state :selected $ :name info" $ {} (:flex 1)
                     div
                       {} $ :class-name css/flex
                       comp-tabs
                         {} $ :selected (:selected state)
                         , en-tabs $ fn (info d!)
-                          d! cursor $ assoc state :selected (:value info)
+                          d! cursor $ assoc state :selected (nth info 1)
                       comp-tabs
                         {} $ :selected (:selected state)
-                        []
-                          {} (:value :book) (:display "\"书本")
-                          {} (:value :card) (:display "\"纸牌")
-                          {} (:value :pl) (:display "\"编程语言")
+                        [] (:: :tab :book "\"书本") (:: :tab :card "\"纸牌") (:: :tab :pl "\"编程语言")
                         fn (info d!)
-                          d! cursor $ assoc state :selected (:value info)
+                          d! cursor $ assoc state :selected (nth info 1)
                       comp-tabs
                         {}
                           :selected $ :selected state
                           :style $ {}
                             :border-bottom $ str "\"1px solid " (hsl 0 0 94)
                         , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:value info)
+                          d! cursor $ assoc state :selected (nth info 1)
                   =< nil 8
                   div
                     {} $ :class-name (str-spaced css/row css/gap8)
@@ -547,7 +556,7 @@
                           :width 200
                           :style $ {}
                         , en-tabs $ fn (info d!) (println "\"selected" info)
-                          d! cursor $ assoc state :selected (:value info)
+                          d! cursor $ assoc state :selected (nth info 1)
         |comp-demo-tags $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-tags () $ div
