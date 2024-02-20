@@ -417,13 +417,13 @@
               {} $ :class-name css/column
               div
                 {} $ :class-name css-title
-                <> "\"Tags demo"
+                <> "\"Catoptric demo"
               =< nil 8
               div
                 {} $ :class-name (str-spaced css/row css/gap8)
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "\"respo-ui.comp/comp-catoptric-tex\n\ncomp-catoptric \"|Demo Text\" $ {}\n  :style $ {}\n  :class-name $ {}\n" $ {}
+                  comp-cirru-snippet "\"respo-ui.comp/comp-catoptric-text\n\ncomp-catoptric-text \"|Demo Text\" $ {}\n  :style $ {}\n  :class-name $ {}\n" $ {}
                 div
                   {}
                     :class-name $ str-spaced css/flex css/row
@@ -453,7 +453,7 @@
               {} $ :class-name css/column
               div
                 {} $ :class-name css-title
-                <> "\"Tags demo"
+                <> "\"Close demo"
               =< nil 8
               div
                 {} $ :class-name (str-spaced css/row css/gap8)
