@@ -2719,7 +2719,7 @@
                       |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |<>)
-                          |b $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text "|\"Tags demo")
+                          |b $ %{} :Leaf (:at 1708407476393) (:by |bjmr3HZle) (:text "|\"Catoptric demo")
                   |l $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
                     :data $ {}
                       |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |=<)
@@ -2752,7 +2752,7 @@
                           |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
                             :data $ {}
                               |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
-                              |b $ %{} :Leaf (:at 1702490527532) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-catoptric-tex\n\ncomp-catoptric \"|Demo Text\" $ {}\n  :style $ {}\n  :class-name $ {}\n")
+                              |b $ %{} :Leaf (:at 1708407305068) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-catoptric-text\n\ncomp-catoptric-text \"|Demo Text\" $ {}\n  :style $ {}\n  :class-name $ {}\n")
                               |h $ %{} :Expr (:at 1702490480036) (:by |bjmr3HZle)
                                 :data $ {}
                                   |T $ %{} :Leaf (:at 1702490480036) (:by |bjmr3HZle) (:text |{})
@@ -2905,7 +2905,7 @@
                       |h $ %{} :Expr (:at 1702317288825) (:by |bjmr3HZle)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1702317288825) (:by |bjmr3HZle) (:text |<>)
-                          |b $ %{} :Leaf (:at 1702317288825) (:by |bjmr3HZle) (:text "|\"Tags demo")
+                          |b $ %{} :Leaf (:at 1708407486639) (:by |bjmr3HZle) (:text "|\"Close demo")
                   |l $ %{} :Expr (:at 1702317288825) (:by |bjmr3HZle)
                     :data $ {}
                       |T $ %{} :Leaf (:at 1702317288825) (:by |bjmr3HZle) (:text |=<)
