@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.0)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.1)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -921,8 +921,10 @@
                   state $ :data states
                 div ({})
                   div ({}) (<> |Widgets)
-                  div ({}) (<> "|Some text as description" ui/text-label) (=< nil 16)
+                  div ({}) (<> "|link to external pages" ui/text-label) (=< nil 16)
                     a $ {} (:class-name css/link) (:inner-text |link)
+                  div ({}) (<> "|slight link without underscore" ui/text-label) (=< nil 16)
+                    a $ {} (:class-name css/link-slight) (:inner-text |link)
                   =< nil 16
                   div
                     {} $ :style
@@ -1071,7 +1073,7 @@
                 :vertical-align :top
         |link $ %{} :CodeEntry (:doc |)
           :code $ quote
-            def link $ {} (:text-decoration :underline) (:user-select :no-select) (:height 24) (:line-height |24px) (:margin 4) (:display :inline-block) (:cursor :pointer) (:user-select :none)
+            def link $ {} (:text-decoration :underline) (:height 24) (:line-height |24px) (:margin 4) (:display :inline-block) (:cursor :pointer) (:user-select :none)
               :color $ hsl 200 100 76
         |row $ %{} :CodeEntry (:doc |)
           :code $ quote
@@ -1223,6 +1225,16 @@
         |link $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle link $ {} ("\"$0" ui/link)
+              "\"$0:hover" $ {}
+                :color $ hsl 200 100 56
+              "\"$0:active" $ {}
+                :color $ hsl 200 100 40
+                :transform "\"scale(1.04)"
+        |link-slight $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle link-slight $ {}
+              "\"$0" $ merge ui/link
+                {} $ :text-decoration :none
               "\"$0:hover" $ {}
                 :color $ hsl 200 100 56
               "\"$0:active" $ {}
