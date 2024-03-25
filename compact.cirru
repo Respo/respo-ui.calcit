@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.1)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.2)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -459,7 +459,7 @@
                 {} $ :class-name (str-spaced css/row css/gap8)
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "\"respo-ui.comp/comp-close\n\ncomp-tag $ {}\n  :style $ {}\n" $ {}
+                  comp-cirru-snippet "\"respo-ui.comp/comp-close\n\ncomp-close $ {}\n  :style $ {}\n  :class-name |\n  :on-click nil" $ {}
                 div
                   {}
                     :class-name $ str-spaced css/flex css/row
@@ -913,6 +913,13 @@
             respo.css :refer $ defstyle
     |respo-ui.comp.widgets-page $ %{} :FileEntry
       :defs $ {}
+        |comp-tags-styles $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defcomp comp-tags-styles () $ div
+              {} $ :class-name (str-spaced css/row-middle css/gap8)
+              span $ {} (:inner-text "\"css/tag") (:class-name css/tag)
+              span $ {} (:inner-text "\"css/tag-stroke") (:class-name css/tag-stroke)
+              span $ {} (:inner-text "\"css/tag-outline") (:class-name css/tag-outline)
         |comp-widgets-page $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-widgets-page (states)
@@ -931,19 +938,19 @@
                       merge ui/row $ {} (:gap 16)
                     button
                       {} $ :class-name css/button-primary
-                      <> |Yes
+                      <> |css/button-primary
                     button
                       {} $ :class-name css/button
-                      <> |Yes
+                      <> |css/button
                     button
                       {} (:class-name css/button)
                         :style $ {}
                           :border-color $ hsl 6 100 60
                           :color $ hsl 6 100 60
-                      <> |Yes
+                      <> |css/button
                     button
                       {} $ :class-name css/button-danger
-                      <> |Yes
+                      <> |css/button-danger
                   =< nil 16
                   div ({})
                     input $ {} (:placeholder "|Some short text") (:value state) (:class-name css/input)
@@ -970,6 +977,11 @@
                     button
                       {} $ :class-name css/button
                       <> |Add
+                  div $ {}
+                    :style $ {} (:height 1) (:width "\"50%")
+                      :background-color $ hsl 0 0 90
+                      :margin "\"48px 12px"
+                  comp-tags-styles
       :ns $ %{} :CodeEntry (:doc |)
         :code $ quote
           ns respo-ui.comp.widgets-page $ :require
@@ -1102,6 +1114,27 @@
               :font-family default-fonts
               :vertical-align :top
               :cursor :pointer
+        |tag $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            def tag $ {}
+              :background-color $ hsl 200 80 60
+              :line-height "\"21px"
+              :font-size 14
+              :padding "\"0px 8px"
+              :border-radius 4
+              :color :white
+        |tag-outline $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            def tag-outline $ merge tag
+              {} (:background-color :white)
+                :border $ str "\"1px solid " (hsl 200 70 80)
+                :color $ hsl 200 30 40
+        |tag-stroke $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            def tag-stroke $ merge tag
+              {}
+                :background-color $ hsl 200 70 90
+                :color $ hsl 200 20 40
         |text-label $ %{} :CodeEntry (:doc |)
           :code $ quote
             def text-label $ {} (:line-height |32px) (:font-size 14)
@@ -1276,6 +1309,15 @@
               "\"$0:focus" $ {}
                 :border $ str "\"1px solid " (hsl 200 50 75)
                 :box-shadow $ str "\"0 0 4px " (hsl 200 70 50 0.2)
+        |tag $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle tag $ {} (:& ui/tag)
+        |tag-outline $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle tag-outline $ {} (:& ui/tag-outline)
+        |tag-stroke $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle tag-stroke $ {} (:& ui/tag-stroke)
         |text-label $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle text-label $ {} ("\"$0" ui/text-label)
