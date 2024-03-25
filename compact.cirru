@@ -459,7 +459,7 @@
                 {} $ :class-name (str-spaced css/row css/gap8)
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "\"respo-ui.comp/comp-close\n\ncomp-tag $ {}\n  :style $ {}\n" $ {}
+                  comp-cirru-snippet "\"respo-ui.comp/comp-close\n\ncomp-close $ {}\n  :style $ {}\n  :class-name |\n  :on-click nil" $ {}
                 div
                   {}
                     :class-name $ str-spaced css/flex css/row

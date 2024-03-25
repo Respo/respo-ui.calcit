@@ -2938,7 +2938,7 @@
                           |h $ %{} :Expr (:at 1702317288825) (:by |bjmr3HZle)
                             :data $ {}
                               |T $ %{} :Leaf (:at 1702317288825) (:by |bjmr3HZle) (:text |comp-cirru-snippet)
-                              |b $ %{} :Leaf (:at 1702317330709) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-close\n\ncomp-tag $ {}\n  :style $ {}\n")
+                              |b $ %{} :Leaf (:at 1711387274035) (:by |bjmr3HZle) (:text "|\"respo-ui.comp/comp-close\n\ncomp-close $ {}\n  :style $ {}\n  :class-name |\n  :on-click nil")
                               |h $ %{} :Expr (:at 1702317288825) (:by |bjmr3HZle)
                                 :data $ {}
                                   |T $ %{} :Leaf (:at 1702317288825) (:by |bjmr3HZle) (:text |{})
