@@ -671,7 +671,7 @@
                           :demo $ {} (:a 1)
                           :vv $ range
                             js/Math.floor $ * 100 (js/Math.random)
-                  comp-cirru-snippet "\"respo-ui.utils/tab-echo! data" $ {}
+                  comp-cirru-snippet "\"respo-ui.util/tab-echo! data" $ {}
                 div
                   {} $ :class-name (str-spaced css/row css/gap8)
                   div
@@ -683,7 +683,7 @@
                             :demo $ {} (:a 1)
                             :html "\"code <code> cc c cc </code>"
                           , :json
-                  comp-cirru-snippet "\"respo-ui.utils/tab-echo! data :json" $ {}
+                  comp-cirru-snippet "\"respo-ui.util/tab-echo! data :json" $ {}
                 div
                   {} $ :class-name (str-spaced css/row css/gap8)
                   div
@@ -695,7 +695,7 @@
                             :demo $ {} (:a 1)
                             :html "\"code <code> cc c cc </code>"
                           , :edn
-                  comp-cirru-snippet "\"respo-ui.utils/tab-echo! data :edn" $ {}
+                  comp-cirru-snippet "\"respo-ui.util/tab-echo! data :edn" $ {}
         |css-content $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle css-content $ {}
