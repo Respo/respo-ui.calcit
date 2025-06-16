@@ -1,6 +1,6 @@
 
 {} (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.2)
+  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.3)
     :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-router.calcit/ |respo-markdown.calcit/
   :entries $ {}
   :files $ {}
@@ -574,11 +574,11 @@
                   {}
                     :class-name $ str-spaced css/flex css/row
                     :style $ {} (:gap "\"8px")
-                  comp-tag :info "\"info demo"
-                  comp-tag :success "\"success demo"
-                  comp-tag :warning "\"warning demo"
-                  comp-tag :error "\"error demo"
-                  comp-tag :default "\"default demo"
+                  comp-tag :info "\":info demo"
+                  comp-tag :success "\":success demo"
+                  comp-tag :warning "\":warning demo"
+                  comp-tag :error "\":error demo"
+                  comp-tag :default "\":default demo"
         |comp-demo-time $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-time () $ div
@@ -943,11 +943,8 @@
                       {} $ :class-name css/button
                       <> |css/button
                     button
-                      {} (:class-name css/button)
-                        :style $ {}
-                          :border-color $ hsl 6 100 60
-                          :color $ hsl 6 100 60
-                      <> |css/button
+                      {} $ :class-name css/button-danger-outline
+                      <> |css/button-danger-outline
                     button
                       {} $ :class-name css/button-danger
                       <> |css/button-danger
@@ -1169,6 +1166,16 @@
               "\"$0:active" $ {} (:transform "\"scale(1.02)") (:transition-duration "\"0ms")
                 :background-color $ hsl 6 100 68
                 :border-color $ hsl 6 100 68
+        |button-danger-outline $ %{} :CodeEntry (:doc |)
+          :code $ quote
+            defstyle button-danger-outline $ {}
+              "\"$0" $ merge ui/button
+                {}
+                  :border-color $ hsl 6 100 60
+                  :color $ hsl 6 100 60
+              "\"$0:hover" $ {}
+                :background-color $ hsl 0 0 98
+              "\"$0:active" $ {} (:transform "\"scale(1.02)") (:transition-duration "\"0ms")
         |button-primary $ %{} :CodeEntry (:doc |)
           :code $ quote
             defstyle button-primary $ {} ("\"$0" ui/button-primary)
