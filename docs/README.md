@@ -18,25 +18,24 @@ To get started with Respo UI, add it as a dependency to your project:
 ```cirru
 ; In your deps.cirru file
 {} (:package |your-app)
-  :deps $ {}
-    |respo/ui $ :version |0.6.3
+  :dependencies $ {}
+    |Respo/respo-ui.calcit |0.6.3
 ```
 
 Then import the components and styles you need:
 
 ```cirru
-(ns your-app.core
-  (:require [respo.core :refer [defcomp <> div]]
-            [respo-ui.core :as ui]
-            [respo-ui.comp :refer [comp-button comp-placeholder]]))
+ns your-app.core
+  :require
+    respo.core :refer $ defcomp <> div
+    respo-ui.core :as ui
+    respo-ui.comp :refer $ comp-copy comp-placeholder
 
-(defcomp comp-container [store]
-  (div
-    {:style ui/global}
-    (comp-button
-      {:text "Click me"
-       :on-click (fn [e d!] (println "Button clicked"))})
-    (comp-placeholder "This is a placeholder")))
+defcomp comp-container (store)
+  div
+    {} (:style ui/global)
+    comp-copy |Click-me
+    comp-placeholder |This-is-a-placeholder
 ```
 
 ## Resources

@@ -13,13 +13,9 @@ The `ui/global` style provides a set of global styles that you can apply to your
 ```cirru
 ns your-app.core
   :require
-    respo.core :refer $ defcomp <> div
     respo-ui.core :as ui
 
-defcomp comp-container (store)
-  div
-    {} $ :style ui/global
-    <> "Hello, world!"
+, ui/global
 ```
 
 ### Layout Styles
@@ -31,17 +27,11 @@ Respo UI provides several layout styles to help you structure your application's
 The `ui/row` style creates a horizontal layout using flexbox.
 
 ```cirru
-div
-  {} $ :style ui/row
-  div
-    {} $ :style $ {} (:padding 8)
-    <> "Item 1"
-  div
-    {} $ :style $ {} (:padding 8)
-    <> "Item 2"
-  div
-    {} $ :style $ {} (:padding 8)
-    <> "Item 3"
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+merge ui/row $ {} (:padding 8)
 ```
 
 #### Column Layout
@@ -49,17 +39,11 @@ div
 The `ui/column` style creates a vertical layout using flexbox.
 
 ```cirru
-div
-  {} $ :style ui/column
-  div
-    {} $ :style $ {} (:padding 8)
-    <> "Item 1"
-  div
-    {} $ :style $ {} (:padding 8)
-    <> "Item 2"
-  div
-    {} $ :style $ {} (:padding 8)
-    <> "Item 3"
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+merge ui/column $ {} (:padding 8)
 ```
 
 #### Center Layout
@@ -67,9 +51,11 @@ div
 The `ui/center` style centers content both horizontally and vertically.
 
 ```cirru
-(div
-  {:style (merge ui/center {:height 100})}
-  (<> "Centered content"))
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+merge ui/center $ {} (:height 100)
 ```
 
 ### Typography Styles
@@ -77,11 +63,11 @@ The `ui/center` style centers content both horizontally and vertically.
 Respo UI provides styles for typography to ensure consistent text appearance across your application.
 
 ```cirru
-(div
-  {}
-  (div {:style ui/title} (<> "Title"))
-  (div {:style ui/headline} (<> "Headline"))
-  (div {:style ui/text} (<> "Regular text")))
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+[] ui/text-label ui/font-fancy ui/font-normal
 ```
 
 ### Button Styles
@@ -89,11 +75,11 @@ Respo UI provides styles for typography to ensure consistent text appearance acr
 Respo UI provides styles for buttons with different appearances.
 
 ```cirru
-(div
-  {}
-  (button {:style ui/button} (<> "Default Button"))
-  (button {:style ui/button-primary} (<> "Primary Button"))
-  (button {:style (merge ui/button {:color :red})} (<> "Custom Button")))
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+[] ui/button ui/button-primary $ merge ui/button $ {} (:color :red)
 ```
 
 ### Form Styles
@@ -101,25 +87,23 @@ Respo UI provides styles for buttons with different appearances.
 Respo UI provides styles for form elements.
 
 ```cirru
-(div
-  {}
-  (input {:style ui/input, :placeholder "Enter text"})
-  (textarea {:style ui/textarea, :placeholder "Enter multiple lines"}))
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+[] ui/input ui/textarea
 ```
 
 ## CSS Classes
 
 In addition to inline styles, Respo UI also provides CSS classes that you can use to style your components. These classes are available in the `respo-ui.css` namespace.
 
-```cirru
-(ns your-app.core
-  (:require [respo.core :refer [defcomp <> div]]
-            [respo-ui.css :as css]))
+```cirru.no-run
+ns your-app.core
+  :require
+    respo-ui.css :as css
 
-(defcomp comp-container [store]
-  (div
-    {:class-name css/row-center}
-    (<> "Centered in a row")))
+css/row-center
 ```
 
 ### Available CSS Classes
@@ -128,11 +112,13 @@ In addition to inline styles, Respo UI also provides CSS classes that you can us
 - `css/column`: Creates a vertical layout
 - `css/center`: Centers content
 - `css/row-center`: Centers content in a row
-- `css/column-center`: Centers content in a column
+- `css/row-evenly`: Distributes items evenly in a row
+- `css/column-evenly`: Distributes items evenly in a column
+- `css/row-dispersive`: Spreads items in a row with space distribution
+- `css/column-dispersive`: Spreads items in a column with space distribution
 - `css/row-parted`: Spaces items apart in a row
 - `css/column-parted`: Spaces items apart in a column
 - `css/row-middle`: Aligns items in the middle of a row
-- `css/column-middle`: Aligns items in the middle of a column
 - `css/flex`: Makes an element flexible
 - `css/expand`: Makes an element expand to fill available space
 
@@ -141,9 +127,11 @@ In addition to inline styles, Respo UI also provides CSS classes that you can us
 You can combine multiple styles using the `merge` function.
 
 ```cirru
-(div
-  {:style (merge ui/row ui/center {:padding 16})}
-  (<> "Centered row with padding"))
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+merge ui/row ui/center $ {} (:padding 16)
 ```
 
 ## Responsive Design
@@ -151,14 +139,11 @@ You can combine multiple styles using the `merge` function.
 Respo UI provides utilities for creating responsive designs that adapt to different screen sizes.
 
 ```cirru
-(div
-  {:style (merge
-            ui/row
-            {:flex-wrap :wrap}
-            (if (< (:width state) 600)
-              {:flex-direction :column}))}
-  (div {} (<> "Item 1"))
-  (div {} (<> "Item 2")))
+ns your-app.core
+  :require
+    respo-ui.core :as ui
+
+merge ui/row $ {} (:flex-wrap :wrap) (:flex-direction :column)
 ```
 
 ## Theme Customization
@@ -166,15 +151,11 @@ Respo UI provides utilities for creating responsive designs that adapt to differ
 You can customize the theme by overriding the default styles.
 
 ```cirru
-(def custom-theme
-  (merge ui/default-theme
-         {:primary-color "#6200ee"
-          :font-family "Roboto, sans-serif"}))
+ns your-app.core
+  :require
+    respo-ui.core :as ui
 
-(defcomp comp-container [store]
-  (div
-    {:style (merge ui/global {:color (:primary-color custom-theme)})}
-    (<> "Custom themed text")))
+merge ui/global $ {} (:color |#6200ee) (:font-family |Roboto-sans-serif)
 ```
 
 ## Best Practices

@@ -13,8 +13,8 @@ To use Respo UI in your project, you need to add it as a dependency in your proj
 ```cirru
 ; In your deps.cirru file
 {} (:package |your-app)
-  :deps $ {}
-    |respo/ui $ :version |0.6.3
+  :dependencies $ {}
+    |Respo/respo-ui.calcit |0.6.3
 ```
 
 Or if you're using npm:
@@ -28,20 +28,20 @@ npm install respo-ui --save
 Here's a simple example of how to use Respo UI components in your application:
 
 ```cirru
-ns your-app.core
+ns app.main
   :require
-    respo.core :refer $ defcomp <> div button
+    respo.core :refer $ defcomp div <>
     respo-ui.core :as ui
-    respo-ui.comp :refer $ comp-button comp-placeholder
+    respo-ui.comp :refer $ comp-attributes comp-placeholder
 
 defcomp comp-container (store)
   div
     {} (:style ui/global)
-    comp-button
-      {} (:text "Click me")
-        :on-click $ fn (e d!)
-          println "Button clicked"
-    comp-placeholder "This is a placeholder"
+    (comp-attributes $ {}
+      :title |Hello
+      :items $ []
+        {} (:label |Name) (:value |Respo))
+    (comp-placeholder |This-is-a-placeholder)
 ```
 
 ## Project Structure

@@ -6,7 +6,7 @@ This document provides practical examples of how to use Respo UI components and 
 
 Here's an example of a basic layout using Respo UI styles:
 
-```cirru
+```clojure
 ns your-app.core
   :require
     respo.core :refer $ defcomp <> div
@@ -36,7 +36,7 @@ defcomp comp-container (store)
 
 Here's an example of a form using Respo UI components and styles:
 
-```cirru
+```clojure
 ns your-app.core
   :require
     respo.core :refer $ defcomp <> div input textarea button
@@ -63,7 +63,7 @@ defcomp comp-form (form)
           :value $ :email form
           :placeholder "Enter your email"
           :on-input $ fn (e d!)
-            d! :form/update $ {} (:email $ :value e))
+            d! :form/update $ {} (:email $ :value e)
     div
       {} $ :style ui/column-parted
       <> "Message"
@@ -72,7 +72,7 @@ defcomp comp-form (form)
           :value $ :message form
           :placeholder "Enter your message"
           :on-input $ fn (e d!)
-            d! :form/update $ {} (:message $ :value e))
+            d! :form/update $ {} (:message $ :value e)
     div
       {} $ :style $ merge ui/row-parted $ {} (:padding-top 16)
       button
@@ -82,14 +82,14 @@ defcomp comp-form (form)
       button
         {} $ :style $ merge ui/button ui/button-primary
           :on-click $ fn (e d!) (d! :form/submit nil)
-        <> "Submit")
+        <> "Submit"
 ```
 
 ## Card Component Example
 
 Here's an example of a reusable card component using Respo UI styles:
 
-```cirru
+```clojure
 ns your-app.comp.card
   :require
     respo.core :refer $ defcomp <> div
@@ -129,7 +129,7 @@ defcomp comp-card (options)
 
 Usage of the card component:
 
-```cirru
+```clojure
 comp-card
   {} $ :title "Card Title"
     :content "This is the content of the card."
@@ -145,7 +145,7 @@ comp-card
 
 Here's an example of a data table using Respo UI styles:
 
-```cirru
+```clojure
 ns your-app.comp.table
   :require
     respo.core :refer $ defcomp <> div list->
@@ -204,7 +204,7 @@ defcomp comp-table (data)
 
 Usage of the table component:
 
-```cirru
+```clojure
 comp-table
   [] $ {} (:id 1) (:name "John Doe") (:email "john@example.com")
     {} (:id 2) (:name "Jane Smith") (:email "jane@example.com")
@@ -215,7 +215,7 @@ comp-table
 
 Here's an example of a modal dialog using Respo UI styles:
 
-```cirru
+```clojure
 ns your-app.comp.modal
   :require
     respo.core :refer $ defcomp <> div
@@ -261,7 +261,7 @@ defcomp comp-modal (options)
 
 Usage of the modal component:
 
-```cirru
+```clojure
 comp-modal
   {} $ :show? true
     :title "Confirmation"
@@ -273,7 +273,7 @@ comp-modal
 
 Here's an example of a responsive layout using Respo UI styles:
 
-```cirru
+```clojure
 ns your-app.comp.responsive
   :require
     respo.core :refer $ defcomp <> div
@@ -303,14 +303,14 @@ defcomp comp-responsive (width)
           <> "Main content"
       div
         {} $ :style $ merge ui/row-center $ {} (:padding 16)
-        <> $ str "Current width: " width "px" 
+        <> $ str "Current width: " width "px"
 ```
 
 ## Advanced Component Example with Attributes
 
 Here's an example of using the `comp-attributes` component for displaying structured data:
 
-```cirru
+```clojure
 ns your-app.comp.user-profile
   :require
     respo.core :refer $ defcomp <> div
@@ -349,7 +349,7 @@ defcomp comp-user-profile (user)
 
 Usage of the user profile component:
 
-```cirru
+```clojure
 comp-user-profile
   {} $ :id "user-123"
     :name "John Doe"

@@ -13,29 +13,10 @@ ns your-app.comp.custom
     respo-ui.core :as ui
 
 defcomp comp-custom (options)
-  let
-    value $ :value options
-    on-change $ :on-change options
-    disabled? $ :disabled? options false
-    div
-      {} $ :style $ merge ui/row-middle
-        {} $ :padding "8px 12px"
-          :border "1px solid #ddd"
-          :border-radius "4px"
-          :background-color $ if disabled? "#f5f5f5" :white
-          :opacity $ if disabled? 0.7 1
-        :style options
-      :class-name $ :class-name options
-      :on-click $ fn (e d!)
-        when (and (some? on-change) (not disabled?))
-          on-change e d!
-      div
-        {} $ :style ui/expand
-        <> $ or value "Empty"
-      when-not disabled?
-        div
-          {} $ :style $ {} (:cursor :pointer)
-          <> "Action"
+  div
+    {}
+      :style $ merge ui/row-middle $ {} (:padding |8px-12px) (:border |1px-solid-#ddd) (:border-radius |4px)
+    <> $ or (:value options) |Empty
 ```
 
 ## State Management with Atoms
@@ -45,31 +26,23 @@ You can use atoms for local component state management:
 ```cirru
 ns your-app.comp.stateful
   :require
-    respo.core :refer $ defcomp <> div use-atom
+    respo.core :refer $ defcomp <> div atom deref
     respo-ui.core :as ui
 
 defcomp comp-stateful ()
   let
-    *counter $ use-atom 0
+      *counter $ atom 0
     div
       {} $ :style ui/column
-      div
-        {}
-        <> $ str "Counter: " @*counter
+      div ({}) $ <> $ str |Counter: $ deref *counter
       div
         {} $ :style $ merge ui/row $ {} (:gap 8)
         div
-          {} $ :style $ merge ui/button
-            {} $ :cursor :pointer
-          :on-click $ fn (e d!)
-            swap! *counter dec
-          <> "-"
+          {} $ :style ui/button
+          <> |-
         div
-          {} $ :style $ merge ui/button ui/button-primary
-            {} $ :cursor :pointer
-          :on-click $ fn (e d!)
-            swap! *counter inc
-          <> "+"
+          {} $ :style ui/button-primary
+          <> |+
 ```
 
 ## Advanced Styling Techniques
@@ -79,47 +52,23 @@ defcomp comp-stateful ()
 You can create components that adapt their styling based on props:
 
 ```cirru
+ns your-app.comp.dynamic
+  :require
+    respo.core :refer $ defcomp <> div
+    respo-ui.core :as ui
+
 defcomp comp-button (options)
-  let
-    type $ :type options :default
-    size $ :size options :medium
-    disabled? $ :disabled? options false
-    on-click $ :on-click options
-    text $ :text options
-    div
-      {} $ :style $ merge
-        ui/center
-        {} $ :padding $ case size
-          :small "4px 8px"
-          :medium "8px 16px"
-          :large "12px 24px"
-        :font-size $ case size
-          :small 12
-          :medium 14
-          :large 16
-        :border-radius "4px"
-        :cursor $ if disabled? :not-allowed :pointer
-        :opacity $ if disabled? 0.7 1
-        :background-color $ case type
-          :primary "#4285f4"
-          :success "#34a853"
-          :warning "#fbbc05"
-          :danger "#ea4335"
-          :default "#f5f5f5"
-        :color $ if (= type :default) "#333" :white
-        :style options
-      :class-name $ :class-name options
-      :on-click $ fn (e d!)
-        when (and (some? on-click) (not disabled?))
-          on-click e d!
-      <> text
+  div
+    {}
+      :style $ merge ui/center $ {} (:padding |8px-16px) (:border-radius |4px) (:background-color $ if (= (:type options) :primary) |#4285f4 |#f5f5f5) (:color $ if (= (:type options) :primary) :white |#333)
+    <> $ or (:text options) |Button
 ```
 
 ### Theme System
 
 Implementing a theme system for consistent styling:
 
-```cirru
+```clojure
 ns your-app.theme
   :require
     respo-ui.core :as ui
@@ -167,7 +116,7 @@ def theme-dark $ {}
 
 Using the theme system in components:
 
-```cirru
+```clojure
 (ns your-app.comp.themed
   (:require [respo.core :refer [defcomp <> div]]
             [respo-ui.core :as ui]
@@ -196,7 +145,7 @@ Using the theme system in components:
 
 Use memoization to avoid unnecessary re-renders:
 
-```cirru
+```clojure
 (ns your-app.comp.memoized
   (:require [respo.core :refer [defcomp <> div]]
             [respo-ui.core :as ui]
@@ -225,7 +174,7 @@ Use memoization to avoid unnecessary re-renders:
 
 Implement virtualized lists for handling large datasets:
 
-```cirru
+```clojure
 (ns your-app.comp.virtual-list
   (:require [respo.core :refer [defcomp <> div list->]]
             [respo-ui.core :as ui]))
@@ -269,7 +218,7 @@ Implement virtualized lists for handling large datasets:
 
 Create compound components for complex UI patterns:
 
-```cirru
+```clojure
 (ns your-app.comp.tabs
   (:require [respo.core :refer [defcomp <> div list->]]
             [respo-ui.core :as ui]))
@@ -314,7 +263,7 @@ Create compound components for complex UI patterns:
 
 Usage of the tabs component:
 
-```cirru
+```clojure
 (comp-tabs
   {:selected :tab1
    :tabs [{:value :tab1, :label "Tab 1"}
@@ -327,7 +276,7 @@ Usage of the tabs component:
 
 Create higher-order components to add functionality to existing components:
 
-```cirru
+```clojure
 (ns your-app.hoc
   (:require [respo.core :refer [defcomp <> div]]
             [respo-ui.core :as ui]))
@@ -362,7 +311,7 @@ Create higher-order components to add functionality to existing components:
 
 Usage of higher-order components:
 
-```cirru
+```clojure
 (def comp-user-list-with-loading (with-loading comp-user-list))
 (def comp-user-list-with-error (with-error-boundary comp-user-list-with-loading))
 
@@ -378,7 +327,7 @@ Usage of higher-order components:
 
 Integrate external CSS libraries with Respo UI:
 
-```cirru
+```clojure
 (ns your-app.main
   (:require [respo.core :refer [render! clear-cache!]]
             [your-app.comp.container :refer [comp-container]]
@@ -394,7 +343,7 @@ Integrate external CSS libraries with Respo UI:
 
 Integrate JavaScript libraries with Respo UI:
 
-```cirru
+```clojure
 (ns your-app.comp.chart
   (:require [respo.core :refer [defcomp <> div]]
             [respo-ui.core :as ui]
@@ -427,7 +376,7 @@ Integrate JavaScript libraries with Respo UI:
 
 Implement advanced routing with nested routes and parameters:
 
-```cirru
+```clojure
 (ns your-app.core
   (:require [respo.core :refer [defcomp <> div]]
             [respo-ui.core :as ui]
@@ -535,7 +484,7 @@ src/
 
 Make your components accessible:
 
-```cirru
+```clojure
 (defcomp comp-accessible-button [options]
   (let [text (:text options)
         on-click (:on-click options)
