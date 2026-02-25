@@ -14,32 +14,32 @@ ns your-app.core
     respo-ui.core :as ui
 ```
 
-| Style              | Description                                      |
-| ------------------ | ------------------------------------------------ |
-| `ui/global`        | Global styles for the application                |
-| `ui/row`           | Horizontal layout using flexbox                  |
-| `ui/column`        | Vertical layout using flexbox                    |
-| `ui/center`        | Centers content both horizontally and vertically |
-| `ui/row-center`    | Centers content horizontally in a row            |
-| `ui/row-evenly`    | Distributes items evenly in a row                |
-| `ui/column-evenly` | Distributes items evenly in a column             |
-| `ui/row-dispersive`    | Spreads items in a row with space distribution |
+| Style                  | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `ui/global`            | Global styles for the application                 |
+| `ui/row`               | Horizontal layout using flexbox                   |
+| `ui/column`            | Vertical layout using flexbox                     |
+| `ui/center`            | Centers content both horizontally and vertically  |
+| `ui/row-center`        | Centers content horizontally in a row             |
+| `ui/row-evenly`        | Distributes items evenly in a row                 |
+| `ui/column-evenly`     | Distributes items evenly in a column              |
+| `ui/row-dispersive`    | Spreads items in a row with space distribution    |
 | `ui/column-dispersive` | Spreads items in a column with space distribution |
-| `ui/row-parted`    | Spaces items apart in a row                      |
-| `ui/column-parted` | Spaces items apart in a column                   |
-| `ui/row-middle`    | Aligns items in the middle of a row              |
-| `ui/flex`          | Makes an element flexible                        |
-| `ui/expand`        | Makes an element expand to fill available space  |
-| `ui/fullscreen`    | Makes an element fill the entire screen          |
+| `ui/row-parted`        | Spaces items apart in a row                       |
+| `ui/column-parted`     | Spaces items apart in a column                    |
+| `ui/row-middle`        | Aligns items in the middle of a row               |
+| `ui/flex`              | Makes an element flexible                         |
+| `ui/expand`            | Makes an element expand to fill available space   |
+| `ui/fullscreen`        | Makes an element fill the entire screen           |
 
 ### Typography Styles
 
-| Style         | Description            |
-| ------------- | ---------------------- |
-| `ui/text-label` | Label-style text      |
-| `ui/font-normal` | Regular text font     |
+| Style            | Description             |
+| ---------------- | ----------------------- |
+| `ui/text-label`  | Label-style text        |
+| `ui/font-normal` | Regular text font       |
 | `ui/font-fancy`  | Fancy heading-like font |
-| `ui/font-code`   | Monospace/code font   |
+| `ui/font-code`   | Monospace/code font     |
 
 ### Button Styles
 
@@ -59,13 +59,13 @@ ns your-app.core
 
 ### Miscellaneous Styles
 
-| Style        | Description        |
-| ------------ | ------------------ |
-| `ui/link`    | Style for links    |
-| `ui/card`    | Style for cards    |
-| `ui/tag` | Style for tags |
+| Style            | Description            |
+| ---------------- | ---------------------- |
+| `ui/link`        | Style for links        |
+| `ui/card`        | Style for cards        |
+| `ui/tag`         | Style for tags         |
 | `ui/tag-outline` | Outline style for tags |
-| `ui/tag-stroke` | Stroke style for tags |
+| `ui/tag-stroke`  | Stroke style for tags  |
 
 ## Components Namespace
 
