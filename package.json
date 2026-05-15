@@ -1,14 +1,14 @@
 {
   "version": "0.6.3",
   "dependencies": {
-    "@calcit/procs": "^0.11.6",
+    "@calcit/procs": "^0.12.35",
     "copy-text-to-clipboard": "^3.2.0",
     "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "bottom-tip": "^0.1.5",
     "cirru-color": "^0.2.4",
-    "vite": "^7.1.2"
+    "vite": "^8.0.13"
   },
   "packageManager": "yarn@4.12.0"
 }
