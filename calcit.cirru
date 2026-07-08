@@ -86,7 +86,7 @@
                           on-change (:checked e) d!
                 if
                   some? $ :label options
-                  <> $ :label options
+                  <> $ str (:label options)
           :examples $ []
         |comp-cirru-snippet $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
@@ -191,7 +191,7 @@
                     fn $ e d!
                 <> content
           :examples $ []
-        |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...") (:schema :dynamic)
+        |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
           :code $ quote
             defcomp comp-time (time & options) (.!extend dayjs is-today)
               let
@@ -202,6 +202,10 @@
                 span $ {} (:class-name css/font-fancy) (:title time) (:inner-text mark)
                   :on-click $ fn (e d!) (js/console.log :time time)
           :examples $ []
+          :schema $ :: :fn
+            {} (:rest :dynamic) (:return :dynamic)
+              :args $ [] :dynamic
+              :features $ #{} :js-ffi
         |css-item-label $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defstyle css-item-label $ {}
@@ -239,14 +243,18 @@
               |$0:hover $ {}
                 :background-color $ hsl 0 0 98
           :examples $ []
-        |effect-dataset-text $ %{} :CodeEntry (:doc "|Respo does not support dataset from attribute, write with effect") (:schema :dynamic)
+        |effect-dataset-text $ %{} :CodeEntry (:doc "|Respo does not support dataset from attribute, write with effect")
           :code $ quote
             defeffect effect-dataset-text (text) (action el at?)
               if
                 or (= action :update) (= action :mount)
                 -> el .-dataset .-text $ set! text
           :examples $ []
-        |effect-tab-highlight $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :schema $ :: :fn
+            {} (:return :dynamic)
+              :args $ [] :dynamic
+              :features $ #{} :js-ffi
+        |effect-tab-highlight $ %{} :CodeEntry (:doc |)
           :code $ quote
             defeffect effect-tab-highlight (selected vertical?) (action el at?)
               when
@@ -271,6 +279,10 @@
                     if (not vertical?)
                       -> cursor .-style .-width $ set! (str 0 |px)
           :examples $ []
+          :schema $ :: :fn
+            {} (:return :dynamic)
+              :args $ [] :dynamic :dynamic
+              :features $ #{} :js-ffi
         |literal? $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defn literal? (v)
@@ -642,7 +654,7 @@
                   comp-tag :error "|:error demo"
                   comp-tag :default "|:default demo"
           :examples $ []
-        |comp-demo-time $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |comp-demo-time $ %{} :CodeEntry (:doc |)
           :code $ quote
             defcomp comp-demo-time () $ div
               {} $ :class-name css/column
@@ -664,6 +676,10 @@
                   div ({})
                     comp-time |2023-11-07T06:23:49.688Z $ {}
           :examples $ []
+          :schema $ :: :fn
+            {} (:return :dynamic)
+              :args $ []
+              :features $ #{} :js-ffi
         |css-title $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defstyle css-title $ {}
@@ -1557,7 +1573,7 @@
               when config/dev? $ js/console.log |Dispatch: op
               reset! *store $ updater @*store op
           :examples $ []
-        |main! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |main! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn main! ()
               if config/dev? $ load-console-formatter!
@@ -1569,6 +1585,10 @@
               render-app!
               println "|App started!"
           :examples $ []
+          :schema $ :: :fn
+            {} (:return :dynamic)
+              :args $ []
+              :features $ #{} :js-ffi
         |mount-target $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             def mount-target $ js/document.querySelector |.app
@@ -1653,7 +1673,7 @@
             defn santinize-html-text (content)
               -> content (.replace |< |&lt;) (.replace |> |&gt;) (.replace "| " |&nbsp;)
           :examples $ []
-        |tab-echo! $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+        |tab-echo! $ %{} :CodeEntry (:doc |)
           :code $ quote
             defn tab-echo! (data ? format)
               case-default format
@@ -1674,5 +1694,9 @@
                   -> w .-document .-body .-innerHTML $ set!
                     str |<pre> (santinize-html-text content) |</pre>
           :examples $ []
+          :schema $ :: :fn
+            {} (:return :dynamic)
+              :args $ [] :dynamic :dynamic
+              :features $ #{} :js-ffi
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote (ns respo-ui.util)
