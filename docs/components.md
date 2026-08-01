@@ -5,7 +5,14 @@ Import components from `respo-ui.comp`.
 ```cirru
 ns app.comp.demo $ :require
   respo-ui.comp :refer $ comp-button comp-input comp-card
+  respo-ui.schema :refer $ ButtonOptions SelectOption
 ```
+
+Public components carry concrete function schemas and return
+`respo.schema/Component`. Inline option maps are checked against the component's
+named options struct. When options are stored in a variable or collection,
+construct the corresponding record explicitly so its field types remain
+available to downstream code.
 
 ## Form controls
 
@@ -37,6 +44,13 @@ comp-input draft $ {}
 
 A controlled native textarea. Options: `:placeholder`, `:disabled`, `:on-input`, `:class-name`, `:style`.
 
+```cirru
+comp-textarea notes $ {}
+  :placeholder "|Notes"
+  :on-input $ fn (e d!)
+    d! cursor $ assoc state :notes (:value e)
+```
+
 ### `comp-checkbox (checked ? options)`
 
 Options: `:label`, `:disabled`, `:on-change`, `:class-name`, `:style`. `:on-change` receives `(checked? d!)`.
@@ -53,6 +67,11 @@ comp-checkbox enabled? $ {}
 A controlled native select. Each item is a map containing `:value`, `:label`, and optional `:disabled`. Options support `:disabled`, `:on-change`, `:class-name`, and `:style`; `:on-change` receives `(next-value d!)`.
 
 ```cirru
+def language-options $ []
+  %{}? SelectOption (:value |calcit) (:label |Calcit)
+  %{}? SelectOption (:value |clojure) (:label |Clojure)
+  %{}? SelectOption (:value |rust) (:label |Rust) (:disabled true)
+
 comp-select language language-options $ {}
   :on-change $ fn (next-value d!)
     d! cursor $ assoc state :language next-value
@@ -60,9 +79,41 @@ comp-select language language-options $ {}
 
 Keep the options collection in a top-level definition when it is static, so it is not rebuilt during every render.
 
+## Typed option schemas
+
+Option fields are defined in `respo-ui.schema`; callback-bearing structs keep
+the application dispatch operation as a generic type parameter.
+
+| Components | Option type |
+| --- | --- |
+| `comp-button` | `ButtonOptions` |
+| `comp-input`, `comp-textarea` | `respo.schema/DomProps` |
+| `comp-select` | `SelectOptions<Op>`; items are `SelectOption` records |
+| `comp-switch`, `comp-checkbox` | `SwitchOptions<Op>` |
+| `comp-card` | `CardOptions<Footer>` |
+| `comp-alert`, `comp-progress` | `PresentationOptions` |
+| `comp-spinner` | `SpinnerOptions` |
+| `comp-divider` | `DividerOptions` |
+| `comp-empty` | `EmptyOptions<Icon, Action>` |
+| `comp-skeleton` | `SkeletonOptions` |
+| `comp-avatar` | `AvatarOptions` |
+| `comp-attributes` | `AttributesOptions<Item>` |
+| `comp-tabs` | `TabsOptions<Value>`; callbacks receive `TabRoute<Value>` |
+
+CSS `:style` remains an intentionally heterogeneous map. Other public fields,
+including labels, booleans, sizes, variants, callback inputs, and component
+return values, use concrete types rather than `:dynamic`.
+
 ### `comp-switch (checked ? options)`
 
 A controlled switch backed by a native checkbox. Options: `:label`, `:disabled`, `:on-change`, `:class-name`, and `:style`.
+
+```cirru
+comp-switch compact? $ {}
+  :label "|Compact mode"
+  :on-change $ fn (next? d!)
+    d! cursor $ assoc state :compact? next?
+```
 
 ## Containers and feedback
 
@@ -88,13 +139,28 @@ comp-alert :warning "|This action cannot be undone"
 
 Renders a progress track. The visual width is clamped to `0..100`; options support `:class-name` and `:style`.
 
+```cirru
+div ({})
+  <> "|Upload · 72%"
+  comp-progress 72
+```
+
 ### `comp-spinner (? options)`
 
 Renders a compact loading indicator with `role="status"`. Options: `:label`, `:class-name`, `:style`.
 
+```cirru
+comp-spinner $ {} (:label "|Loading results")
+```
+
 ### `comp-divider (? options)`
 
 Renders a horizontal separator. Pass `:vertical? true` for an inline vertical separator. Options also support `:class-name` and `:style`.
+
+```cirru
+comp-divider
+comp-divider $ {} (:vertical? true)
+```
 
 ### `comp-placeholder (text)`
 
@@ -104,27 +170,39 @@ Displays an empty-state placeholder.
 
 A richer empty state. Options: `:icon`, `:description`, `:action`, `:class-name`, and `:style`. `:icon` and `:action` may be Respo nodes.
 
+```cirru
+comp-empty "|No results" $ {}
+  :icon $ <> "|⌕"
+  :description "|Try another search term."
+  :action $ comp-button "|Clear filters"
+```
+
 ### `comp-skeleton (? options)`
 
 An animated loading placeholder. Unlabeled instances are decorative; pass `:label` to expose `role="status"`. Options: `:kind` (`:text` or `:circle`), `:width`, `:height`, `:class-name`, and `:style`.
 
-### `comp-modal (content ? options)`
-
-A stateless dialog overlay. The calling component owns visibility. Options: `:title`, `:footer`, `:on-close`, `:class-name`, `:style`, `:overlay-class-name`, and `:overlay-style`.
-
 ```cirru
-when show-modal?
-  comp-modal content $ {}
-    :title "|Confirm action"
-    :on-close $ fn (e d!)
-      d! cursor $ assoc state :show-modal? false
+comp-skeleton $ {} (:kind :circle) (:label "|Loading avatar")
+comp-skeleton $ {} (:width |60%)
+comp-skeleton $ {} (:height |72px)
 ```
+
+### Dialogs and prompts
+
+Dialogs are intentionally outside this library's scope. Use
+[`respo-alerts`](https://github.com/Respo/alerts.calcit) for animated alerts,
+prompts, confirms, and modal flows.
 
 ## Data and navigation
 
 ### `comp-avatar (text ? options)`
 
 Displays initials or an image. Options: `:src`, `:alt`, `:title`, `:size` (`:small` or `:large`), `:class-name`, and `:style`.
+
+```cirru
+comp-avatar |CY $ {} (:size :large) (:title "|Chen Yong")
+comp-avatar |CY $ {} (:src |/avatars/cy.png) (:alt "|Chen Yong")
+```
 
 ### `comp-attributes (options)`
 
@@ -144,7 +222,7 @@ comp-attributes $ {}
 
 ### `comp-tabs (options tabs on-route)`
 
-`tabs` accepts `(:: :tab value display)` tuples or maps containing `:value`/`:name` and `:display`/`:title`. Options include `:selected`, `:vertical?`, `:width`, `:class-name`, `:style`, `:tab-class-name`, `:tab-style`, and `:selected-tab-style`.
+`tabs` accepts `(:: :tab value display)` tuples or maps containing `:value`/`:name` and `:display`/`:title`. Inputs are normalized to `TabRoute<Value>`, which is passed to `on-route` together with the Respo dispatcher. Options use `TabsOptions<Value>` and include `:selected`, `:vertical?`, `:width`, `:class-name`, `:style`, `:tab-class-name`, `:tab-style`, and `:selected-tab-style`.
 
 ### `comp-tag (kind content ? options)`
 

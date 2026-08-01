@@ -45,3 +45,7 @@ Component option maps are optional where the signature contains `? options`. Tex
 - Put only state-dependent values such as a calculated width in `:style`.
 
 This avoids allocating and diffing the same style maps on every render.
+
+Respo UI does not maintain dialogs or prompts. Use
+[`respo-alerts`](https://github.com/Respo/alerts.calcit) for those flows and
+their animations.

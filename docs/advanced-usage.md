@@ -35,6 +35,33 @@ list-> ({}) $ -> items $ map
 
 `comp-input`, `comp-textarea`, and `comp-checkbox` do not own application state. Feed them the current value and dispatch the next value from their handler. This keeps state transitions explicit and avoids component-local caches becoming stale.
 
+## Preserve schemas across component boundaries
+
+Public components use concrete primitive, named struct, generic callback, and
+`respo.schema/Component` return types. Prefer named records for reusable option
+values and collection items; an unannotated top-level map or list otherwise
+loses the expected type supplied at an inline call site.
+
+```cirru
+def select-items $ []
+  %{}? SelectOption (:value |calcit) (:label |Calcit)
+  %{}? SelectOption (:value |rust) (:label |Rust) (:disabled true)
+```
+
+Audit library boundaries independently from compilation:
+
+```bash
+cr analyze check-types --ns respo-ui.comp --summary-only
+cr analyze weak-types --ns respo-ui.comp \
+  --only schema-dynamic,code-dynamic \
+  --intent unresolved \
+  --summary-only
+```
+
+Do not replace heterogeneous APIs with repeated `:dynamic`. Use named structs
+for option shapes, type variables for content/dispatch relationships, and named
+Respo schemas for DOM props and component return values.
+
 ## Dynamic content
 
 Text-like slots in `comp-button`, `comp-card`, and `comp-alert` accept either a literal or a Respo node. Build complex content before passing it when that improves readability:
@@ -54,7 +81,6 @@ let
 - `comp-alert` uses `role="alert"`.
 - `comp-spinner` uses `role="status"` and accepts an accessible `:label`.
 - `comp-switch` and `comp-select` keep native form controls underneath their presentation.
-- `comp-modal` uses `role="dialog"` and takes its accessible name from `:title`.
 - `comp-divider` uses `role="separator"`.
 - `comp-progress` uses `role="progressbar"`; announce detailed progress in adjacent text when users need the exact value.
 
@@ -71,3 +97,7 @@ yarn vite build --base=./
 ```
 
 Treat preprocessing warnings as defects. Newer Respo releases type-check DOM properties, so unsupported keys in element property maps should be removed or implemented in Respo's `DomProps` intentionally.
+
+For animated alerts, prompts, confirms, and modal accessibility behavior, use
+[`respo-alerts`](https://github.com/Respo/alerts.calcit) rather than adding an
+overlay component to Respo UI.

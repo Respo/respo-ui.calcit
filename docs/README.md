@@ -7,7 +7,7 @@ Respo UI provides reusable styles and small, composable components for Calcit ap
 - [Introduction](./introduction.md) — installation and first use
 - [Components](./components.md) — component signatures, options, and examples
 - [Styles](./styles.md) — map styles, generated CSS classes, and performance
-- [Examples](./examples.md) — forms, feedback, loading states, cards, and dialogs
+- [Examples](./examples.md) — forms, feedback, loading states, and cards
 - [API reference](./api-reference.md) — namespace-level inventory
 - [Advanced usage](./advanced-usage.md) — list rendering and optimization
 
@@ -37,3 +37,6 @@ defcomp comp-demo ()
 ```
 
 Use `respo-ui.css` classes for reusable static presentation. Keep `:style` for values that actually vary at runtime.
+
+Animated alerts, prompts, confirms, and modal flows are provided separately by
+[`respo-alerts`](https://github.com/Respo/alerts.calcit).

@@ -18,12 +18,92 @@ defcomp comp-demo ()
 
 Available groups:
 
-- Layout: `row`, `column`, `center`, `row-center`, `row-middle`, `row-evenly`, `row-dispersive`, `row-parted`, `column-evenly`, `column-dispersive`, `column-parted`, `flex`, `expand`, `fullscreen`, `gap8`, `gap16`.
+- Layout: `row`, `column`, `center`, `row-center`, `row-middle`, `row-evenly`, `row-dispersive`, `row-parted`, `column-evenly`, `column-dispersive`, `column-parted`, `flex`, `expand`, `fullscreen`, `stack`, `cluster`, `responsive-grid`, `split-layout`, `with-sidebar`, `content-container`, `cover`, `reel`, `gap8`, `gap16`.
 - Typography: `font-normal`, `font-normal!`, `font-fancy`, `font-fancy!`, `font-code`, `font-code!`, `text-label`.
 - Controls: `button`, `button-primary`, `button-danger`, `button-danger-outline`, `input`, `textarea`, `select`, `checkbox`, `checkbox-label`.
 - Other: `global`, `preset`, `card`, `link`, `link-slight`, `tag`, `tag-outline`, `tag-stroke`.
 
 Apply `css/preset` once near the application root when the global body/reset rules are wanted.
+
+## Layout recipes
+
+The newer layout classes are intentionally gap-free. Compose `gap8` or `gap16`
+at the call site so the same structural primitive works at different density
+levels.
+
+### Responsive cards
+
+`responsive-grid` uses `auto-fit` with a preferred 240px column width. It fills
+wide containers and collapses safely to one column without JavaScript or a
+viewport listener.
+
+```cirru
+div
+  {} $ :class-name $ str-spaced css/responsive-grid css/gap16
+  comp-card |Overview
+  comp-card |Activity
+  comp-card |Members
+```
+
+### Sidebar and main content
+
+`with-sidebar` treats the first child as the sidebar and the last child as the
+main region. Both regions wrap when their preferred widths no longer fit.
+
+```cirru
+div
+  {} $ :class-name $ str-spaced css/with-sidebar css/gap16
+  div
+    {} $ :class-name $ str-spaced css/stack css/gap8
+    <> |Navigation
+  div
+    {} $ :class-name $ str-spaced css/stack css/gap16
+    <> |Content
+```
+
+Keep exactly two direct children in this recipe. Add nested wrappers inside a
+region when it needs more structure.
+
+### Wrapping toolbars and action groups
+
+```cirru
+div
+  {} $ :class-name $ str-spaced css/split-layout css/gap16
+  <> "|Project members"
+  div
+    {} $ :class-name $ str-spaced css/cluster css/gap8
+    comp-button |Filter
+    comp-button |Invite $ {} (:kind :primary)
+```
+
+`split-layout` keeps the outer groups at opposite edges. `cluster` keeps the
+actions together and lets them wrap instead of overflowing.
+
+### Horizontal reels
+
+```cirru
+div
+  {} $ :class-name $ str-spaced css/reel css/gap16
+  comp-card |Preview-A
+  comp-card |Preview-B
+  comp-card |Preview-C
+```
+
+Direct children keep their intrinsic width and use proximity scroll snapping.
+Set a width on each item when the child does not already provide one.
+
+### Focused screens
+
+```cirru
+div
+  {} $ :class-name css/cover
+  div
+    {} $ :class-name $ str-spaced css/content-container css/stack css/gap16
+    <> "|Centered and width-bounded"
+```
+
+`cover` provides viewport-height centering. `content-container` caps the content
+at 1120px and preserves 16px gutters on narrow screens.
 
 ## Style maps (`respo-ui.core`)
 
