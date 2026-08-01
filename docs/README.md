@@ -1,49 +1,42 @@
-# Respo UI Documentation
+# Respo UI documentation
 
-Welcome to the Respo UI documentation. This documentation provides comprehensive information about the Respo UI library, a UI component library for the Respo framework.
+Respo UI provides reusable styles and small, composable components for Calcit applications built with Respo.
 
-## Table of Contents
+## Guides
 
-- [Introduction](./introduction.md) - An overview of Respo UI and how to get started
-- [Components](./components.md) - Detailed information about the available components
-- [Styles](./styles.md) - Information about the available styles and CSS utilities
-- [Examples](./examples.md) - Practical examples of how to use Respo UI
-- [API Reference](./api-reference.md) - Comprehensive reference for the Respo UI API
-- [Advanced Usage](./advanced-usage.md) - Advanced patterns and techniques for Respo UI
+- [Introduction](./introduction.md) — installation and first use
+- [Components](./components.md) — component signatures, options, and examples
+- [Styles](./styles.md) — map styles, generated CSS classes, and performance
+- [Examples](./examples.md) — forms, feedback, loading states, and cards
+- [API reference](./api-reference.md) — namespace-level inventory
+- [Advanced usage](./advanced-usage.md) — list rendering and optimization
 
-## Quick Start
+## Quick start
 
-To get started with Respo UI, add it as a dependency to your project:
+Add the tagged Calcit module to `deps.cirru`:
 
 ```cirru
-; In your deps.cirru file
-{} (:package |your-app)
+{} (:calcit-version |0.12.56)
   :dependencies $ {}
-    |Respo/respo-ui.calcit |0.6.3
+    |Respo/respo-ui.calcit |0.6.5
 ```
 
-Then import the components and styles you need:
+Then synchronize modules with `caps` and import only the APIs you use:
 
 ```cirru
-ns your-app.core
-  :require
-    respo.core :refer $ defcomp <> div
-    respo-ui.core :as ui
-    respo-ui.comp :refer $ comp-copy comp-placeholder
+ns app.comp.demo $ :require
+  respo.core :refer $ defcomp div <>
+  respo-ui.comp :refer $ comp-button comp-alert
+  respo-ui.css :as css
 
-defcomp comp-container (store)
+defcomp comp-demo ()
   div
-    {} (:style ui/global)
-    comp-copy |Click-me
-    comp-placeholder |This-is-a-placeholder
+    {} $ :class-name css/column
+    comp-alert :success "|Ready"
+    comp-button "|Continue" $ {} (:kind :primary)
 ```
 
-## Resources
+Use `respo-ui.css` classes for reusable static presentation. Keep `:style` for values that actually vary at runtime.
 
-- [Respo UI Website](https://ui.respo-mvc.org/)
-- [GitHub Repository](https://github.com/Respo/respo-ui)
-- [Respo Framework](https://github.com/Respo/respo)
-
-## License
-
-Respo UI is licensed under the MIT License.
+Animated alerts, prompts, confirms, and modal flows are provided separately by
+[`respo-alerts`](https://github.com/Respo/alerts.calcit).

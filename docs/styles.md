@@ -1,167 +1,157 @@
-# Respo UI Styles
+# Styles
 
-Respo UI provides a set of predefined styles and CSS utilities that you can use to style your application. This document describes the available styles and how to use them.
+Respo UI exposes the same design primitives in two forms.
 
-## Core Styles
+## Generated CSS classes (`respo-ui.css`)
 
-Respo UI provides a set of core styles that you can use to style your components. These styles are available in the `respo-ui.core` namespace.
-
-### Global Styles
-
-The `ui/global` style provides a set of global styles that you can apply to your application's root element.
+Use these through `:class-name`. This is the preferred path for static styles because Respo compares a short class string instead of repeatedly diffing equivalent maps.
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
+ns app.comp.demo $ :require
+  respo.core :refer $ defcomp div
+  respo-ui.css :as css
 
-, ui/global
+defcomp comp-demo ()
+  div $ {}
+    :class-name $ str-spaced css/row-middle css/gap8
 ```
 
-### Layout Styles
+Available groups:
 
-Respo UI provides several layout styles to help you structure your application's UI.
+- Layout: `row`, `column`, `center`, `row-center`, `row-middle`, `row-evenly`, `row-dispersive`, `row-parted`, `column-evenly`, `column-dispersive`, `column-parted`, `flex`, `expand`, `fullscreen`, `stack`, `cluster`, `responsive-grid`, `split-layout`, `with-sidebar`, `content-container`, `cover`, `reel`, `gap8`, `gap16`.
+- Typography: `font-normal`, `font-normal!`, `font-fancy`, `font-fancy!`, `font-code`, `font-code!`, `text-label`.
+- Controls: `button`, `button-primary`, `button-danger`, `button-danger-outline`, `input`, `textarea`, `select`, `checkbox`, `checkbox-label`.
+- Other: `global`, `preset`, `card`, `link`, `link-slight`, `tag`, `tag-outline`, `tag-stroke`.
 
-#### Row Layout
+Apply `css/preset` once near the application root when the global body/reset rules are wanted.
 
-The `ui/row` style creates a horizontal layout using flexbox.
+## Layout recipes
+
+The newer layout classes are intentionally gap-free. Compose `gap8` or `gap16`
+at the call site so the same structural primitive works at different density
+levels.
+
+### Responsive cards
+
+`responsive-grid` uses `auto-fit` with a preferred 240px column width. It fills
+wide containers and collapses safely to one column without JavaScript or a
+viewport listener.
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-merge ui/row $ {} (:padding 8)
+div
+  {} $ :class-name $ str-spaced css/responsive-grid css/gap16
+  comp-card |Overview
+  comp-card |Activity
+  comp-card |Members
 ```
 
-#### Column Layout
+### Sidebar and main content
 
-The `ui/column` style creates a vertical layout using flexbox.
+`with-sidebar` treats the first child as the sidebar and the last child as the
+main region. Both regions wrap when their preferred widths no longer fit.
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-merge ui/column $ {} (:padding 8)
+div
+  {} $ :class-name $ str-spaced css/with-sidebar css/gap16
+  div
+    {} $ :class-name $ str-spaced css/stack css/gap8
+    <> |Navigation
+  div
+    {} $ :class-name $ str-spaced css/stack css/gap16
+    <> |Content
 ```
 
-#### Center Layout
+Keep exactly two direct children in this recipe. Add nested wrappers inside a
+region when it needs more structure.
 
-The `ui/center` style centers content both horizontally and vertically.
+### Wrapping toolbars and action groups
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-merge ui/center $ {} (:height 100)
+div
+  {} $ :class-name $ str-spaced css/split-layout css/gap16
+  <> "|Project members"
+  div
+    {} $ :class-name $ str-spaced css/cluster css/gap8
+    comp-button |Filter
+    comp-button |Invite $ {} (:kind :primary)
 ```
 
-### Typography Styles
+`split-layout` keeps the outer groups at opposite edges. `cluster` keeps the
+actions together and lets them wrap instead of overflowing.
 
-Respo UI provides styles for typography to ensure consistent text appearance across your application.
+### Horizontal reels
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-[] ui/text-label ui/font-fancy ui/font-normal
+div
+  {} $ :class-name $ str-spaced css/reel css/gap16
+  comp-card |Preview-A
+  comp-card |Preview-B
+  comp-card |Preview-C
 ```
 
-### Button Styles
+Direct children keep their intrinsic width and use proximity scroll snapping.
+Set a width on each item when the child does not already provide one.
 
-Respo UI provides styles for buttons with different appearances.
+### Focused screens
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-[] ui/button ui/button-primary $ merge ui/button $ {} (:color :red)
+div
+  {} $ :class-name css/cover
+  div
+    {} $ :class-name $ str-spaced css/content-container css/stack css/gap16
+    <> "|Centered and width-bounded"
 ```
 
-### Form Styles
+`cover` provides viewport-height centering. `content-container` caps the content
+at 1120px and preserves 16px gutters on narrow screens.
 
-Respo UI provides styles for form elements.
+## Style maps (`respo-ui.core`)
+
+Use these when a style map must be composed dynamically:
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-[] ui/input ui/textarea
+div $ {}
+  :style $ merge ui/row-middle $ {}
+    :width dynamic-width
 ```
 
-## CSS Classes
+The core namespace supplies the layout, typography, control, card, link, and tag maps corresponding to most CSS classes. It also exports `default-fonts` and `hsl`.
 
-In addition to inline styles, Respo UI also provides CSS classes that you can use to style your components. These classes are available in the `respo-ui.css` namespace.
+## Defining application styles
 
-```cirru.no-run
-ns your-app.core
-  :require
-    respo-ui.css :as css
-
-css/row-center
-```
-
-### Available CSS Classes
-
-- `css/row`: Creates a horizontal layout
-- `css/column`: Creates a vertical layout
-- `css/center`: Centers content
-- `css/row-center`: Centers content in a row
-- `css/row-evenly`: Distributes items evenly in a row
-- `css/column-evenly`: Distributes items evenly in a column
-- `css/row-dispersive`: Spreads items in a row with space distribution
-- `css/column-dispersive`: Spreads items in a column with space distribution
-- `css/row-parted`: Spaces items apart in a row
-- `css/column-parted`: Spaces items apart in a column
-- `css/row-middle`: Aligns items in the middle of a row
-- `css/flex`: Makes an element flexible
-- `css/expand`: Makes an element expand to fill available space
-
-## Combining Styles
-
-You can combine multiple styles using the `merge` function.
+Extract fixed maps into `defstyle`:
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
+ns app.comp.card $ :require
+  respo.core :refer $ defcomp div
+  respo.css :refer $ defstyle
+  respo.util.format :refer $ hsl
 
-merge ui/row ui/center $ {} (:padding 16)
+defstyle style-card $ {}
+  |& $ {}
+    :padding "|12px 16px"
+    :border-radius |8px
+    :background-color :white
+  |&:hover $ {}
+    :box-shadow $ str "|0 4px 16px " (hsl 0 0 0 0.08)
+
+defcomp comp-card (content width)
+  div
+    {}
+      :class-name style-card
+      :style $ {} (:width width)
+    , content
 ```
 
-## Responsive Design
+Only the dynamic width stays inline. This reduces map allocation, DOM style operations, and virtual-DOM comparison work.
 
-Respo UI provides utilities for creating responsive designs that adapt to different screen sizes.
+## CSS value rules
+
+Respo adds `px` to numeric CSS values. Use strings for unitless values and compound values:
 
 ```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-merge ui/row $ {} (:flex-wrap :wrap) (:flex-direction :column)
+{} (:font-weight |600) (:line-height |1.5) (:flex |1)
+  :padding "|8px 12px"
 ```
 
-## Theme Customization
-
-You can customize the theme by overriding the default styles.
-
-```cirru
-ns your-app.core
-  :require
-    respo-ui.core :as ui
-
-merge ui/global $ {} (:color |#6200ee) (:font-family |Roboto-sans-serif)
-```
-
-## Best Practices
-
-- Use the provided styles consistently throughout your application
-- Combine styles using the `merge` function to create custom styles
-- Use CSS classes for common layout patterns
-- Create a custom theme for your application to ensure consistent styling
-- Use responsive design techniques to adapt to different screen sizes
+Plain numbers remain appropriate when pixels are intended, such as `:gap 8` or `:height 32`.
