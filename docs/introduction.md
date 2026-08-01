@@ -1,63 +1,47 @@
-# Respo UI Introduction
+# Introduction
 
-Respo UI is a UI component library for the Respo framework, a virtual DOM library for ClojureScript. This library provides a set of reusable UI components and styles to help you build web applications with Respo.
+Respo UI is a Calcit module for Respo. It contains:
 
-## Overview
+- style maps in `respo-ui.core` for composition with `merge`;
+- generated class names in `respo-ui.css` for static, reusable CSS;
+- focused UI primitives in `respo-ui.comp`.
 
-Respo UI is designed to be simple, flexible, and easy to use. It provides a set of components that can be used to build user interfaces for web applications. The library is built with the Calcit-js compiler, which compiles ClojureScript code to JavaScript.
+It is not an npm component package. JavaScript dependencies are installed by the consuming project, while Respo UI itself is resolved through `deps.cirru` and `caps`.
 
 ## Installation
 
-To use Respo UI in your project, you need to add it as a dependency in your project configuration.
-
 ```cirru
-; In your deps.cirru file
-{} (:package |your-app)
+{} (:calcit-version |0.12.56)
   :dependencies $ {}
-    |Respo/respo-ui.calcit |0.6.3
+    |Respo/respo-ui.calcit |0.6.5
 ```
-
-Or if you're using npm:
 
 ```bash
-npm install respo-ui --save
+caps
 ```
 
-## Basic Usage
-
-Here's a simple example of how to use Respo UI components in your application:
+## Basic usage
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp div <>
-    respo-ui.core :as ui
-    respo-ui.comp :refer $ comp-attributes comp-placeholder
+ns app.comp.container $ :require
+  respo.core :refer $ defcomp div <>
+  respo-ui.comp :refer $ comp-card comp-progress
+  respo-ui.css :as css
 
-defcomp comp-container (store)
+defcomp comp-container ()
   div
-    {} (:style ui/global)
-    (comp-attributes $ {}
-      :title |Hello
-      :items $ []
-        {} (:label |Name) (:value |Respo))
-    (comp-placeholder |This-is-a-placeholder)
+    {} $ :class-name $ str-spaced css/column css/gap16
+    comp-card "|Reusable content" $ {}
+      :title "|Overview"
+    comp-progress 72
 ```
 
-## Project Structure
+Component option maps are optional where the signature contains `? options`. Text-like component content may generally be a literal or a Respo node.
 
-The Respo UI library is organized into several namespaces:
+## Choosing a styling API
 
-- `respo-ui.core`: Contains core styles and utilities
-- `respo-ui.comp`: Contains reusable components
-- `respo-ui.css`: Contains CSS utilities and helpers
+- Prefer `respo-ui.css` and `:class-name` for fixed layout, color, typography, borders, gaps, and hover rules.
+- Use `respo-ui.core` maps when composing a style map is the actual API you need.
+- Put only state-dependent values such as a calculated width in `:style`.
 
-Each namespace provides different functionality that you can use in your application.
-
-## Next Steps
-
-Explore the documentation to learn more about the available components and styles:
-
-- [Components](./components.md): Learn about the available UI components
-- [Styles](./styles.md): Learn about the available styles and CSS utilities
-- [Examples](./examples.md): See examples of how to use Respo UI in your application
+This avoids allocating and diffing the same style maps on every render.

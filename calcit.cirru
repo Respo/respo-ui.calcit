@@ -1,11 +1,23 @@
 
-{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-ui)
-  :configs $ {} (:init-fn |respo-ui.main/main!) (:reload-fn |respo-ui.main/reload!) (:version |0.6.5)
-    :modules $ [] |memof/ |respo-router.calcit/ |respo-markdown.calcit/ |respo.calcit/
+{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-ui) (:version |0.6.5)
   :entries $ {}
+    :default $ {} (:description |) (:init-fn 'respo-ui.main/main!) (:mode :native) (:reload-fn 'respo-ui.main/reload!)
+      :modules $ [] |memof/ |respo-router.calcit/ |respo-markdown.calcit/ |respo.calcit/
+      :type-slots $ {}
   :files $ {}
     |respo-ui.comp $ %{} :FileEntry
       :defs $ {}
+        |comp-alert $ %{} :CodeEntry (:doc "|Render an accessible alert. Kinds are :info, :success, :warning, and :error; content may be text or a Respo node.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-alert (kind content ? options)
+              div
+                {} (:role |alert)
+                  :class-name $ str-spaced style-alert
+                    case-default kind style-alert-info (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error)
+                    :class-name options
+                  :style $ :style options
+                if (literal? content) (<> content) content
+          :examples $ []
         |comp-attributes $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defcomp comp-attributes (options)
@@ -59,6 +71,59 @@
                       <> title
                     , ret
                   , ret
+          :examples $ []
+        |comp-avatar $ %{} :CodeEntry (:doc "|Render initials or an image avatar. Options: :src, :alt, :title, :size (:small or :large), :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-avatar (text ? options)
+              div
+                {}
+                  :title $ :title options
+                  :class-name $ str-spaced style-avatar
+                    case-default (:size options) nil (:small style-avatar-small) (:large style-avatar-large)
+                    :class-name options
+                  :style $ :style options
+                if
+                  some? $ :src options
+                  create-element :img $ {}
+                    :src $ :src options
+                    :alt $ either (:alt options) (str text)
+                    :class-name style-avatar-image
+                  <> text
+          :examples $ []
+        |comp-button $ %{} :CodeEntry (:doc "|Render a native button with Respo UI variants. Options: :kind (:primary, :danger, :danger-outline), :type, :disabled, :on-click, :class-name, :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-button (content ? options)
+              button
+                {}
+                  :type $ either (:type options) |button
+                  :disabled $ or (:disabled options) false
+                  :class-name $ str-spaced
+                    case-default (:kind options) css/button (:primary css/button-primary) (:danger css/button-danger) (:danger-outline css/button-danger-outline)
+                    :class-name options
+                  :style $ :style options
+                  :on-click $ :on-click options
+                if (literal? content) (<> content) content
+          :examples $ []
+        |comp-card $ %{} :CodeEntry (:doc "|Render a composable card. Content may be text or a Respo node; options support :title, :footer, :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-card (content ? options)
+              div
+                {}
+                  :class-name $ str-spaced style-card (:class-name options)
+                  :style $ :style options
+                when
+                  some? $ :title options
+                  div
+                    {} $ :class-name style-card-title
+                    <> $ :title options
+                div
+                  {} $ :class-name style-card-body
+                  if (literal? content) (<> content) content
+                when
+                  some? $ :footer options
+                  div
+                    {} $ :class-name style-card-footer
+                    :footer options
           :examples $ []
         |comp-catoptric-text $ %{} :CodeEntry (:doc "|by \"catoptric text\" I mean text added with CSS content, thus unsearchable from browser search or select. The text can still be grabbed from DOM tree though.") (:schema :dynamic)
           :code $ quote
@@ -120,12 +185,146 @@
                 div $ {} (:class-name style-copy-outline)
                   :style $ {} (:top -5) (:right -2)
           :examples $ []
+        |comp-divider $ %{} :CodeEntry (:doc "|Render a horizontal divider, or a vertical divider with :vertical? true.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-divider (? options)
+              div $ {} (:role |separator)
+                :class-name $ str-spaced
+                  if (:vertical? options) style-divider-vertical style-divider
+                  :class-name options
+                :style $ :style options
+          :examples $ []
+        |comp-empty $ %{} :CodeEntry (:doc "|Render a richer empty state with optional :icon, :description, :action, :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-empty (title ? options)
+              div
+                {}
+                  :class-name $ str-spaced style-empty (:class-name options)
+                  :style $ :style options
+                div
+                  {} $ :class-name style-empty-icon
+                  if
+                    some? $ :icon options
+                    :icon options
+                    <> "|◇"
+                div
+                  {} $ :class-name style-empty-title
+                  <> title
+                when
+                  some? $ :description options
+                  div
+                    {} $ :class-name style-empty-description
+                    <> $ :description options
+                when
+                  some? $ :action options
+                  div ({}) (:action options)
+          :examples $ []
+        |comp-input $ %{} :CodeEntry (:doc "|Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-input (value ? options)
+              input $ {}
+                :type $ either (:type options) |text
+                :value value
+                :placeholder $ :placeholder options
+                :disabled $ or (:disabled options) false
+                :class-name $ str-spaced css/input (:class-name options)
+                :style $ :style options
+                :on-input $ :on-input options
+          :examples $ []
+        |comp-modal $ %{} :CodeEntry (:doc "|Render a stateless accessible dialog overlay. Options: :title, :footer, :on-close, :class-name, :style, :overlay-class-name, and :overlay-style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-modal (content ? options)
+              div
+                {} (:role |dialog)
+                  :aria-label $ either (:title options) |Dialog
+                  :class-name $ str-spaced style-modal-overlay (:overlay-class-name options)
+                  :style $ :overlay-style options
+                div
+                  {}
+                    :class-name $ str-spaced style-modal-panel (:class-name options)
+                    :style $ :style options
+                  when
+                    some? $ :title options
+                    div
+                      {} $ :class-name style-modal-header
+                      <> $ :title options
+                      when
+                        some? $ :on-close options
+                        comp-close $ {}
+                          :on-click $ :on-close options
+                  div
+                    {} $ :class-name style-modal-body
+                    if (literal? content) (<> content) content
+                  when
+                    some? $ :footer options
+                    div
+                      {} $ :class-name style-modal-footer
+                      :footer options
+          :examples $ []
         |comp-placeholder $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defcomp comp-placeholder (text)
               div
                 {} $ :class-name css-placeholder
                 <> text
+          :examples $ []
+        |comp-progress $ %{} :CodeEntry (:doc "|Render an accessible progress bar. Value is clamped visually to 0..100; options support :class-name and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-progress (value ? options)
+              div
+                {} (:role |progressbar)
+                  :class-name $ str-spaced style-progress (:class-name options)
+                  :style $ :style options
+                div $ {} (:class-name style-progress-value)
+                  :style $ {}
+                    :width $ str
+                      &min 100 $ &max 0 value
+                      , |%
+          :examples $ []
+        |comp-select $ %{} :CodeEntry (:doc "|Render a controlled native select from keyed option maps. Each item uses :value, :label, and optional :disabled; :on-change receives the next value and d!.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-select (value items ? options)
+              create-list-element :select
+                {} (:value value)
+                  :disabled $ or (:disabled options) false
+                  :class-name $ str-spaced css/select (:class-name options)
+                  :style $ :style options
+                  :on-change $ fn (e d!)
+                    let
+                        on-change $ :on-change options
+                      when (some? on-change)
+                        on-change (:value e) d!
+                -> items
+                  map $ fn (item)
+                    let
+                        option-value $ :value item
+                      [] option-value $ option
+                        {} (:value option-value)
+                          :selected $ = value option-value
+                          :disabled $ or (:disabled item) false
+                          :inner-text $ str
+                            either (:label item) option-value
+                  pairs-map
+          :examples $ []
+        |comp-skeleton $ %{} :CodeEntry (:doc "|Render an animated loading placeholder. Unlabeled skeletons are decorative; pass :label to expose role=status. Options: :kind (:text or :circle), :width, :height, :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-skeleton (? options)
+              div $ {}
+                :role $ if
+                  some? $ :label options
+                  , |status nil
+                :aria-label $ :label options
+                :aria-hidden $ nil? (:label options)
+                :class-name $ str-spaced style-skeleton
+                  if
+                    = :circle $ :kind options
+                    , style-skeleton-circle style-skeleton-text
+                  :class-name options
+                :style $ merge
+                  {}
+                    :width $ :width options
+                    :height $ :height options
+                  :style options
           :examples $ []
         |comp-snippet $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
@@ -139,6 +338,39 @@
                 span
                   {} $ :class-name style-copy-wrapper
                   comp-copy code $ fn (e d!) (copy! code)
+          :examples $ []
+        |comp-spinner $ %{} :CodeEntry (:doc "|Render an accessible loading spinner. Options support :label, :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-spinner (? options)
+              span $ {} (:role |status)
+                :aria-label $ either (:label options) |Loading
+                :class-name $ str-spaced style-spinner (:class-name options)
+                :style $ :style options
+          :examples $ []
+        |comp-switch $ %{} :CodeEntry (:doc "|Render a controlled accessible switch backed by a native checkbox. Options: :label, :disabled, :on-change, :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-switch (checked ? options)
+              create-element :label
+                {}
+                  :class-name $ str-spaced style-switch-label
+                    if (:disabled options) style-control-disabled
+                    :class-name options
+                  :style $ :style options
+                input $ {} (:type |checkbox) (:checked checked)
+                  :disabled $ or (:disabled options) false
+                  :aria-label $ :label options
+                  :class-name style-switch-input
+                  :on-change $ fn (e d!)
+                    let
+                        on-change $ :on-change options
+                      when (some? on-change)
+                        on-change (:checked e) d!
+                span $ {}
+                  :class-name $ str-spaced style-switch-track (if checked style-switch-track-checked)
+                when
+                  some? $ :label options
+                  span ({})
+                    <> $ :label options
           :examples $ []
         |comp-tabs $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
@@ -190,6 +422,16 @@
                   :on-click $ either (:on-click options)
                     fn $ e d!
                 <> content
+          :examples $ []
+        |comp-textarea $ %{} :CodeEntry (:doc "|Render a controlled textarea. Pass the current value and optional :placeholder, :disabled, :on-input, :class-name, and :style.") (:schema :dynamic)
+          :code $ quote
+            defcomp comp-textarea (value ? options)
+              textarea $ {} (:value value)
+                :placeholder $ :placeholder options
+                :disabled $ or (:disabled options) false
+                :class-name $ str-spaced css/textarea (:class-name options)
+                :style $ :style options
+                :on-input $ :on-input options
           :examples $ []
         |comp-time $ %{} :CodeEntry (:doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...")
           :code $ quote
@@ -288,10 +530,105 @@
             defn literal? (v)
               or (string? v) (tag? v) (number? v) (bool? v)
           :examples $ []
+        |style-alert $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-alert $ {}
+              |& $ {} (:padding "|10px 12px") (:border "|1px solid transparent") (:border-radius |6px) (:line-height |1.5)
+          :examples $ []
+        |style-alert-error $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-alert-error $ {}
+              |& $ {}
+                :color $ hsl 4 68 38
+                :background-color $ hsl 4 80 96
+                :border-color $ hsl 4 65 86
+          :examples $ []
+        |style-alert-info $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-alert-info $ {}
+              |& $ {}
+                :color $ hsl 210 70 34
+                :background-color $ hsl 210 80 96
+                :border-color $ hsl 210 60 86
+          :examples $ []
+        |style-alert-success $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-alert-success $ {}
+              |& $ {}
+                :color $ hsl 135 55 28
+                :background-color $ hsl 135 55 95
+                :border-color $ hsl 135 45 84
+          :examples $ []
+        |style-alert-warning $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-alert-warning $ {}
+              |& $ {}
+                :color $ hsl 38 80 28
+                :background-color $ hsl 45 90 94
+                :border-color $ hsl 42 75 80
+          :examples $ []
         |style-attributes-title $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defstyle style-attributes-title $ {}
               |$0 $ {} (:font-size 18) (:margin-bottom 6)
+          :examples $ []
+        |style-avatar $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-avatar $ {}
+              |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:width |32px) (:height |32px) (:overflow :hidden) (:border-radius |50%)
+                :background-color $ hsl 220 75 92
+                :color $ hsl 220 65 42
+                :font-family ui/font-normal
+                :font-size |12px
+                :font-weight |600
+                :text-transform :uppercase
+                :flex-shrink |0
+          :examples $ []
+        |style-avatar-image $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-avatar-image $ {}
+              |& $ {} (:width |100%) (:height |100%) (:object-fit :cover)
+          :examples $ []
+        |style-avatar-large $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-avatar-large $ {}
+              |& $ {} (:width |48px) (:height |48px) (:font-size |16px)
+          :examples $ []
+        |style-avatar-small $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-avatar-small $ {}
+              |& $ {} (:width |24px) (:height |24px) (:font-size |10px)
+          :examples $ []
+        |style-card $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-card $ {}
+              |& $ {}
+                :border $ str "|1px solid " (hsl 0 0 90)
+                :border-radius |8px
+                :background-color :white
+                :overflow :hidden
+                :box-shadow $ str "|0 2px 10px " (hsl 0 0 0 0.06)
+          :examples $ []
+        |style-card-body $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-card-body $ {}
+              |& $ {} (:padding |16px)
+          :examples $ []
+        |style-card-footer $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-card-footer $ {}
+              |& $ {} (:padding "|10px 16px")
+                :border-top $ str "|1px solid " (hsl 0 0 92)
+                :background-color $ hsl 0 0 98
+          :examples $ []
+        |style-card-title $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-card-title $ {}
+              |& $ {} (:padding "|12px 16px")
+                :border-bottom $ str "|1px solid " (hsl 0 0 92)
+                :font-family ui/font-fancy
+                :font-size |16px
+                :font-weight |600
           :examples $ []
         |style-catoptric $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
@@ -309,6 +646,11 @@
                 :user-select :none
               |&:hover $ {} (:opacity 1)
               |&:active $ {} (:transform "|scale(1.1)") (:transition-duration |0ms)
+          :examples $ []
+        |style-control-disabled $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-control-disabled $ {}
+              |& $ {} (:opacity 0.5) (:cursor :not-allowed)
           :examples $ []
         |style-copy-container $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
@@ -332,6 +674,47 @@
             defstyle style-copy-wrapper $ {}
               |& $ {} (:position :absolute) (:top 10) (:right 2)
           :examples $ []
+        |style-divider $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-divider $ {}
+              |& $ {} (:width |100%) (:height |1px) (:margin "|12px 0")
+                :background-color $ hsl 0 0 90
+          :examples $ []
+        |style-divider-vertical $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-divider-vertical $ {}
+              |& $ {} (:display :inline-block) (:width |1px) (:height |1em) (:margin "|0 12px")
+                :background-color $ hsl 0 0 90
+                :vertical-align :middle
+          :examples $ []
+        |style-empty $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-empty $ {}
+              |& $ {} (:display :flex) (:flex-direction :column) (:align-items :center) (:justify-content :center) (:min-height |160px) (:padding |24px)
+                :border $ str "|1px dashed " (hsl 220 15 82)
+                :border-radius |8px
+                :text-align :center
+                :background-color $ hsl 220 20 99
+          :examples $ []
+        |style-empty-description $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-empty-description $ {}
+              |& $ {} (:margin-top |4px) (:margin-bottom |12px)
+                :color $ hsl 220 10 52
+          :examples $ []
+        |style-empty-icon $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-empty-icon $ {}
+              |& $ {} (:font-size |28px) (:line-height |1)
+                :color $ hsl 220 20 68
+                :margin-bottom |10px
+          :examples $ []
+        |style-empty-title $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-empty-title $ {}
+              |& $ {} (:font-size |16px) (:font-weight |600)
+                :color $ hsl 220 20 25
+          :examples $ []
         |style-item $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defstyle style-item $ {}
@@ -344,10 +727,116 @@
                 :background-color $ hsl 0 0 100
                 :box-shadow $ str "|0 0 4px 1px " (hsl 0 0 0 0.08)
           :examples $ []
+        |style-modal-body $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-modal-body $ {}
+              |& $ {} (:padding |16px)
+          :examples $ []
+        |style-modal-footer $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-modal-footer $ {}
+              |& $ {} (:display :flex) (:justify-content :flex-end) (:gap |8px) (:padding "|12px 16px")
+                :border-top $ str "|1px solid " (hsl 0 0 92)
+                :background-color $ hsl 0 0 98
+          :examples $ []
+        |style-modal-header $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-modal-header $ {}
+              |& $ {} (:display :flex) (:align-items :center) (:justify-content :space-between) (:padding "|14px 16px")
+                :border-bottom $ str "|1px solid " (hsl 0 0 92)
+                :font-family ui/font-fancy
+                :font-size |17px
+                :font-weight |600
+          :examples $ []
+        |style-modal-overlay $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-modal-overlay $ {}
+              |& $ {} (:position :fixed) (:inset |0) (:display :flex) (:align-items :center) (:justify-content :center) (:padding |16px) (:z-index |1000)
+                :background-color $ hsl 220 20 10 0.45
+                :backdrop-filter "|blur(2px)"
+          :examples $ []
+        |style-modal-panel $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-modal-panel $ {}
+              |& $ {} (:width "|min(520px, calc(100vw - 32px))") (:max-height "|calc(100vh - 32px)") (:overflow :auto) (:border-radius |10px) (:background-color :white)
+                :box-shadow $ str "|0 18px 50px " (hsl 220 30 5 0.25)
+          :examples $ []
+        |style-progress $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-progress $ {}
+              |& $ {} (:width |100%) (:height |8px) (:overflow :hidden) (:border-radius |999px)
+                :background-color $ hsl 220 20 92
+          :examples $ []
+        |style-progress-value $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-progress-value $ {}
+              |& $ {} (:height |100%) (:border-radius |inherit)
+                :background-color $ hsl 220 80 62
+                :transition "|width 180ms ease"
+          :examples $ []
         |style-selected-tab $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defstyle style-selected-tab $ {}
               |& $ {}
+          :examples $ []
+        |style-skeleton $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-skeleton $ {}
+              |& $ {} (:display :block)
+                :background-color $ hsl 220 18 90
+                :animation "|respo-ui-skeleton 1.2s ease-in-out infinite alternate"
+              "|@keyframes respo-ui-skeleton" $ {}
+                |from $ {} (:opacity 0.45)
+                |to $ {} (:opacity 1)
+          :examples $ []
+        |style-skeleton-circle $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-skeleton-circle $ {}
+              |& $ {} (:width |32px) (:height |32px) (:border-radius |50%)
+          :examples $ []
+        |style-skeleton-text $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-skeleton-text $ {}
+              |& $ {} (:width |100%) (:height |12px) (:border-radius |4px)
+          :examples $ []
+        |style-spinner $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-spinner $ {}
+              |& $ {} (:display :inline-block) (:width |16px) (:height |16px)
+                :border $ str "|2px solid " (hsl 220 30 88)
+                :border-top-color $ hsl 220 80 60
+                :border-radius |50%
+                :vertical-align :middle
+                :animation "|respo-ui-spin 700ms linear infinite"
+              "|@keyframes respo-ui-spin" $ {}
+                |to $ {} (:transform "|rotate(360deg)")
+          :examples $ []
+        |style-switch-input $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-switch-input $ {}
+              |& $ {} (:position :absolute) (:width |1px) (:height |1px) (:opacity 0) (:pointer-events :none)
+          :examples $ []
+        |style-switch-label $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-switch-label $ {}
+              |& $ {} (:display :inline-flex) (:align-items :center) (:gap |8px) (:cursor :pointer) (:user-select :none)
+          :examples $ []
+        |style-switch-track $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-switch-track $ {}
+              |& $ {} (:position :relative) (:display :inline-block) (:width |36px) (:height |20px) (:border-radius |999px)
+                :background-color $ hsl 220 12 82
+                :transition "|background-color 160ms ease"
+              |&::after $ {} (:content ||) (:position :absolute) (:top |2px) (:left |2px) (:width |16px) (:height |16px) (:border-radius |50%) (:background-color :white)
+                :box-shadow $ str "|0 1px 4px " (hsl 0 0 0 0.2)
+                :transition "|transform 160ms ease"
+          :examples $ []
+        |style-switch-track-checked $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-switch-track-checked $ {}
+              |& $ {}
+                :background-color $ hsl 220 80 62
+              |&::after $ {} (:transform "|translateX(16px)")
           :examples $ []
         |style-tab-highlight $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
@@ -427,7 +916,7 @@
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns respo-ui.comp $ :require
-            respo.core :refer $ defcomp defeffect div list-> input textarea button span select option a <> pre create-element
+            respo.core :refer $ defcomp defeffect div list-> input textarea button span select option a <> pre create-element create-list-element
             respo.comp.space :refer $ =<
             respo-ui.core :as ui
             respo.util.format :refer $ hsl
@@ -443,11 +932,28 @@
           :code $ quote
             defcomp comp-components-page (states)
               let
-                  state $ or (:data states) false
+                  cursor $ :cursor states
+                  state $ or (:data states) ({})
                 div
-                  {} $ :style
-                    {} $ :padding-bottom |50vh
-                  div ({}) (<> "|There are also components follow the guidelines of Respo UI:") (render-entry |https://github.com/Respo/alerts.calcit |alerts) (render-entry |https://github.com/Respo/respo-feather.calcit |respo-feather) (render-entry |https://github.com/Respo/respo-message.calcit |respo-message) (render-entry |https://github.com/Respo/respo-markdown.calcit |respo-markdown) (; render-entry |https://github.com/Respo/notifier.calcit |notifier)
+                  {} $ :class-name style-components-page
+                  div
+                    {} $ :class-name style-page-hero
+                    div ({}) (<> "|Component examples" style-page-title)
+                    div ({}) (<> "|Composable primitives with controlled state and static CSS classes." ui/text-label)
+                    div
+                      {} $ :class-name (str-spaced css/row css/gap8 style-resource-links)
+                      render-entry |https://github.com/Respo/alerts.calcit |alerts
+                      render-entry |https://github.com/Respo/respo-feather.calcit |respo-feather
+                      render-entry |https://github.com/Respo/respo-message.calcit |respo-message
+                      render-entry |https://github.com/Respo/respo-markdown.calcit |respo-markdown
+                  comp-demo-form-controls state cursor
+                  comp-demo-data-display
+                  comp-demo-loading-states
+                  comp-demo-modal state cursor
+                  comp-divider
+                  div
+                    {} $ :class-name style-section-title
+                    <> "|Utility components"
                   comp-demo-attributes
                   comp-demo-tabs $ >> states :tabs
                   comp-demo-cirru-snippet
@@ -551,6 +1057,132 @@
                   <> "|demo demo"
                   comp-copy "|DEMO TO COPY"
                   <> "|demo demo"
+          :examples $ []
+        |comp-demo-data-display $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defcomp comp-demo-data-display () $ div
+              {} $ :class-name style-demo-section
+              div
+                {} $ :class-name style-section-title
+                <> "|Data display"
+              div
+                {} $ :class-name style-demo-grid
+                comp-card
+                  div
+                    {} $ :class-name style-avatar-row
+                    comp-avatar |CY $ {} (:size :small) (:title "|Small avatar")
+                    comp-avatar |RS $ {} (:title "|Default avatar")
+                    comp-avatar |UI $ {} (:size :large) (:title "|Large avatar")
+                    div ({}) (<> "|Stable sizes and image fallback")
+                      div ({}) (<> "|Small · default · large" ui/text-label)
+                  {} $ :title |Avatars
+                comp-card
+                  div
+                    {} $ :class-name (str-spaced css/column css/gap8)
+                    comp-alert :info "|A neutral product update"
+                    comp-alert :success "|All checks passed"
+                    comp-progress 78
+                  {} $ :title "|Status summary"
+          :examples $ []
+        |comp-demo-form-controls $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defcomp comp-demo-form-controls (state cursor)
+              div
+                {} $ :class-name style-demo-section
+                div
+                  {} $ :class-name style-section-title
+                  <> "|Form controls"
+                div
+                  {} $ :class-name style-demo-grid
+                  comp-card
+                    div
+                      {} $ :class-name (str-spaced css/column css/gap8)
+                      comp-input
+                        either (:query state) |
+                        {} (:placeholder "|Search components")
+                          :on-input $ fn (e d!)
+                            d! cursor $ assoc state :query (:value e)
+                      comp-select
+                        either (:language state) |calcit
+                        , language-options $ {}
+                          :on-change $ fn (next-value d!)
+                            d! cursor $ assoc state :language next-value
+                      comp-switch
+                        or (:compact? state) false
+                        {} (:label "|Compact mode")
+                          :on-change $ fn (next? d!)
+                            d! cursor $ assoc state :compact? next?
+                    {} (:title "|Controlled values")
+                      :footer $ <>
+                        str "|Selected: " $ either (:language state) |calcit
+                        , ui/text-label
+                  comp-card
+                    div
+                      {} $ :class-name (str-spaced css/column css/gap8)
+                      comp-button "|Default action"
+                      comp-button "|Primary action" $ {} (:kind :primary)
+                      comp-button "|Danger action" $ {} (:kind :danger)
+                      comp-button |Unavailable $ {} (:disabled true)
+                    {} $ :title "|Button states"
+          :examples $ []
+        |comp-demo-loading-states $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defcomp comp-demo-loading-states () $ div
+              {} $ :class-name style-demo-section
+              div
+                {} $ :class-name style-section-title
+                <> "|Loading and empty states"
+              div
+                {} $ :class-name style-demo-grid
+                comp-card
+                  div
+                    {} $ :class-name (str-spaced css/column css/gap8)
+                    div
+                      {} $ :class-name (str-spaced css/row-middle css/gap8)
+                      comp-skeleton $ {} (:kind :circle) (:label "|Loading avatar")
+                      div
+                        {} $ :class-name (str-spaced css/column css/gap8 css/expand)
+                        comp-skeleton $ {} (:width |48%)
+                        comp-skeleton $ {} (:width |72%)
+                    comp-divider
+                    comp-skeleton $ {} (:height |72px)
+                  {} $ :title "|Skeleton composition"
+                comp-empty "|No components found" $ {} (:description "|Try another search term or clear the filters.")
+                  :action $ comp-button "|Clear filters"
+                    {} $ :kind :primary
+          :examples $ []
+        |comp-demo-modal $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defcomp comp-demo-modal (state cursor)
+              div
+                {} $ :class-name style-demo-section
+                div
+                  {} $ :class-name style-section-title
+                  <> "|Overlay composition"
+                div
+                  {} $ :class-name style-demo-surface
+                  div ({}) (<> "|Modal stays stateless; the page owns visibility.")
+                    div ({}) (<> "|Title, body, footer and close action are composable." ui/text-label)
+                  comp-button "|Open modal" $ {} (:kind :primary)
+                    :on-click $ fn (e d!)
+                      d! cursor $ assoc state :show-modal? true
+                when (:show-modal? state)
+                  comp-modal
+                    div
+                      {} $ :class-name (str-spaced css/column css/gap8)
+                      <> "|This dialog is controlled by page state."
+                      comp-alert :info "|Use a portal wrapper in applications that require custom stacking roots."
+                    {} (:title "|Confirm example")
+                      :on-close $ fn (e d!)
+                        d! cursor $ assoc state :show-modal? false
+                      :footer $ div
+                        {} $ :class-name (str-spaced css/row css/gap8)
+                        comp-button |Cancel $ {}
+                          :on-click $ fn (e d!)
+                            d! cursor $ assoc state :show-modal? false
+                        comp-button |Confirm $ {} (:kind :primary)
+                          :on-click $ fn (e d!)
+                            d! cursor $ assoc state :show-modal? false
           :examples $ []
         |comp-demo-placeholder $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
@@ -686,18 +1318,79 @@
               |$0 $ {} (:margin-top 40) (:font-size 18) (:font-weight :bold)
                 :color $ hsl 0 0 10
           :examples $ []
+        |language-options $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            def language-options $ []
+              {} (:value |calcit) (:label |Calcit)
+              {} (:value |clojure) (:label |Clojure)
+              {} (:value |haskell) (:label |Haskell)
+              {} (:value |rust) (:label |Rust) (:disabled true)
+          :examples $ []
         |render-entry $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defn render-entry (url title)
               div ({})
-                a $ {} (:href url) (:inner-text title)
+                a $ {} (:href url) (:target |_blank) (:rel |noreferrer) (:class-name css/link) (:inner-text title)
+          :examples $ []
+        |style-avatar-row $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-avatar-row $ {}
+              |& $ {} (:display :flex) (:align-items :center) (:gap |12px)
+          :examples $ []
+        |style-components-page $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-components-page $ {}
+              |& $ {} (:max-width |1040px) (:padding "|8px 24px 50vh")
+          :examples $ []
+        |style-demo-grid $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-demo-grid $ {}
+              |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(280px, 1fr))") (:gap |16px) (:align-items :stretch)
+          :examples $ []
+        |style-demo-section $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-demo-section $ {}
+              |& $ {} (:margin-top |32px)
+          :examples $ []
+        |style-demo-surface $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-demo-surface $ {}
+              |& $ {} (:display :flex) (:align-items :center) (:justify-content :space-between) (:gap |16px) (:padding |16px)
+                :border $ str "|1px solid " (hsl 220 15 90)
+                :border-radius |8px
+                :background-color :white
+          :examples $ []
+        |style-page-hero $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-page-hero $ {}
+              |& $ {} (:padding |24px)
+                :border $ str "|1px solid " (hsl 220 30 90)
+                :border-radius |12px
+                :background $ str "|linear-gradient(135deg, " (hsl 220 80 98) "|, " (hsl 260 70 98) "|)"
+          :examples $ []
+        |style-page-title $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-page-title $ {}
+              |& $ {} (:font-family ui/font-fancy) (:font-size |28px) (:font-weight |600) (:line-height |1.3)
+                :color $ hsl 220 25 18
+          :examples $ []
+        |style-resource-links $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-resource-links $ {}
+              |& $ {} (:margin-top |14px) (:flex-wrap :wrap)
+          :examples $ []
+        |style-section-title $ %{} :CodeEntry (:doc |) (:schema :dynamic)
+          :code $ quote
+            defstyle style-section-title $ {}
+              |& $ {} (:margin-bottom |12px) (:font-family ui/font-fancy) (:font-size |19px) (:font-weight |600)
+                :color $ hsl 220 18 24
           :examples $ []
       :ns $ %{} :NsEntry (:doc |)
         :code $ quote
           ns respo-ui.comp.components $ :require
             respo.core :refer $ defcomp >> div a <> pre code
             respo.comp.space :refer $ =<
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-select comp-switch comp-avatar comp-skeleton comp-empty comp-modal comp-card comp-progress comp-alert comp-divider
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl

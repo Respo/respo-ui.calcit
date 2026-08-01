@@ -1,223 +1,167 @@
-# Respo UI Components
+# Components
 
-Respo UI provides a set of reusable components that you can use to build your application's user interface. This document describes the available components and how to use them.
-
-## Table of Contents
-
-- [comp-attributes](#comp-attributes)
-- [comp-catoptric-text](#comp-catoptric-text)
-- [comp-cirru-snippet](#comp-cirru-snippet)
-- [comp-close](#comp-close)
-- [comp-copy](#comp-copy)
-- [comp-placeholder](#comp-placeholder)
-
-## comp-attributes
-
-The `comp-attributes` component is used to display a grid of attributes with labels and values.
-
-### Usage
+Import components from `respo-ui.comp`.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp
-    respo-ui.comp :refer $ comp-attributes
-
-defcomp comp-demo ()
-  comp-attributes $ {}
-    :items $ []
-      {} (:label |Name) (:value |John-Doe)
-      {} (:label |Age) (:value 30)
-      {} (:label |Email) (:value |john@example.com)
-    :title |User-Information
-    :item-width 200
+ns app.comp.demo $ :require
+  respo-ui.comp :refer $ comp-button comp-input comp-card
 ```
 
-You can also use the `:attr` tuple format for more concise code:
+## Form controls
+
+### `comp-button (content ? options)`
+
+Renders a native button. `content` may be text or a Respo node.
+
+Options: `:kind` (`:primary`, `:danger`, `:danger-outline`), `:type`, `:disabled`, `:on-click`, `:class-name`, `:style`.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp
-    respo-ui.comp :refer $ comp-attributes
-
-defcomp comp-demo-attr ()
-  comp-attributes $ {}
-    :items $ []
-      :: :attr |Name |John-Doe
-      :: :attr |Age 30
-      :: :attr |Email |john@example.com
-    :title |User-Information
+comp-button "|Save" $ {}
+  :kind :primary
+  :on-click $ fn (e d!)
+    d! $ :: :save
 ```
 
-For items that need to span multiple columns, use the `:attr-span` tuple format:
+### `comp-input (value ? options)`
+
+A controlled native input. Options: `:type`, `:placeholder`, `:disabled`, `:on-input`, `:class-name`, `:style`.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp
-    respo-ui.comp :refer $ comp-attributes
-
-defcomp comp-demo-span ()
-  comp-attributes $ {}
-    :items $ []
-      :: :attr |Name |John-Doe
-      :: :attr-span |Bio |A-long-biography-that-spans-multiple-columns 2
-    :title |User-Profile
+comp-input draft $ {}
+  :placeholder "|Project name"
+  :on-input $ fn (e d!)
+    d! cursor $ :value e
 ```
 
-### Props
+### `comp-textarea (value ? options)`
 
-| Prop           | Type   | Description                                 |
-| -------------- | ------ | ------------------------------------------- |
-| `:items`       | Vector | A vector of items to display                |
-| `:title`       | String | Optional title for the attributes section   |
-| `:item-width`  | Number | Width of each item in pixels (default: 160) |
-| `:item-height` | Number | Height of each item                         |
-| `:class-name`  | String | Additional CSS class name                   |
-| `:style`       | Map    | Additional inline styles                    |
-| `:css-item`    | String | CSS class for items                         |
-| `:css-label`   | String | CSS class for labels                        |
-| `:css-value`   | String | CSS class for values                        |
-| `:css-title`   | String | CSS class for title                         |
+A controlled native textarea. Options: `:placeholder`, `:disabled`, `:on-input`, `:class-name`, `:style`.
 
-## comp-catoptric-text
+### `comp-checkbox (checked ? options)`
 
-The `comp-catoptric-text` component displays text that is added with CSS content, making it unsearchable from browser search or select. The text can still be accessed from the DOM tree.
-
-### Usage
+Options: `:label`, `:disabled`, `:on-change`, `:class-name`, `:style`. `:on-change` receives `(checked? d!)`.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp div
-    respo-ui.comp :refer $ comp-catoptric-text
-
-defcomp comp-demo-catoptric ()
-  div ({})
-    comp-catoptric-text |This-text-is-not-searchable
-    comp-catoptric-text |Custom-text $ {}
-      :class-name |custom-class
-      :style $ {} (:color :red)
+comp-checkbox enabled? $ {}
+  :label "|Enable notifications"
+  :on-change $ fn (next? d!)
+    d! $ :: :set-enabled next?
 ```
 
-### Props
+### `comp-select (value items ? options)`
 
-| Prop          | Type   | Description               |
-| ------------- | ------ | ------------------------- |
-| `text`        | String | The text to display       |
-| `:class-name` | String | Additional CSS class name |
-| `:style`      | Map    | Additional inline styles  |
-
-## comp-cirru-snippet
-
-The `comp-cirru-snippet` component displays Cirru code with syntax highlighting and a copy button.
-
-### Usage
+A controlled native select. Each item is a map containing `:value`, `:label`, and optional `:disabled`. Options support `:disabled`, `:on-change`, `:class-name`, and `:style`; `:on-change` receives `(next-value d!)`.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp div
-    respo-ui.comp :refer $ comp-cirru-snippet
-
-defcomp comp-demo-snippet ()
-  div ({})
-    comp-cirru-snippet |defn-add
-    comp-cirru-snippet |plus-1-2 $ {}
-      :class-name |custom-class
-      :style $ {} (:border |1px-solid-#eee)
+comp-select language language-options $ {}
+  :on-change $ fn (next-value d!)
+    d! cursor $ assoc state :language next-value
 ```
 
-### Props
+Keep the options collection in a top-level definition when it is static, so it is not rebuilt during every render.
 
-| Prop          | Type   | Description               |
-| ------------- | ------ | ------------------------- |
-| `text`        | String | The Cirru code to display |
-| `:class-name` | String | Additional CSS class name |
-| `:style`      | Map    | Additional inline styles  |
+### `comp-switch (checked ? options)`
 
-## comp-close
+A controlled switch backed by a native checkbox. Options: `:label`, `:disabled`, `:on-change`, `:class-name`, and `:style`.
 
-The `comp-close` component displays a close button (✕).
+## Containers and feedback
 
-### Usage
+### `comp-card (content ? options)`
+
+Options: `:title`, `:footer`, `:class-name`, `:style`. Both `content` and `:footer` may be Respo nodes.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp div
-    respo-ui.comp :refer $ comp-close
-
-defcomp comp-demo-close ()
-  div ({})
-    comp-close
-    comp-close $ {}
-      :on-click $ fn (e d!)
-        println |Close-clicked
-      :style $ {} (:color :red)
-      :class-name |custom-close
+comp-card "|Build completed" $ {}
+  :title "|Status"
+  :footer $ comp-button "|Dismiss"
 ```
 
-### Props
+### `comp-alert (kind content ? options)`
 
-| Prop          | Type     | Description               |
-| ------------- | -------- | ------------------------- |
-| `:on-click`   | Function | Click handler function    |
-| `:style`      | Map      | Additional inline styles  |
-| `:class-name` | String   | Additional CSS class name |
-
-## comp-copy
-
-The `comp-copy` component displays a copy button that copies the provided code to the clipboard when clicked.
-
-### Usage
+Kinds: `:info`, `:success`, `:warning`, `:error`. The root uses `role="alert"`.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp div
-    respo-ui.comp :refer $ comp-copy
-
-defcomp comp-demo-copy ()
-  div ({})
-    comp-copy |Text-to-copy
-    comp-copy |Text-to-copy $ fn (e d!)
-      println |Copied-to-clipboard
+comp-alert :warning "|This action cannot be undone"
 ```
 
-### Props
+### `comp-progress (value ? options)`
 
-| Prop   | Type     | Description                   |
-| ------ | -------- | ----------------------------- |
-| `code` | String   | The text to copy to clipboard |
-| `f`    | Function | Optional custom click handler |
+Renders a progress track. The visual width is clamped to `0..100`; options support `:class-name` and `:style`.
 
-## comp-placeholder
+### `comp-spinner (? options)`
 
-The `comp-placeholder` component displays placeholder text.
+Renders a compact loading indicator with `role="status"`. Options: `:label`, `:class-name`, `:style`.
 
-### Usage
+### `comp-divider (? options)`
+
+Renders a horizontal separator. Pass `:vertical? true` for an inline vertical separator. Options also support `:class-name` and `:style`.
+
+### `comp-placeholder (text)`
+
+Displays an empty-state placeholder.
+
+### `comp-empty (title ? options)`
+
+A richer empty state. Options: `:icon`, `:description`, `:action`, `:class-name`, and `:style`. `:icon` and `:action` may be Respo nodes.
+
+### `comp-skeleton (? options)`
+
+An animated loading placeholder. Unlabeled instances are decorative; pass `:label` to expose `role="status"`. Options: `:kind` (`:text` or `:circle`), `:width`, `:height`, `:class-name`, and `:style`.
+
+### `comp-modal (content ? options)`
+
+A stateless dialog overlay. The calling component owns visibility. Options: `:title`, `:footer`, `:on-close`, `:class-name`, `:style`, `:overlay-class-name`, and `:overlay-style`.
 
 ```cirru
-ns app.main
-  :require
-    respo.core :refer $ defcomp
-    respo-ui.comp :refer $ comp-placeholder
-
-defcomp comp-demo-placeholder ()
-  comp-placeholder |No-data-available
+when show-modal?
+  comp-modal content $ {}
+    :title "|Confirm action"
+    :on-close $ fn (e d!)
+      d! cursor $ assoc state :show-modal? false
 ```
 
-### Props
+## Data and navigation
 
-| Prop   | Type   | Description                     |
-| ------ | ------ | ------------------------------- |
-| `text` | String | The placeholder text to display |
+### `comp-avatar (text ? options)`
 
-## Best Practices
+Displays initials or an image. Options: `:src`, `:alt`, `:title`, `:size` (`:small` or `:large`), `:class-name`, and `:style`.
 
-- Use components consistently throughout your application
-- Combine components to create more complex UI elements
-- Use the provided styling options to customize the appearance of components
-- Consider creating wrapper components for frequently used component configurations
+### `comp-attributes (options)`
+
+Displays a responsive attribute grid.
+
+Required option: `:items`. Optional: `:title`, `:item-width`, `:item-height`, `:class-name`, `:style`, `:css-item`, `:css-label`, `:css-value`, `:css-title`.
+
+Items may be maps or tuples:
+
+```cirru
+comp-attributes $ {}
+  :title "|Runtime"
+  :items $ []
+    :: :attr "|Version" "|0.12.56"
+    :: :attr-span "|Description" "|Calcit UI module" 2
+```
+
+### `comp-tabs (options tabs on-route)`
+
+`tabs` accepts `(:: :tab value display)` tuples or maps containing `:value`/`:name` and `:display`/`:title`. Options include `:selected`, `:vertical?`, `:width`, `:class-name`, `:style`, `:tab-class-name`, `:tab-style`, and `:selected-tab-style`.
+
+### `comp-tag (kind content ? options)`
+
+Kinds: `:info`, `:success`, `:warning`, `:error`. Options: `:on-click`, `:class-name`, `:style`.
+
+### `comp-time (time & options)`
+
+Formats an ISO-like time with Day.js. Today's values show a time; older values show date and weekday.
+
+## Text and code utilities
+
+- `comp-copy (code ? f)` — clipboard copy affordance; optional custom handler.
+- `comp-snippet (code ? options)` — plain code snippet.
+- `comp-cirru-snippet (text ? options)` — Cirru-highlighted snippet with copy affordance.
+- `comp-close (? options)` — close icon; options include `:on-click`, `:class-name`, `:style`.
+- `comp-catoptric-text (text ? options)` — writes text through CSS content so browser find/selection does not see it normally.
+
+## Performance notes
+
+These components keep their fixed presentation in `defstyle` classes. When rendering collections of them, use stable domain IDs in `list->`; use `memo-comp-by` for expensive repeated subtrees whose arguments are stable. Do not use array indexes as keys when items can move.
