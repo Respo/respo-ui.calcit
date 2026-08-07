@@ -2147,14 +2147,11 @@
             def global $ {} (:line-height |2) (:font-size |14px) (:font-family default-fonts)
               :color $ hsl 0 0 20
           :examples $ []
-        |hsl $ %{} :CodeEntry (:doc |)
+        |hsl $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defn hsl (h s l ? a)
               if (some? a) (str "|hsl(" h |, s |%, l |%, a "|)") (str "|hsl(" h |, s |%, l "|%)")
           :examples $ []
-          :schema $ :: :fn
-            {} (:return :string)
-              :args $ [] :number :number :number (:: :optional :number)
         |input $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             def input $ merge global
@@ -2401,14 +2398,11 @@
               |$0 $ {} (:line-height |2) (:font-size |14px) (:font-family ui/default-fonts)
                 :color $ hsl 0 0 20
           :examples $ []
-        |hsl $ %{} :CodeEntry (:doc |)
+        |hsl $ %{} :CodeEntry (:doc |) (:schema :dynamic)
           :code $ quote
             defn hsl (h s l ? a)
               if (some? a) (str "|hsl(" h |, s |%, l |%, a "|)") (str "|hsl(" h |, s |%, l "|%)")
           :examples $ []
-          :schema $ :: :fn
-            {} (:return :string)
-              :args $ [] :number :number :number (:: :optional :number)
         |input $ %{} :CodeEntry (:doc |) (:schema :string)
           :code $ quote
             defstyle input $ {} (|$0 ui/input)
