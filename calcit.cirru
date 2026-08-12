@@ -2999,8 +2999,8 @@
             %{} 'TestEntry (:name |nil-and-map-options)
               :code $ quote
                 do
-                  assert= |nil-options nil $ respo-ui.schema/read-field nil :missing
-                  assert= |map-options nil $ respo-ui.schema/read-field ({}) :missing
+                  assert= nil $ respo-ui.schema/read-field nil :missing
+                  assert= nil $ respo-ui.schema/read-field ({}) :missing
         |store $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def store $ %{} Store (:router nil)
