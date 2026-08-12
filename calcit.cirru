@@ -151,7 +151,7 @@
           :schema $ :: 'Dynamic
         |comp-checkbox $ %{} 'CodeEntry (:doc |)
           :code $ quote
-            defcomp comp-checkbox (checked ? options) (assert-type checked :bool)
+            defcomp comp-checkbox (checked ? options) (assert-type checked 'Bool)
               create-element :label
                 {}
                   :class-name $ str-spaced css/checkbox-label (respo-ui.schema/read-field options :class-name)
@@ -2815,16 +2815,16 @@
           :code $ quote
             defstruct AttributesOptions
               [] $ quote Item
-              :items $ :: :list (quote Item)
-              :title $ :: :optional :string
-              :item-width $ :: :optional :number
-              :item-height $ :: :optional :number
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
-              :css-item $ :: :optional :string
-              :css-label $ :: :optional :string
-              :css-value $ :: :optional :string
-              :css-title $ :: :optional :string
+              :items $ :: 'List (quote Item)
+              :title $ :: 'Optional 'String
+              :item-width $ :: 'Optional 'Number
+              :item-height $ :: 'Optional 'Number
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
+              :css-item $ :: 'Optional 'String
+              :css-label $ :: 'Optional 'String
+              :css-value $ :: 'Optional 'String
+              :css-title $ :: 'Optional 'String
           :examples $ []
             quote $ %{}? AttributesOptions
               :items $ []
@@ -2832,24 +2832,24 @@
         |AvatarOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-avatar image metadata, size, class name, and style.")
           :code $ quote
             defstruct AvatarOptions
-              :src $ :: :optional :string
-              :alt $ :: :optional :string
-              :title $ :: :optional :string
-              :size $ :: :optional :tag
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :src $ :: 'Optional 'String
+              :alt $ :: 'Optional 'String
+              :title $ :: 'Optional 'String
+              :size $ :: 'Optional 'Tag
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? AvatarOptions (:size :large) (:title "|Chen Yong")
           :schema $ :: 'Dynamic
         |ButtonOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style.")
           :code $ quote
             defstruct ButtonOptions
-              :kind $ :: :optional :tag
-              :type $ :: :optional :string
-              :disabled $ :: :optional :bool
-              :on-click $ :: :optional (quote respo.schema/EventHandler)
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :kind $ :: 'Optional 'Tag
+              :type $ :: 'Optional 'String
+              :disabled $ :: 'Optional 'Bool
+              :on-click $ :: 'Optional (quote respo.schema/EventHandler)
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? ButtonOptions (:kind :primary)
           :schema $ :: 'Dynamic
@@ -2857,19 +2857,19 @@
           :code $ quote
             defstruct CardOptions
               [] $ quote Footer
-              :title $ :: :optional :string
-              :footer $ :: :optional (quote Footer)
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :title $ :: 'Optional 'String
+              :footer $ :: 'Optional (quote Footer)
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? CardOptions (:title |Summary)
           :schema $ :: 'Dynamic
         |DividerOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-divider, including vertical orientation.")
           :code $ quote
             defstruct DividerOptions
-              :vertical? $ :: :optional :bool
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :vertical? $ :: 'Optional 'Bool
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? DividerOptions (:vertical? true)
           :schema $ :: 'Dynamic
@@ -2877,26 +2877,26 @@
           :code $ quote
             defstruct EmptyOptions
               [] (quote Icon) (quote Action)
-              :icon $ :: :optional (quote Icon)
-              :description $ :: :optional :string
-              :action $ :: :optional (quote Action)
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :icon $ :: 'Optional (quote Icon)
+              :description $ :: 'Optional 'String
+              :action $ :: 'Optional (quote Action)
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? EmptyOptions (:description "|Try another search term.")
           :schema $ :: 'Dynamic
         |PresentationOptions $ %{} 'CodeEntry (:doc "|Shared typed class-name and style options for presentation-only components.")
           :code $ quote
             defstruct PresentationOptions
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? PresentationOptions (:class-name |status)
           :schema $ :: 'Dynamic
         |SelectOption $ %{} 'CodeEntry (:doc "|A typed native select item with string value and label plus optional disabled state.")
           :code $ quote
-            defstruct SelectOption (:value :string) (:label :string)
-              :disabled $ :: :optional :bool
+            defstruct SelectOption (:value 'String) (:label 'String)
+              :disabled $ :: 'Optional 'Bool
           :examples $ []
             quote $ %{}? SelectOption (:value |calcit) (:label |Calcit)
           :schema $ :: 'Dynamic
@@ -2904,62 +2904,62 @@
           :code $ quote
             defstruct SelectOptions
               [] $ quote Op
-              :disabled $ :: :optional :bool
-              :on-change $ :: :optional
-                :: :fn $ {}
-                  :args $ [] :string
-                    :: :fn $ {}
+              :disabled $ :: 'Optional 'Bool
+              :on-change $ :: 'Optional
+                :: 'Fn $ {}
+                  :args $ [] 'String
+                    :: 'Fn $ {}
                       :args $ [] (quote Op)
-                      :return :unit
-                  :return :unit
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+                      :return 'Unit
+                  :return 'Unit
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SelectOptions (:disabled false)
           :schema $ :: 'Dynamic
         |SkeletonOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-skeleton: label, kind, dimensions, class name, and style.")
           :code $ quote
             defstruct SkeletonOptions
-              :label $ :: :optional :string
-              :kind $ :: :optional :tag
-              :width $ :: :optional :string
-              :height $ :: :optional :string
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :label $ :: 'Optional 'String
+              :kind $ :: 'Optional 'Tag
+              :width $ :: 'Optional 'String
+              :height $ :: 'Optional 'String
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SkeletonOptions (:kind :text) (:width |60%)
           :schema $ :: 'Dynamic
         |SpinnerOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-spinner, including its accessible label.")
           :code $ quote
             defstruct SpinnerOptions
-              :label $ :: :optional :string
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+              :label $ :: 'Optional 'String
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SpinnerOptions (:label "|Loading results")
           :schema $ :: 'Dynamic
         |Store $ %{} 'CodeEntry (:doc "|Typed application store shape for the documentation site.")
           :code $ quote
             defstruct Store
-              :router $ :: :optional :map
-              :states :map
+              :router $ :: 'Optional 'Map
+              :states 'Map
           :examples $ []
           :schema $ :: 'Dynamic
         |SwitchOptions $ %{} 'CodeEntry (:doc "|Typed options shared by comp-switch and comp-checkbox. The Op generic preserves the dispatched operation type.")
           :code $ quote
             defstruct SwitchOptions
               [] $ quote Op
-              :label $ :: :optional :string
-              :disabled $ :: :optional :bool
-              :on-change $ :: :optional
-                :: :fn $ {}
-                  :args $ [] :bool
-                    :: :fn $ {}
+              :label $ :: 'Optional 'String
+              :disabled $ :: 'Optional 'Bool
+              :on-change $ :: 'Optional
+                :: 'Fn $ {}
+                  :args $ [] 'Bool
+                    :: 'Fn $ {}
                       :args $ [] (quote Op)
-                      :return :unit
-                  :return :unit
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
+                      :return 'Unit
+                  :return 'Unit
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SwitchOptions (:label "|Compact mode")
           :schema $ :: 'Dynamic
@@ -2967,7 +2967,7 @@
           :code $ quote
             defenum TabRoute
               [] $ quote Value
-              :tab (quote Value) :string
+              :tab (quote Value) 'String
           :examples $ []
             quote $ %:: TabRoute :tab :book |Book
           :schema $ :: 'Dynamic
@@ -2975,14 +2975,14 @@
           :code $ quote
             defstruct TabsOptions
               [] $ quote Value
-              :selected $ :: :optional (quote Value)
-              :vertical? $ :: :optional :bool
-              :width $ :: :optional :number
-              :class-name $ :: :optional :string
-              :style $ :: :optional :map
-              :tab-class-name $ :: :optional :string
-              :tab-style $ :: :optional :map
-              :selected-tab-style $ :: :optional :map
+              :selected $ :: 'Optional (quote Value)
+              :vertical? $ :: 'Optional 'Bool
+              :width $ :: 'Optional 'Number
+              :class-name $ :: 'Optional 'String
+              :style $ :: 'Optional 'Map
+              :tab-class-name $ :: 'Optional 'String
+              :tab-style $ :: 'Optional 'Map
+              :selected-tab-style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? TabsOptions (:selected :book)
           :schema $ :: 'Dynamic
