@@ -2989,11 +2989,18 @@
         |read-field $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn read-field (value field)
-              if (struct? value) (&struct:get value field) (&map:get value field)
+              if (struct? value) (&struct:get value field)
+                if (map? value) (&map:get value field) nil
           :examples $ []
           :schema $ :: 'Fn
             {} (:return 'Dynamic)
               :args $ [] 'Dynamic 'Tag
+          :tests $ []
+            %{} 'TestEntry (:name |nil-and-map-options)
+              :code $ quote
+                do
+                  assert= |nil-options nil $ respo-ui.schema/read-field nil :missing
+                  assert= |map-options nil $ respo-ui.schema/read-field ({}) :missing
         |store $ %{} 'CodeEntry (:doc |)
           :code $ quote
             def store $ %{} Store (:router nil)
