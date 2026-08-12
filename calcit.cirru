@@ -1,5 +1,5 @@
 
-{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-ui) (:version |0.7.4)
+{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-ui) (:version |0.7.5)
   :entries $ {}
     :default $ {} (:description |) (:init-fn 'respo-ui.main/main!) (:mode :native) (:reload-fn 'respo-ui.main/reload!)
       :modules $ [] |respo-router.calcit/ |respo-markdown.calcit/ |respo.calcit/
@@ -174,15 +174,17 @@
         |comp-cirru-snippet $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defcomp comp-cirru-snippet (text ? options)
-              div
-                {}
-                  :class-name $ str-spaced css/row css-snippet (schema/read-field options :class-name)
-                  :style $ schema/read-field options :style
-                pre $ {} (:class-name css/expand)
-                  :innerHTML $ generateHtml text
-                span
-                  {} $ :class-name style-copy-wrapper
-                  comp-copy text $ fn (e d!) (copy! text)
+              let
+                  options $ or options ({})
+                div
+                  {}
+                    :class-name $ str-spaced css/row css-snippet (schema/read-field options :class-name)
+                    :style $ schema/read-field options :style
+                  pre $ {} (:class-name css/expand)
+                    :innerHTML $ generateHtml text
+                  span
+                    {} $ :class-name style-copy-wrapper
+                    comp-copy text $ fn (e d!) (copy! text)
           :examples $ []
             quote $ comp-cirru-snippet "|defn f (x) x"
           :schema $ :: 'Dynamic
