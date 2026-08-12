@@ -176,14 +176,15 @@
             defcomp comp-cirru-snippet (text ? options)
               div
                 {}
-                  :class-name $ str-spaced css/row css-snippet (get options :class-name)
-                  :style $ get options :style
+                  :class-name $ str-spaced css/row css-snippet (schema/read-field options :class-name)
+                  :style $ schema/read-field options :style
                 pre $ {} (:class-name css/expand)
                   :innerHTML $ generateHtml text
                 span
                   {} $ :class-name style-copy-wrapper
                   comp-copy text $ fn (e d!) (copy! text)
           :examples $ []
+            quote $ comp-cirru-snippet "|defn f (x) x"
           :schema $ :: 'Dynamic
         |comp-close $ %{} 'CodeEntry (:doc |)
           :code $ quote
@@ -998,6 +999,7 @@
             |dayjs :default dayjs
             |dayjs/plugin/isToday :default is-today
             respo.schema :refer $ *dispatch-op
+            respo-ui.schema :as schema
     |respo-ui.comp.components $ %{} 'FileEntry
       :defs $ {}
         |comp-components-page $ %{} 'CodeEntry (:doc |)
