@@ -31,6 +31,7 @@ jobs:
 
       - name: Deploy to server
         id: deploy
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: Pendect/action-rsyncer@v2.0.0
         env:
           DEPLOY_KEY: ${{secrets.rsync_private_key}}
