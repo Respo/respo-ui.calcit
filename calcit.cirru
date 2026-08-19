@@ -1,8 +1,9 @@
 
-{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-ui) (:version |0.7.5)
+{} (:about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `cr query` to inspect and `cr edit`/`cr tree` to modify. Run `cr docs agents --full` first. Manual edits must follow format and schema conventions, then run `cr edit format`.") (:package |respo-ui)
   :entries $ {}
     :default $ {} (:description |) (:init-fn 'respo-ui.main/main!) (:mode :native) (:reload-fn 'respo-ui.main/reload!)
-      :modules $ [] |respo-router.calcit/ |respo-markdown.calcit/ |respo.calcit/
+      :feature-policy $ {}
+      :modules $ [] |respo-router.calcit/ |respo-markdown.calcit/ |respo.calcit/ |js-ffi/
       :type-slots $ {}
   :files $ {}
     |respo-ui.comp $ %{} 'FileEntry
@@ -2828,7 +2829,7 @@
           :examples $ []
             quote $ %{}? AttributesOptions
               :items $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |AvatarOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-avatar image metadata, size, class name, and style.")
           :code $ quote
             defstruct AvatarOptions
@@ -2840,7 +2841,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? AvatarOptions (:size :large) (:title "|Chen Yong")
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |ButtonOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style.")
           :code $ quote
             defstruct ButtonOptions
@@ -2852,7 +2853,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? ButtonOptions (:kind :primary)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |CardOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-card with a string title and generic footer content.")
           :code $ quote
             defstruct CardOptions
@@ -2863,7 +2864,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? CardOptions (:title |Summary)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |DividerOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-divider, including vertical orientation.")
           :code $ quote
             defstruct DividerOptions
@@ -2872,7 +2873,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? DividerOptions (:vertical? true)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |EmptyOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-empty with generic icon and action slots.")
           :code $ quote
             defstruct EmptyOptions
@@ -2884,7 +2885,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? EmptyOptions (:description "|Try another search term.")
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |PresentationOptions $ %{} 'CodeEntry (:doc "|Shared typed class-name and style options for presentation-only components.")
           :code $ quote
             defstruct PresentationOptions
@@ -2892,14 +2893,14 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? PresentationOptions (:class-name |status)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |SelectOption $ %{} 'CodeEntry (:doc "|A typed native select item with string value and label plus optional disabled state.")
           :code $ quote
             defstruct SelectOption (:value 'String) (:label 'String)
               :disabled $ :: 'Optional 'Bool
           :examples $ []
             quote $ %{}? SelectOption (:value |calcit) (:label |Calcit)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |SelectOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-select. The Op generic preserves the operation accepted by the dispatcher passed to on-change.")
           :code $ quote
             defstruct SelectOptions
@@ -2916,7 +2917,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SelectOptions (:disabled false)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |SkeletonOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-skeleton: label, kind, dimensions, class name, and style.")
           :code $ quote
             defstruct SkeletonOptions
@@ -2928,7 +2929,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SkeletonOptions (:kind :text) (:width |60%)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |SpinnerOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-spinner, including its accessible label.")
           :code $ quote
             defstruct SpinnerOptions
@@ -2937,14 +2938,14 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SpinnerOptions (:label "|Loading results")
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |Store $ %{} 'CodeEntry (:doc "|Typed application store shape for the documentation site.")
           :code $ quote
             defstruct Store
               :router $ :: 'Optional 'Map
               :states 'Map
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |SwitchOptions $ %{} 'CodeEntry (:doc "|Typed options shared by comp-switch and comp-checkbox. The Op generic preserves the dispatched operation type.")
           :code $ quote
             defstruct SwitchOptions
@@ -2962,7 +2963,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SwitchOptions (:label "|Compact mode")
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |TabRoute $ %{} 'CodeEntry (:doc "|Normalized typed tab route carrying a generic value and string display label.")
           :code $ quote
             defenum TabRoute
@@ -2970,7 +2971,7 @@
               :tab (quote Value) 'String
           :examples $ []
             quote $ %:: TabRoute :tab :book |Book
-          :schema $ :: 'Dynamic
+          :schema $ :: 'EnumDef
         |TabsOptions $ %{} 'CodeEntry (:doc "|Typed visual and selection options for comp-tabs with a generic selected value.")
           :code $ quote
             defstruct TabsOptions
@@ -2985,7 +2986,7 @@
               :selected-tab-style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? TabsOptions (:selected :book)
-          :schema $ :: 'Dynamic
+          :schema $ :: 'StructDef
         |read-field $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn read-field (value field)
