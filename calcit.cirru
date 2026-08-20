@@ -192,10 +192,12 @@
         |comp-close $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defcomp comp-close (? options)
-              span $ {} (:inner-text "|✕")
-                :style $ get options :style
-                :class-name $ str-spaced style-close (get options :class-name)
-                :on-click $ get options :on-click
+              let
+                  options $ or options ({})
+                span $ {} (:inner-text "|✕")
+                  :style $ get options :style
+                  :class-name $ str-spaced style-close (get options :class-name)
+                  :on-click $ get options :on-click
           :examples $ []
           :schema $ :: 'Dynamic
         |comp-copy $ %{} 'CodeEntry (:doc |)
