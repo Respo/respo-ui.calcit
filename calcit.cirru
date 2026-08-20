@@ -2831,7 +2831,7 @@
           :examples $ []
             quote $ %{}? AttributesOptions
               :items $ []
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |AvatarOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-avatar image metadata, size, class name, and style.")
           :code $ quote
             defstruct AvatarOptions
@@ -2843,7 +2843,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? AvatarOptions (:size :large) (:title "|Chen Yong")
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |ButtonOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style.")
           :code $ quote
             defstruct ButtonOptions
@@ -2855,7 +2855,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? ButtonOptions (:kind :primary)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |CardOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-card with a string title and generic footer content.")
           :code $ quote
             defstruct CardOptions
@@ -2866,7 +2866,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? CardOptions (:title |Summary)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |DividerOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-divider, including vertical orientation.")
           :code $ quote
             defstruct DividerOptions
@@ -2875,7 +2875,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? DividerOptions (:vertical? true)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |EmptyOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-empty with generic icon and action slots.")
           :code $ quote
             defstruct EmptyOptions
@@ -2887,7 +2887,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? EmptyOptions (:description "|Try another search term.")
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |PresentationOptions $ %{} 'CodeEntry (:doc "|Shared typed class-name and style options for presentation-only components.")
           :code $ quote
             defstruct PresentationOptions
@@ -2895,14 +2895,14 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? PresentationOptions (:class-name |status)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |SelectOption $ %{} 'CodeEntry (:doc "|A typed native select item with string value and label plus optional disabled state.")
           :code $ quote
             defstruct SelectOption (:value 'String) (:label 'String)
               :disabled $ :: 'Optional 'Bool
           :examples $ []
             quote $ %{}? SelectOption (:value |calcit) (:label |Calcit)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |SelectOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-select. The Op generic preserves the operation accepted by the dispatcher passed to on-change.")
           :code $ quote
             defstruct SelectOptions
@@ -2919,7 +2919,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SelectOptions (:disabled false)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |SkeletonOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-skeleton: label, kind, dimensions, class name, and style.")
           :code $ quote
             defstruct SkeletonOptions
@@ -2931,7 +2931,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SkeletonOptions (:kind :text) (:width |60%)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |SpinnerOptions $ %{} 'CodeEntry (:doc "|Typed options for comp-spinner, including its accessible label.")
           :code $ quote
             defstruct SpinnerOptions
@@ -2940,14 +2940,14 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SpinnerOptions (:label "|Loading results")
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |Store $ %{} 'CodeEntry (:doc "|Typed application store shape for the documentation site.")
           :code $ quote
             defstruct Store
               :router $ :: 'Optional 'Map
               :states 'Map
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |SwitchOptions $ %{} 'CodeEntry (:doc "|Typed options shared by comp-switch and comp-checkbox. The Op generic preserves the dispatched operation type.")
           :code $ quote
             defstruct SwitchOptions
@@ -2965,7 +2965,7 @@
               :style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? SwitchOptions (:label "|Compact mode")
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |TabRoute $ %{} 'CodeEntry (:doc "|Normalized typed tab route carrying a generic value and string display label.")
           :code $ quote
             defenum TabRoute
@@ -2973,7 +2973,7 @@
               :tab (quote Value) 'String
           :examples $ []
             quote $ %:: TabRoute :tab :book |Book
-          :schema $ :: 'EnumDef
+          :schema $ :: 'Enum
         |TabsOptions $ %{} 'CodeEntry (:doc "|Typed visual and selection options for comp-tabs with a generic selected value.")
           :code $ quote
             defstruct TabsOptions
@@ -2988,7 +2988,7 @@
               :selected-tab-style $ :: 'Optional 'Map
           :examples $ []
             quote $ %{}? TabsOptions (:selected :book)
-          :schema $ :: 'StructDef
+          :schema $ :: 'Enum
         |read-field $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn read-field (value field)
