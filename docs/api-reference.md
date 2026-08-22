@@ -93,8 +93,8 @@ Utilities: `default-fonts`, `hsl`.
 When working against a newer tag, query the module instead of assuming this static page is exhaustive:
 
 ```bash
-cr query defs respo-ui.comp
-cr query defs respo-ui.css
-cr query peek respo-ui.comp/comp-button
-cr query def respo-ui.comp/comp-tabs
+calcit query defs respo-ui.comp
+calcit query defs respo-ui.css
+calcit query peek respo-ui.comp/comp-button
+calcit query def respo-ui.comp/comp-tabs
 ```

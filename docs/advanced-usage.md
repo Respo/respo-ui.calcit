@@ -51,8 +51,8 @@ def select-items $ []
 Audit library boundaries independently from compilation:
 
 ```bash
-cr analyze check-types --ns respo-ui.comp --summary-only
-cr analyze weak-types --ns respo-ui.comp \
+calcit analyze check-types --ns respo-ui.comp --summary-only
+calcit analyze weak-types --ns respo-ui.comp \
   --only schema-dynamic,code-dynamic \
   --intent unresolved \
   --summary-only
@@ -89,10 +89,10 @@ let
 For library changes, run the same stages as CI:
 
 ```bash
-caps
+caps --ci
 yarn install --immutable
-cr --check-only
-cr js
+calcit calcit.cirru --check-only
+calcit calcit.cirru js
 yarn vite build --base=./
 ```
 
