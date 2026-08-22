@@ -1,5 +1,5 @@
 
-{} (:calcit-version |0.13.27)
+{} (:calcit-version |0.13.29)
   :version |0.7.9
   :dependencies $ {} (|Respo/respo-markdown.calcit |0.4.22)
     |Respo/respo-router.calcit |0.8.5
