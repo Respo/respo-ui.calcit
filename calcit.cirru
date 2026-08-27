@@ -161,12 +161,14 @@
                   :disabled $ or (respo-ui.schema/read-field options :disabled) false
                   :on $ {}
                     :change $ fn (e d!)
-                      let
-                          on-change $ respo-ui.schema/read-field options :on-change
-                        when (some? on-change)
-                          on-change
-                            or (respo-ui.schema/read-field e :checked) false
-                            , d!
+                      do
+                        let
+                            on-change $ respo-ui.schema/read-field options :on-change
+                          when (some? on-change)
+                            on-change
+                              or (respo-ui.schema/read-field e :checked) false
+                              , d!
+                        , &unit
                 if
                   some? $ respo-ui.schema/read-field options :label
                   <> $ str (respo-ui.schema/read-field options :label)
@@ -301,12 +303,14 @@
                   :class-name $ str-spaced css/select (respo-ui.schema/read-field options :class-name)
                   :style $ respo-ui.schema/read-field options :style
                   :on-change $ fn (e d!)
-                    let
-                        on-change $ respo-ui.schema/read-field options :on-change
-                      when (some? on-change)
-                        on-change
-                          str $ respo-ui.schema/read-field e :value
-                          fn (op) (d! op)
+                    do
+                      let
+                          on-change $ respo-ui.schema/read-field options :on-change
+                        when (some? on-change)
+                          on-change
+                            str $ respo-ui.schema/read-field e :value
+                            fn (op) (d! op)
+                      , &unit
                 -> items
                   map $ fn (item)
                     let
@@ -384,12 +388,14 @@
                   :aria-label $ respo-ui.schema/read-field options :label
                   :class-name style-switch-input
                   :on-change $ fn (e d!)
-                    let
-                        on-change $ respo-ui.schema/read-field options :on-change
-                      when (some? on-change)
-                        on-change
-                          or (respo-ui.schema/read-field e :checked) false
-                          fn (op) (d! op)
+                    do
+                      let
+                          on-change $ respo-ui.schema/read-field options :on-change
+                        when (some? on-change)
+                          on-change
+                            or (respo-ui.schema/read-field e :checked) false
+                            fn (op) (d! op)
+                      , &unit
                 span $ {}
                   :class-name $ str-spaced style-switch-track (if checked style-switch-track-checked)
                 when
@@ -484,7 +490,8 @@
                     str "|Today " $ .!format now |HH:mm
                     .!format now "|MM-DD ddd"
                 span $ {} (:class-name css/font-fancy) (:title time) (:inner-text mark)
-                  :on-click $ fn (e d!) (js/console.log :time time)
+                  :on-click $ fn (e d!)
+                    do (js/console.log :time time) &unit
           :examples $ []
           :schema $ :: 'Fn
             {} (:rest 'Option) (:return 'respo.schema/Component)
