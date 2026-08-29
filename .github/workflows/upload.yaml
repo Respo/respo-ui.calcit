@@ -23,11 +23,24 @@ jobs:
           yarn --version
 
       - uses: calcit-lang/setup-calcit@v1
+        with:
+          tools: calcit,caps
 
-      - name: "compiles to js"
-        run: >
-          caps --ci && yarn install --immutable
-          && calcit calcit.cirru js && yarn vite build --base=./
+      - name: Validate and compile
+        run: |
+          caps --strict --ci
+          yarn install --immutable
+          calcit calcit.cirru edit format
+          git diff --exit-code -- calcit.cirru
+          calcit calcit.cirru --check-only
+          calcit calcit.cirru test --require-match --summary-only --format json
+          mkdir -p .calcit
+          calcit calcit.cirru analyze check-types --summary-only --format json > .calcit/check-types.json
+          calcit calcit.cirru analyze weak-types --only schema-dynamic,code-dynamic,code-nil --intent unresolved,declared-optional --summary-only --format json > .calcit/weak-types.json
+          calcit calcit.cirru analyze deprecated --summary-only --format json > .calcit/deprecated.json
+          node scripts/check-calcit-upgrade-baseline.mjs
+          calcit calcit.cirru js
+          yarn vite build --base=./
 
       - name: Deploy to server
         id: deploy
