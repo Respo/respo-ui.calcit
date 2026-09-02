@@ -36,7 +36,7 @@
                         {} (:display :grid)
                           :grid-template-columns $ str "|repeat(auto-fit, minmax(" item-width "|px,1fr))"
                           :gap 8
-                        :style options
+                        either (:style options) ({})
                     -> items $ map-indexed
                       fn (idx info)
                         [] idx $ let
@@ -441,8 +441,11 @@
                               div
                                 {}
                                   :class-name $ str-spaced css-tab (respo-ui.schema/read-field options :tab-class-name) (if selected? style-selected-tab)
-                                  :style $ merge (:tab-style options)
-                                    if selected? $ :selected-tab-style options
+                                  :style $ merge
+                                    either (:tab-style options) ({})
+                                    if selected?
+                                      either (:selected-tab-style options) ({})
+                                      {}
                                   :on-click $ fn (e d!) (on-route item d!)
                                 <> display
           :examples $ []
@@ -1525,7 +1528,7 @@
                   {}
                     :class-name $ str-spaced css/preset css/global css/fullscreen css/row
                     :style $ {} (:padding-top 16)
-                  comp-sidebar $ or (nth router 0) |index.html
+                  comp-sidebar $ option:unwrap-or (nth router 0) |index.html
                   div
                     {} $ :class-name (str-spaced css/expand css-content)
                     match router
@@ -1864,7 +1867,7 @@
                 <> label
           :examples $ []
           :schema $ :: 'Fn
-            {} (:return 'respo.schema/Component)
+            {} (:return 'respo.schema/Element)
               :args $ [] 'String
         'render-layout-section $ %{} 'CodeEntry (:doc |)
           :code $ quote
@@ -1878,8 +1881,8 @@
                 , demo
           :examples $ []
           :schema $ :: 'Fn
-            {} (:return 'respo.schema/Component)
-              :args $ [] 'String 'String 'respo.schema/Component
+            {} (:return 'respo.schema/Element)
+              :args $ [] 'String 'String 'respo.schema/Element
         'style-class-chip $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defstyle style-class-chip $ {}
@@ -2071,7 +2074,7 @@
                   =< nil 16
                   div
                     {} $ :style
-                      merge ui/row $ {} (:gap 16)
+                      {} (:display |flex) (:align-items |stretch) (:flex-direction |row) (:gap 16)
                     button
                       {} $ :class-name css/button-primary
                       <> |css/button-primary
@@ -2725,17 +2728,16 @@
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
           :code $ quote
-            defatom *store $ merge schema/store
-              {} $ :router
-                parse-address
-                  unsafe-coerce
-                    .!slice
-                      unsafe-coerce
-                        .-hash $ unsafe-coerce js/location 'JsObject
-                        , 'JsObject
-                      , 1
-                    , 'String
-                  , router/dict
+            defatom *store $ assoc schema/store :router
+              parse-address
+                unsafe-coerce
+                  .!slice
+                    unsafe-coerce
+                      .-hash $ unsafe-coerce js/location 'JsObject
+                      , 'JsObject
+                    , 1
+                  , 'String
+                , router/dict
           :examples $ []
           :schema $ :: 'Dynamic
         'dispatch! $ %{} 'CodeEntry (:doc |)
