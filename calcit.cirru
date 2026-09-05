@@ -3055,7 +3055,7 @@
         'santinize-html-text $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn santinize-html-text (content)
-              -> content (.replace |< |&lt;) (.replace |> |&gt;) (.replace "| " |&nbsp;)
+              -> content (.replace |& |&amp;) (.replace |< |&lt;) (.replace |> |&gt;) (.replace "| " |&nbsp;)
           :examples $ []
           :schema $ :: 'Fn
             {} (:return 'String)
@@ -3064,6 +3064,9 @@
             %{} 'TestEntry (:name |escapes-html-and-spaces)
               :code $ quote
                 assert= |&lt;a&gt;&nbsp;b $ santinize-html-text "|<a> b"
+            %{} 'TestEntry (:name |escapes-html-entities)
+              :code $ quote
+                assert= |&amp;#60;script&amp;#62; $ santinize-html-text |&#60;script&#62;
         'tab-echo! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn tab-echo! (data ? format)
@@ -3077,7 +3080,7 @@
                 :json $ let
                     content $ unsafe-coerce
                       js/JSON.stringify (to-js-data data) nil 2
-                      , String
+                      , 'String
                     w $ unsafe-coerce (js/window.open |about:blank |_blank) 'respo-ui.util/EchoWindowHost
                   respo.dom/set-inner-html!
                     unsafe-coerce
