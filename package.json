@@ -1,7 +1,7 @@
 {
-  "version": "0.7.15",
+  "version": "0.7.16",
   "dependencies": {
-    "@calcit/procs": "0.13.75",
+    "@calcit/procs": "0.13.77",
     "copy-text-to-clipboard": "^3.2.0",
     "dayjs": "^1.11.13"
   },
