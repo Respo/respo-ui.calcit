@@ -3040,12 +3040,33 @@
             respo-router.parser :refer $ parse-address
     'respo-ui.util $ %{} 'FileEntry
       :defs $ {}
+        'EchoWindowHost $ %{} 'CodeEntry (:doc |)
+          :code $ quote
+            deftrait EchoWindowHost (:document 'respo.dom/DomDocument)
+              .post-message! $ :: 'Fn
+                {}
+                  :generics $ [] 'T
+                  :args $ [] 'T 'String 'String
+                  :return 'Unit
+          :examples $ []
+          :ffi $ {} (:backend :js) (:kind :external-object)
+            :names $ {} (:post-message! |postMessage)
+          :schema $ :: 'Trait
         'santinize-html-text $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn santinize-html-text (content)
-              -> content (.replace |< |&lt;) (.replace |> |&gt;) (.replace "| " |&nbsp;)
+              -> content (.replace |& |&amp;) (.replace |< |&lt;) (.replace |> |&gt;) (.replace "| " |&nbsp;)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn
+            {} (:return 'String)
+              :args $ [] 'String
+          :tests $ []
+            %{} 'TestEntry (:name |escapes-html-and-spaces)
+              :code $ quote
+                assert= |&lt;a&gt;&nbsp;b $ santinize-html-text "|<a> b"
+            %{} 'TestEntry (:name |escapes-html-entities)
+              :code $ quote
+                assert= |&amp;#60;script&amp;#62; $ santinize-html-text |&#60;script&#62;
         'tab-echo! $ %{} 'CodeEntry (:doc |)
           :code $ quote
             defn tab-echo! (data ? format)
@@ -3053,27 +3074,27 @@
                 let
                     content $ format-cirru-edn (:: :tab-echo data)
                     app |https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev
-                    w $ unsafe-coerce (js/window.open app |_target) 'JsObject
-                  flipped js/setTimeout 20 $ fn () (.!postMessage w content |https://r.tiye.me)
-                  flipped js/setTimeout 200 $ fn () (.!postMessage w content |https://r.tiye.me)
+                    w $ unsafe-coerce (js/window.open app |_target) 'respo-ui.util/EchoWindowHost
+                  flipped js/setTimeout 20 $ fn () (.post-message! w content |https://r.tiye.me)
+                  flipped js/setTimeout 200 $ fn () (.post-message! w content |https://r.tiye.me)
                 :json $ let
-                    content $ js/JSON.stringify (to-js-data data) nil 2
-                    w $ unsafe-coerce (js/window.open |about:blank |_blank) 'JsObject
-                  ->
+                    content $ unsafe-coerce
+                      js/JSON.stringify (to-js-data data) nil 2
+                      , 'String
+                    w $ unsafe-coerce (js/window.open |about:blank |_blank) 'respo-ui.util/EchoWindowHost
+                  respo.dom/set-inner-html!
                     unsafe-coerce
-                      .-body $ unsafe-coerce (.-document w) 'JsObject
-                      , 'JsObject
-                    , .-innerHTML $ set!
-                      str |<pre> (santinize-html-text content) |</pre>
+                      .-body $ .-document w
+                      , 'respo.dom/DomElement
+                    str |<pre> (santinize-html-text content) |</pre>
                 :edn $ let
                     content $ format-cirru-edn data
-                    w $ unsafe-coerce (js/window.open |about:blank |_blank) 'JsObject
-                  ->
+                    w $ unsafe-coerce (js/window.open |about:blank |_blank) 'respo-ui.util/EchoWindowHost
+                  respo.dom/set-inner-html!
                     unsafe-coerce
-                      .-body $ unsafe-coerce (.-document w) 'JsObject
-                      , 'JsObject
-                    , .-innerHTML $ set!
-                      str |<pre> (santinize-html-text content) |</pre>
+                      .-body $ .-document w
+                      , 'respo.dom/DomElement
+                    str |<pre> (santinize-html-text content) |</pre>
           :examples $ []
           :schema $ :: 'Fn
             {} (:return 'Dynamic)
