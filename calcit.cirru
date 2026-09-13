@@ -91,7 +91,7 @@
                       {} (:display :grid)
                         :grid-template-columns $ str "|repeat(auto-fit, minmax(" item-width "|px,1fr))"
                         :gap 8
-                      option:unwrap-or options.:style $ {}
+                      if (option:some? options.:style) (option:unwrap options.:style) ({})
                   -> items $ map-indexed $ fn (idx info)
                     [] idx $ let
                         item $ cond
@@ -584,7 +584,7 @@
                       if (option:some? options.:width)
                         {} $ :width $ option:unwrap-or options.:width 0
                         {}
-                      option:unwrap-or options.:style $ {}
+                      if (option:some? options.:style) (option:unwrap options.:style) ({})
                   div $ {} $ :class-name
                     str-spaced style-tab-highlight $ if vertical? style-tab-vertical-highlight
                   , & $ -> tabs $ map
@@ -610,9 +610,15 @@
                                   option:unwrap-or options.:tab-class-name |
                                   if selected? style-selected-tab
                                 :style $ ui/merge-styles
-                                  option:unwrap-or options.:tab-style $ {}
+                                  if
+                                    option:some? options.:tab-style
+                                    option:unwrap options.:tab-style
+                                    {}
                                   if selected?
-                                    option:unwrap-or options.:selected-tab-style $ {}
+                                    if
+                                      option:some? options.:selected-tab-style
+                                      option:unwrap options.:selected-tab-style
+                                      {}
                                     {}
                                 :on-click $ fn (e d!) (on-route item d!)
                               <> display
