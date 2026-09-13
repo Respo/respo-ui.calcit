@@ -541,10 +541,8 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] (:: 'respo-ui.schema/TabsOptions 'Value) (:: 'List 'Item)
               :: 'Fn $ {} (:return 'Unit)
-                :args $ [] (:: 'respo-ui.schema/TabRoute 'Value)
-                  :: 'Fn $ {} (:return 'Unit)
-                    :args $ [] 'Op
-            :generics $ [] 'Value 'Item 'Op
+                :args $ [] (:: 'respo-ui.schema/TabRoute 'Value) 'DynFn
+            :generics $ [] 'Value 'Item
         'comp-tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-tag (kind content options)
             div
@@ -1588,10 +1586,8 @@
           :code $ quote $ defn ignore-tab-route (route dispatch!) &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] (:: 'respo-ui.schema/TabRoute 'Value)
-              :: 'Fn $ {} (:return 'Unit)
-                :args $ [] 'Op
-            :generics $ [] 'Value 'Op
+            :args $ [] (:: 'respo-ui.schema/TabRoute 'Value) 'DynFn
+            :generics $ [] 'Value
         'language-options $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def language-options
             []
