@@ -3,11 +3,7 @@
   :about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `calcit query` to inspect and `calcit edit`/`calcit tree` to modify. Run `calcit docs agents --contract` before mutations; use `--full` for first orientation or changed contract digest. Manual edits must follow format and schema conventions, then run `calcit edit format`."
   :package |respo-ui
   :entries $ {} $ :default
-    {} (:description |)
-      :init-fn 'respo-ui.main/main!
-      :mode :js
-      :reload-fn 'respo-ui.main/reload!
-      :target :browser
+    {} (:description |) (:init-fn 'respo-ui.main/main!) (:mode :js) (:reload-fn 'respo-ui.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo-router.calcit/ |respo.calcit/ |js-ffi/
       :type-slots $ {}
@@ -42,9 +38,7 @@
             :writable $ #{} :text
           :schema $ :: 'Trait
         'UiDomElement $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait UiDomElement (:offset-left 'Number) (:offset-top 'Number) (:client-width 'Number) (:client-height 'Number)
-            :style 'respo-ui.comp/UiStyle
-            :dataset 'respo-ui.comp/UiDataset
+          :code $ quote $ deftrait UiDomElement (:offset-left 'Number) (:offset-top 'Number) (:client-width 'Number) (:client-height 'Number) (:style 'respo-ui.comp/UiStyle) (:dataset 'respo-ui.comp/UiDataset)
             .query-selector $ :: 'Fn $ {}
               :generics $ [] 'T
               :args $ [] 'T 'String
@@ -65,16 +59,12 @@
             div
               {} (:role |alert)
                 :class-name $ str-spaced style-alert
-                  case-default kind style-alert-info
-                    :success style-alert-success
-                    :warning style-alert-warning
-                    :error style-alert-error
+                  case-default kind style-alert-info (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               if (literal? content) (<> content) content
           :examples $ [] $ quote (comp-alert :success "|Changes saved")
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag 'Content $ :: 'Option 'respo-ui.schema/PresentationOptions
             :generics $ [] 'Content
         'comp-attributes $ %{} 'CodeEntry (:doc |)
@@ -127,8 +117,7 @@
                   , ret
                 , ret
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'respo-ui.schema/AttributesOptions 'Item
             :generics $ [] 'Item
         'comp-avatar $ %{} 'CodeEntry
@@ -138,20 +127,14 @@
               {}
                 :title $ respo-ui.schema/read-field options :title
                 :class-name $ str-spaced style-avatar
-                  case-default
-                    respo-ui.schema/read-field options :size
-                    , |
-                      :small style-avatar-small
-                      :large style-avatar-large
+                  case-default (respo-ui.schema/read-field options :size) | (:small style-avatar-small) (:large style-avatar-large)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               if
                 some? $ respo-ui.schema/read-field options :src
                 create-element :img $ {}
                   :src $ respo-ui.schema/read-field options :src
-                  :alt $ either
-                    respo-ui.schema/read-field options :alt
-                    str text
+                  :alt $ either (respo-ui.schema/read-field options :alt) (str text)
                   :class-name style-avatar-image
                 <> text
           :examples $ [] $ quote
@@ -162,27 +145,17 @@
               :size $ %some :large
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo-ui.schema/AvatarOptions
         'comp-button $ %{} 'CodeEntry
           :doc "|Render a native button with Respo UI variants. Options: :kind (:primary, :danger, :danger-outline), :type, :disabled, :on-click, :class-name, :style."
           :code $ quote $ defcomp comp-button (content options)
             button
               {}
-                :type $ either
-                  respo-ui.schema/read-field options :type
-                  , |button
-                :disabled $ or
-                  respo-ui.schema/read-field options :disabled
-                  , false
+                :type $ either (respo-ui.schema/read-field options :type) |button
+                :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :class-name $ str-spaced
-                  case-default
-                    respo-ui.schema/read-field options :kind
-                    , css/button
-                      :primary css/button-primary
-                      :danger css/button-danger
-                      :danger-outline css/button-danger-outline
+                  case-default (respo-ui.schema/read-field options :kind) css/button (:primary css/button-primary) (:danger css/button-danger) (:danger-outline css/button-danger-outline)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
                 :on-click $ respo-ui.schema/read-field options :on-click
@@ -195,8 +168,7 @@
               :on-click $ %none
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content $ :: 'Option 'respo-ui.schema/ButtonOptions
             :generics $ [] 'Content
         'comp-card $ %{} 'CodeEntry
@@ -210,9 +182,7 @@
                 some? $ respo-ui.schema/read-field options :title
                 div
                   {} $ :class-name style-card-title
-                  <> $ either
-                    respo-ui.schema/read-field options :title
-                    , |
+                  <> $ either (respo-ui.schema/read-field options :title) |
               div
                 {} $ :class-name style-card-body
                 if (literal? content) (<> content) content
@@ -227,21 +197,18 @@
               :footer $ %none
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content $ :: 'Option 'respo-ui.schema/CardOptions
             :generics $ [] 'Content
         'comp-catoptric-text $ %{} 'CodeEntry
           :doc "|by \"catoptric text\" I mean text added with CSS content, thus unsearchable from browser search or select. The text can still be grabbed from DOM tree though."
           :code $ quote $ defcomp comp-catoptric-text (text options)
-            []
-              effect-dataset-text text
+            [] (effect-dataset-text text)
               span $ {}
                 :class-name $ str-spaced style-catoptric $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo-ui.schema/PresentationOptions
         'comp-checkbox $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-checkbox (checked options) (assert-type checked 'Bool)
@@ -250,9 +217,7 @@
                 :class-name $ str-spaced css/checkbox-label $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               input $ {} (:type |checkbox) (:class-name css/checkbox) (:checked checked)
-                :disabled $ or
-                  respo-ui.schema/read-field options :disabled
-                  , false
+                :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :on $ {} $ :change
                   fn (e d!)
                     do
@@ -267,10 +232,8 @@
                 some? $ respo-ui.schema/read-field options :label
                 <> $ str $ respo-ui.schema/read-field options :label
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
-            :args $ [] 'Bool $ :: 'Option
-              :: 'respo-ui.schema/SwitchOptions 'Op
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Bool $ :: 'Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
         'comp-cirru-snippet $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-cirru-snippet (text options)
@@ -283,10 +246,8 @@
               span
                 {} $ :class-name style-copy-wrapper
                 comp-copy text
-          :examples $ [] $ quote
-            comp-cirru-snippet "|defn f (x) x"
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :examples $ [] $ quote (comp-cirru-snippet "|defn f (x) x")
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo-ui.schema/PresentationOptions
         'comp-close $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-close (options)
@@ -295,8 +256,7 @@
               :class-name $ str-spaced style-close $ respo-ui.schema/read-field options :class-name
               :on-click $ respo-ui.schema/read-field options :on-click
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'Option 'respo-ui.schema/ButtonOptions
         'comp-copy $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-copy (code f)
@@ -306,21 +266,17 @@
                 :on-click $ match f
                   (:some handler) handler
                   (:none) (copy-handler code)
-              div $ {}
-                :class-name style-copy-outline
+              div $ {} (:class-name style-copy-outline)
                 :style $ {} (:top -5) (:right -2)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo.schema/EventHandler
         'comp-divider $ %{} 'CodeEntry
           :doc "|Render a horizontal divider, or a vertical divider with :vertical? true."
           :code $ quote $ defcomp comp-divider (options)
             div $ {} (:role |separator)
               :class-name $ str-spaced
-                if
-                  respo-ui.schema/read-field options :vertical?
-                  , style-divider-vertical style-divider
+                if (respo-ui.schema/read-field options :vertical?) style-divider-vertical style-divider
                 respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
           :examples $ [] $ quote
@@ -328,8 +284,7 @@
               :vertical? $ %some true
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'Option 'respo-ui.schema/DividerOptions
         'comp-empty $ %{} 'CodeEntry
           :doc "|Render a richer empty state with optional :icon, :description, :action, :class-name, and :style."
@@ -351,13 +306,10 @@
                 some? $ respo-ui.schema/read-field options :description
                 div
                   {} $ :class-name style-empty-description
-                  <> $ either
-                    respo-ui.schema/read-field options :description
-                    , |
+                  <> $ either (respo-ui.schema/read-field options :description) |
               when
                 some? $ respo-ui.schema/read-field options :action
-                div ({})
-                  respo-ui.schema/read-field options :action
+                div ({}) (respo-ui.schema/read-field options :action)
           :examples $ [] $ quote
             comp-empty "|No results" $ %some $ %{} respo-ui.schema/EmptyOptions
               :icon $ %none
@@ -365,21 +317,16 @@
               :action $ %none
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo-ui.schema/EmptyOptions
         'comp-input $ %{} 'CodeEntry
           :doc "|Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-input (value options)
             input $ {}
-              :type $ either
-                respo-ui.schema/read-field options :type
-                , |text
+              :type $ either (respo-ui.schema/read-field options :type) |text
               :value value
               :placeholder $ respo-ui.schema/read-field options :placeholder
-              :disabled $ or
-                respo-ui.schema/read-field options :disabled
-                , false
+              :disabled $ or (respo-ui.schema/read-field options :disabled) false
               :class-name $ str-spaced css/input $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
               :on-input $ respo-ui.schema/read-field options :on-input
@@ -391,8 +338,7 @@
               :on-input $ %none
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo-ui.schema/InputOptions
         'comp-placeholder $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-placeholder (text)
@@ -400,8 +346,7 @@
               {} $ :class-name css-placeholder
               <> text
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String
         'comp-progress $ %{} 'CodeEntry
           :doc "|Render an accessible progress bar. Value is clamped visually to 0..100; options support :class-name and :style."
@@ -410,24 +355,20 @@
               {} (:role |progressbar)
                 :class-name $ str-spaced style-progress $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-              div $ {}
-                :class-name style-progress-value
+              div $ {} (:class-name style-progress-value)
                 :style $ {} $ :width
                   str
                     &min 100 $ &max 0 value
                     , |%
           :examples $ [] $ quote (comp-progress 72)
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Number $ :: 'Option 'respo-ui.schema/PresentationOptions
         'comp-select $ %{} 'CodeEntry
           :doc "|Render a controlled native select from keyed option maps. Each item uses :value, :label, and optional :disabled; :on-change receives the next value and d!."
           :code $ quote $ defcomp comp-select (value items options)
             create-list-element :select
               {} (:value value)
-                :disabled $ or
-                  respo-ui.schema/read-field options :disabled
-                  , false
+                :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :class-name $ str-spaced css/select $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
                 :on-change $ fn (e d!)
@@ -455,10 +396,8 @@
                 :on-change $ %none
                 :class-name $ %none
                 :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
-            :args $ [] 'String
-              :: 'List 'respo-ui.schema/SelectOption
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String (:: 'List 'respo-ui.schema/SelectOption)
               :: 'Option $ :: 'respo-ui.schema/SelectOptions 'Op
             :generics $ [] 'Op
         'comp-skeleton $ %{} 'CodeEntry
@@ -488,14 +427,12 @@
               :height $ %none
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'Option 'respo-ui.schema/SkeletonOptions
         'comp-snippet $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-snippet (code options)
             div
-              {} $ :class-name $ str-spaced css/row css-snippet
-                respo-ui.schema/read-field options :class-name
+              {} $ :class-name $ str-spaced css/row css-snippet (respo-ui.schema/read-field options :class-name)
               pre $ {} (:class-name css/expand)
                 :style $ respo-ui.schema/read-field options :style
                 :inner-text code
@@ -503,16 +440,13 @@
                 {} $ :class-name style-copy-wrapper
                 comp-copy code
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo-ui.schema/PresentationOptions
         'comp-spinner $ %{} 'CodeEntry
           :doc "|Render an accessible loading spinner. Options support :label, :class-name, and :style."
           :code $ quote $ defcomp comp-spinner (options)
             span $ {} (:role |status)
-              :aria-label $ either
-                respo-ui.schema/read-field options :label
-                , |Loading
+              :aria-label $ either (respo-ui.schema/read-field options :label) |Loading
               :class-name $ str-spaced style-spinner $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
           :examples $ [] $ quote
@@ -520,8 +454,7 @@
               :label $ %some "|Loading results"
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'Option 'respo-ui.schema/SpinnerOptions
         'comp-switch $ %{} 'CodeEntry
           :doc "|Render a controlled accessible switch backed by a native checkbox. Options: :label, :disabled, :on-change, :class-name, and :style."
@@ -529,15 +462,11 @@
             create-element :label
               {}
                 :class-name $ str-spaced style-switch-label
-                  if
-                    respo-ui.schema/read-field options :disabled
-                    , style-control-disabled
+                  if (respo-ui.schema/read-field options :disabled) style-control-disabled
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               input $ {} (:type |checkbox) (:checked checked)
-                :disabled $ or
-                  respo-ui.schema/read-field options :disabled
-                  , false
+                :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :aria-label $ respo-ui.schema/read-field options :label
                 :class-name style-switch-input
                 :on-change $ fn (e d!)
@@ -554,9 +483,7 @@
               when
                 some? $ respo-ui.schema/read-field options :label
                 span ({})
-                  <> $ either
-                    respo-ui.schema/read-field options :label
-                    , |
+                  <> $ either (respo-ui.schema/read-field options :label) |
           :examples $ [] $ quote
             comp-switch false $ %some $ %{} respo-ui.schema/SwitchOptions
               :label $ %some "|Compact mode"
@@ -564,22 +491,18 @@
               :on-change $ %none
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
-            :args $ [] 'Bool $ :: 'Option
-              :: 'respo-ui.schema/SwitchOptions 'Op
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Bool $ :: 'Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
         'comp-tabs $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-tabs (options tabs on-route)
             let
                 selected options.:selected
                 vertical? $ option:unwrap-or options.:vertical? false
-              []
-                effect-tab-highlight selected vertical?
+              [] (effect-tab-highlight selected vertical?)
                 div
                   {}
-                    :class-name $ str-spaced style-tabs (if vertical? css/column css/row)
-                      option:unwrap-or options.:class-name |
+                    :class-name $ str-spaced style-tabs (if vertical? css/column css/row) (option:unwrap-or options.:class-name |)
                     :style $ ui/merge-styles
                       if (option:some? options.:width)
                         {} $ :width $ option:unwrap-or options.:width 0
@@ -606,31 +529,19 @@
                               selected? $ = selected $ %some value
                             div
                               {}
-                                :class-name $ str-spaced css-tab
-                                  option:unwrap-or options.:tab-class-name |
-                                  if selected? style-selected-tab
+                                :class-name $ str-spaced css-tab (option:unwrap-or options.:tab-class-name |) (if selected? style-selected-tab)
                                 :style $ ui/merge-styles
-                                  if
-                                    option:some? options.:tab-style
-                                    option:unwrap options.:tab-style
-                                    {}
+                                  if (option:some? options.:tab-style) (option:unwrap options.:tab-style) ({})
                                   if selected?
-                                    if
-                                      option:some? options.:selected-tab-style
-                                      option:unwrap options.:selected-tab-style
-                                      {}
+                                    if (option:some? options.:selected-tab-style) (option:unwrap options.:selected-tab-style) ({})
                                     {}
                                 :on-click $ fn (e d!) (on-route item d!)
                               <> display
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
-            :args $ []
-              :: 'respo-ui.schema/TabsOptions 'Value
-              :: 'List 'Item
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] (:: 'respo-ui.schema/TabsOptions 'Value) (:: 'List 'Item)
               :: 'Fn $ {} (:return 'Unit)
-                :args $ []
-                  :: 'respo-ui.schema/TabRoute 'Value
+                :args $ [] (:: 'respo-ui.schema/TabRoute 'Value)
                   :: 'Fn $ {} (:return 'Unit)
                     :args $ [] 'Op
             :generics $ [] 'Value 'Item 'Op
@@ -639,19 +550,14 @@
             div
               {}
                 :class-name $ str-spaced style-tag
-                  case-default kind | (:info style-tag-info)
-                    :success style-tag-success
-                    :warning style-tag-warning
-                    :error style-tag-error
+                  case-default kind | (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-                :on-click $ either
-                  respo-ui.schema/read-field options :on-click
+                :on-click $ either (respo-ui.schema/read-field options :on-click)
                   fn $ e d!
               <> content
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag 'Content $ :: 'Option 'respo-ui.schema/ButtonOptions
             :generics $ [] 'Content
         'comp-textarea $ %{} 'CodeEntry
@@ -659,9 +565,7 @@
           :code $ quote $ defcomp comp-textarea (value options)
             textarea $ {} (:value value)
               :placeholder $ respo-ui.schema/read-field options :placeholder
-              :disabled $ or
-                respo-ui.schema/read-field options :disabled
-                , false
+              :disabled $ or (respo-ui.schema/read-field options :disabled) false
               :class-name $ str-spaced css/textarea $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
               :on-input $ respo-ui.schema/read-field options :on-input
@@ -673,8 +577,7 @@
               :on-input $ %none
               :class-name $ %none
               :style $ %none
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'Option 'respo-ui.schema/InputOptions
         'comp-time $ %{} 'CodeEntry
           :doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future..."
@@ -685,8 +588,7 @@
                 :on-click $ fn (e d!)
                   do (js/console.log :time time) &unit
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String
             :features $ #{} :js-ffi
         'copy-handler $ %{} 'CodeEntry (:doc |)
@@ -694,8 +596,7 @@
             fn (e d!)
               do (copy! code) &unit
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/EventHandler
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
             :args $ [] 'String
             :features $ #{} :js-ffi
         'css-item-label $ %{} 'CodeEntry (:doc |)
@@ -745,8 +646,7 @@
                   element $ unsafe-coerce el UiDomElement
                 -> element.:dataset .-text $ set! text
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Effect
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Effect)
             :args $ [] 'String
             :features $ #{} :js-ffi
         'effect-tab-highlight $ %{} 'CodeEntry (:doc |)
@@ -777,8 +677,7 @@
                   when (not vertical?)
                     -> cursor.:style .-width $ set! |0px
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Effect
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Effect)
             :args $ [] 'Value 'Bool
             :features $ #{} :js-ffi
             :generics $ [] 'Value
@@ -805,10 +704,7 @@
             :generics $ [] 'Value
         'style-alert $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert
-            {} $ |& $ {} (:padding "|10px 12px")
-              :border "|1px solid transparent"
-              :border-radius |6px
-              :line-height |1.5
+            {} $ |& $ {} (:padding "|10px 12px") (:border "|1px solid transparent") (:border-radius |6px) (:line-height |1.5)
           :examples $ []
           :schema $ :: 'String
         'style-alert-error $ %{} 'CodeEntry (:doc |)
@@ -921,8 +817,7 @@
                 :transition-duration |200ms
                 :user-select :none
               |&:hover $ {} $ :opacity 1
-              |&:active $ {} (:transform "|scale(1.1)")
-                :transition-duration |0ms
+              |&:active $ {} (:transform "|scale(1.1)") (:transition-duration |0ms)
           :examples $ []
           :schema $ :: 'String
         'style-control-disabled $ %{} 'CodeEntry (:doc |)
@@ -934,9 +829,7 @@
           :code $ quote $ defstyle style-copy-container
             {}
               |& $ {} (:display :inline-block) (:margin "|0 8px 0 4px")
-              |&:hover $ {}
-                :transition-duration |200ms
-                :transform "|scale(1.06)"
+              |&:hover $ {} (:transition-duration |200ms) (:transform "|scale(1.06)")
           :examples $ []
           :schema $ :: 'String
         'style-copy-outline $ %{} 'CodeEntry (:doc |)
@@ -1078,8 +971,7 @@
               |& $ {} (:position :relative) (:display :inline-block) (:width |36px) (:height |20px) (:border-radius |999px)
                 :background-color $ hsl 220 12 82
                 :transition "|background-color 160ms ease"
-              |&::after $ {} (:content ||) (:position :absolute) (:top |2px) (:left |2px) (:width |16px) (:height |16px) (:border-radius |50%)
-                :background-color :white
+              |&::after $ {} (:content ||) (:position :absolute) (:top |2px) (:left |2px) (:width |16px) (:height |16px) (:border-radius |50%) (:background-color :white)
                 :box-shadow $ str "|0 1px 4px " $ hsl 0 0 0 0.2
                 :transition "|transform 160ms ease"
           :examples $ []
@@ -1200,8 +1092,7 @@
               {} $ :class-name style-components-page
               div
                 {} $ :class-name style-page-hero
-                div ({})
-                  <> "|Component examples" style-page-title
+                div ({}) (<> "|Component examples" style-page-title)
                 div ({})
                   <> "|Composable primitives with controlled state and static CSS classes." ui/text-label
                 div
@@ -1228,8 +1119,7 @@
               comp-demo-catoptric-text
               comp-demo-placeholder
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-attributes $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-attributes ()
@@ -1246,12 +1136,9 @@
                   {} $ :class-name css/flex
                   comp-attributes $ {} (:title "|Attributes DEMO")
                     :items $ [] (:: :attr |Demo |content) (:: :attr "|Demo 2" "|content 2") (:: :attr-span "|DEMO 2" "|content 2" 2) (:: :attr "|Demo 2" "|content 2") (:: :attr "|Demo 2" "|content 2")
-                      :: :attr "|DEMO 3" $ a $ {} (:inner-text |Demo)
-                        :href |https://respo-mvc.org
-                        :target |_blank
+                      :: :attr "|DEMO 3" $ a $ {} (:inner-text |Demo) (:href |https://respo-mvc.org) (:target |_blank)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-catoptric-text $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-catoptric-text ()
@@ -1272,8 +1159,7 @@
                     :style $ {} $ :gap |8px
                   comp-catoptric-text "|DEMO Text"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-cirru-snippet $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-cirru-snippet ()
@@ -1294,8 +1180,7 @@
                   =< 0 8
                   comp-cirru-snippet "|defn f (a b)\n  + a b"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-close $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-close ()
@@ -1316,8 +1201,7 @@
                     :style $ {} $ :gap |8px
                   comp-close
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-copy $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-demo-copy ()
@@ -1336,8 +1220,7 @@
                   comp-copy "|DEMO TO COPY"
                   <> "|demo demo"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Element
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ []
         'comp-demo-data-display $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-data-display ()
@@ -1392,8 +1275,7 @@
                     :class-name $ %none
                     :style $ %none
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-form-controls $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-form-controls ()
@@ -1475,8 +1357,7 @@
                     :class-name $ %none
                     :style $ %none
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-loading-states $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-loading-states ()
@@ -1565,8 +1446,7 @@
                     :class-name $ %none
                     :style $ %none
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-placeholder $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-placeholder ()
@@ -1582,8 +1462,7 @@
                   comp-placeholder "|This is a demo"
                   comp-placeholder "|中文 Demo"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-snippet $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-snippet ()
@@ -1602,15 +1481,13 @@
                   {} $ :class-name css/flex
                   comp-cirru-snippet "|defn f (a b)\n  + a b"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-tabs $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-tabs ()
             let
                 selected :book
-                en-tabs $ [] (:: :tab :book |Book) (:: :tab :card |Card)
-                  :: :tab :pl "|Programming language"
+                en-tabs $ [] (:: :tab :book |Book) (:: :tab :card |Card) (:: :tab :pl "|Programming language")
               div ({})
                 div
                   {} $ :class-name css-title
@@ -1643,8 +1520,7 @@
                         %some $ {}
                       , en-tabs ignore-tab-route
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-tags $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-tags ()
@@ -1669,8 +1545,7 @@
                   comp-tag :error "|:error demo"
                   comp-tag :default "|:default demo"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-demo-time $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-time ()
@@ -1689,11 +1564,9 @@
                   {} $ :class-name css/flex
                   div ({})
                     comp-time $ current-iso-string
-                  div ({})
-                    comp-time |2023-11-07T06:23:49.688Z
+                  div ({}) (comp-time |2023-11-07T06:23:49.688Z)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
             :features $ #{} :js-ffi
         'css-title $ %{} 'CodeEntry (:doc |)
@@ -1715,8 +1588,7 @@
           :code $ quote $ defn ignore-tab-route (route dispatch!) &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-              :: 'respo-ui.schema/TabRoute 'Value
+            :args $ [] (:: 'respo-ui.schema/TabRoute 'Value)
               :: 'Fn $ {} (:return 'Unit)
                 :args $ [] 'Op
             :generics $ [] 'Value 'Op
@@ -1738,8 +1610,7 @@
             div ({})
               a $ {} (:href url) (:target |_blank) (:rel |noreferrer) (:class-name css/link) (:inner-text title)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Element
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String
         'style-avatar-row $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-avatar-row
@@ -1753,10 +1624,7 @@
           :schema $ :: 'String
         'style-demo-grid $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-demo-grid
-            {} $ |& $ {} (:display :grid)
-              :grid-template-columns "|repeat(auto-fit, minmax(280px, 1fr))"
-              :gap |16px
-              :align-items :stretch
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(280px, 1fr))") (:gap |16px) (:align-items :stretch)
           :examples $ []
           :schema $ :: 'String
         'style-demo-section $ %{} 'CodeEntry (:doc |)
@@ -1833,21 +1701,17 @@
                   match router
                     (:index) (comp-home)
                     (:index) (comp-home)
-                    (:widgets)
-                      comp-widgets-page
-                    (:layouts)
-                      comp-layouts-page
+                    (:widgets) (comp-widgets-page)
+                    (:layouts) (comp-layouts-page)
                     (:fonts) (comp-fonts-page)
-                    (:components)
-                      comp-components-page
+                    (:components) (comp-components-page)
                     (:utils) (comp-utils-page)
                     (:not-found pp)
                       <> $ to-lispy-string router
                     _ $ do (eprintln |unknown-router router) (comp-home)
                 if dev? $ comp-inspect |Store store $ {} (:bottom 0)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'respo-ui.schema/Store
         'comp-utils-page $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-utils-page ()
@@ -1855,8 +1719,7 @@
               div ({}) (<> |Utils)
               div
                 {} $ :class-name $ str-spaced css/column css/gap8
-                div ({})
-                  <> "|tab-echo! to open new tab and show EDN data."
+                div ({}) (<> "|tab-echo! to open new tab and show EDN data.")
                 div
                   {} $ :class-name $ str-spaced css/row css/gap8
                   div
@@ -1892,8 +1755,7 @@
                           %some :edn
                   comp-cirru-snippet "|respo-ui.util/tab-echo! data :edn"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'css-content $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-content
@@ -1937,8 +1799,7 @@
             div $ {} (:inner-text text)
               :style $ {} (:white-space :pre-wrap) (:line-height 1.6) (:color |#555)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.docs
@@ -1972,8 +1833,7 @@
               render-font-demo css/font-code ui/font-code 300
               render-font-demo css/font-code ui/font-code 400
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'css-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-demo
@@ -1988,8 +1848,7 @@
                 :style $ {} $ :font-weight weight
               <> $ str "|This is a demo of the font, guess what you like: " family "| " weight
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Element
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String 'Number
         'style-section $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def style-section
@@ -2017,8 +1876,7 @@
               div ({})
                 comp-doc-block "|Respo UI is some minimal style collections for creating small pieces of apps. It includes variables for Flexbox layouts, basic button and input styles, fonts like \"Josefin Sans\" and \"Hind\".\n\nYou may read code on [GitHub](http://github.com/Respo/respo-ui). [Fonts files](https://github.com/tiye/favored-fonts) are hosted separately on my server."
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'style-home $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def style-home
@@ -2168,8 +2026,7 @@
                       {} $ :class-name style-class-chip
                       <> "|Learn more"
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'render-box $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-box (label)
@@ -2177,8 +2034,7 @@
               {} $ :class-name style-demo-item
               <> label
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Element
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String
         'render-layout-section $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-layout-section (title description demo)
@@ -2190,8 +2046,7 @@
               comp-doc-block description
               , demo
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Element
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String 'respo.schema/Element
         'style-class-chip $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-class-chip
@@ -2211,8 +2066,7 @@
           :schema $ :: 'String
         'style-cover-card $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-cover-card
-            {} $ |& $ {} (:padding "|20px 24px") (:border-radius |12px)
-              :background-color :white
+            {} $ |& $ {} (:padding "|20px 24px") (:border-radius |12px) (:background-color :white)
               :box-shadow $ str "|0 12px 36px " $ hsl 35 30 70 0.25
               :text-align :center
           :examples $ []
@@ -2301,8 +2155,7 @@
               render-entry |components.html |Components $ = :components router-name
               render-entry |utils.html |Utils $ = :utils router-name
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag
         'css-sidebar-entry $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-sidebar-entry
@@ -2316,21 +2169,18 @@
           :code $ quote $ defn on-route (path-name)
             fn (e dispatch!) (dispatch! :router/nav path-name)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/EventHandler
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
             :args $ [] 'String
         'render-entry $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-entry (path title selected?)
             div
-              {}
-                :class-name css-sidebar-entry
+              {} (:class-name css-sidebar-entry)
                 :style $ if selected? $ {}
                   :background-color $ hsl 0 0 50 0.1
                 :on-click $ on-route path
               <> title
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Element
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String 'Bool
         'style-logo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def style-logo
@@ -2361,20 +2211,15 @@
               span $ {} (:inner-text |css/tag-stroke) (:class-name css/tag-stroke)
               span $ {} (:inner-text |css/tag-outline) (:class-name css/tag-outline)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
         'comp-widgets-page $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-widgets-page ()
             div ({})
               div ({}) (<> |Widgets)
-              div ({})
-                <> "|link to external pages" ui/text-label
-                =< 0 16
+              div ({}) (<> "|link to external pages" ui/text-label) (=< 0 16)
                 a $ {} (:class-name css/link) (:inner-text |link)
-              div ({})
-                <> "|slight link without underscore" ui/text-label
-                =< 0 16
+              div ({}) (<> "|slight link without underscore" ui/text-label) (=< 0 16)
                 a $ {} (:class-name css/link-slight) (:inner-text |link)
               =< 0 16
               div
@@ -2445,8 +2290,7 @@
               =< 0 8
               comp-tags-styles
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.schema/Component
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.widgets-page
@@ -2466,9 +2310,7 @@
           :schema $ :: 'Bool
         'site $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def site
-            {} (:title "|Respo UI")
-              :icon |http://cdn.tiye.me/logo/respo.png
-              :storage-key |respo-ui
+            {} (:title "|Respo UI") (:icon |http://cdn.tiye.me/logo/respo.png) (:storage-key |respo-ui)
           :examples $ []
           :schema $ :: 'Map 'Tag 'String
       :ns $ %{} 'NsEntry (:doc |)
@@ -2675,8 +2517,7 @@
           :schema $ :: 'Map 'Tag 'Dynamic
         'tag-outline $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag-outline
-            merge-styles tag $ {}
-              :background-color :white
+            merge-styles tag $ {} (:background-color :white)
               :border $ str "|1px solid " $ hsl 200 70 80
               :color $ hsl 200 30 40
           :examples $ []
@@ -2714,8 +2555,7 @@
           :code $ quote $ defstyle button
             {} (|$0 ui/button)
               |$0:hover $ {} $ :background-color (hsl 0 0 98)
-              |$0:active $ {} (:transform "|scale(1.02)")
-                :transition-duration |0ms
+              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
           :examples $ []
           :schema $ :: 'String
         'button-danger $ %{} 'CodeEntry (:doc |)
@@ -2724,8 +2564,7 @@
               |$0:hover $ {}
                 :background-color $ hsl 6 100 64
                 :border-color $ hsl 6 100 64
-              |$0:active $ {} (:transform "|scale(1.02)")
-                :transition-duration |0ms
+              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
                 :background-color $ hsl 6 100 68
                 :border-color $ hsl 6 100 68
           :examples $ []
@@ -2737,19 +2576,16 @@
                 :border-color $ hsl 6 100 60
                 :color $ hsl 6 100 60
               |$0:hover $ {} $ :background-color (hsl 0 0 98)
-              |$0:active $ {} (:transform "|scale(1.02)")
-                :transition-duration |0ms
+              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
           :examples $ []
           :schema $ :: 'String
         'button-primary $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle button-primary
-            {}
-              |$0 ui/button-primary
+            {} (|$0 ui/button-primary)
               |$0:hover $ {}
                 :background-color $ hsl 220 80 64
                 :border-color $ hsl 220 80 64
-              |$0:active $ {} (:transform "|scale(1.02)")
-                :transition-duration |0ms
+              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
                 :background-color $ hsl 220 80 68
                 :border-color $ hsl 220 80 68
           :examples $ []
@@ -2805,10 +2641,7 @@
         'content-container $ %{} 'CodeEntry
           :doc "|Centered content container capped at 1120px with 16px viewport gutters."
           :code $ quote $ defstyle content-container
-            {} $ |& $ {}
-              :width "|min(calc(100% - 32px), 1120px)"
-              :margin-inline :auto
-              :min-width 0
+            {} $ |& $ {} (:width "|min(calc(100% - 32px), 1120px)") (:margin-inline :auto) (:min-width 0)
           :examples $ []
           :schema $ :: 'String
         'cover $ %{} 'CodeEntry
@@ -2841,8 +2674,7 @@
           :schema $ :: 'String
         'font-fancy $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-fancy
-            {} $ |$0 $ {}
-              :font-family "|Josefin Sans, Helvetica neue, Arial, sans-serif"
+            {} $ |$0 $ {} (:font-family "|Josefin Sans, Helvetica neue, Arial, sans-serif")
           :examples $ []
           :schema $ :: 'String
         'font-fancy! $ %{} 'CodeEntry (:doc |)
@@ -2853,14 +2685,12 @@
           :schema $ :: 'String
         'font-normal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-normal
-            {} $ |& $ {}
-              :font-family "|Hind, Helvatica, Arial, sans-serif"
+            {} $ |& $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
           :examples $ []
           :schema $ :: 'String
         'font-normal! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-normal!
-            {} $ |& $ {}
-              :font-family "|Hind, Helvatica, Arial, sans-serif"
+            {} $ |& $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
           :examples $ []
           :schema $ :: 'String
         'fullscreen $ %{} 'CodeEntry (:doc |)
@@ -2924,9 +2754,7 @@
         'preset $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle preset
             {}
-              |body $ {} (:margin 0)
-                :overscroll-behavior-x :none
-                :overscroll-behavior-y :none
+              |body $ {} (:margin 0) (:overscroll-behavior-x :none) (:overscroll-behavior-y :none)
               "|body *" $ {} $ :box-sizing :border-box
               |::-webkit-scrollbar $ {} (:width 4) (:height 4)
               |::-webkit-scrollbar-track $ {} $ :background-color (hsl 0 0 100)
@@ -2940,21 +2768,14 @@
           :doc "|Horizontally scrollable row with proximity scroll snapping for cards and previews."
           :code $ quote $ defstyle reel
             {}
-              |& $ {} (:display :flex) (:overflow-x :auto)
-                :overscroll-behavior-inline :contain
-                :scroll-snap-type "|x proximity"
-                :min-width 0
-              "|& > *" $ {} (:flex "|0 0 auto")
-                :scroll-snap-align :start
+              |& $ {} (:display :flex) (:overflow-x :auto) (:overscroll-behavior-inline :contain) (:scroll-snap-type "|x proximity") (:min-width 0)
+              "|& > *" $ {} (:flex "|0 0 auto") (:scroll-snap-align :start)
           :examples $ []
           :schema $ :: 'String
         'responsive-grid $ %{} 'CodeEntry
           :doc "|Auto-fit grid with a 240px preferred column width and safe narrow-screen fallback."
           :code $ quote $ defstyle responsive-grid
-            {} $ |& $ {} (:display :grid)
-              :grid-template-columns "|repeat(auto-fit, minmax(min(100%, 240px), 1fr))"
-              :align-items :stretch
-              :min-width 0
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(min(100%, 240px), 1fr))") (:align-items :stretch) (:min-width 0)
           :examples $ []
           :schema $ :: 'String
         'row $ %{} 'CodeEntry (:doc |)
@@ -3041,8 +2862,7 @@
             {}
               |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :flex-start) (:min-width 0)
               "|& > :first-child" $ {} $ :flex "|1 1 220px"
-              "|& > :last-child" $ {} (:flex "|999 1 480px")
-                :min-width "|min(100%, 480px)"
+              "|& > :last-child" $ {} (:flex "|999 1 480px") (:min-width "|min(100%, 480px)")
           :examples $ []
           :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
@@ -3074,12 +2894,9 @@
           :code $ quote $ defn get-mount-target ()
             let
                 document $ unsafe-coerce js/document respo.dom/DomDocument
-              unsafe-coerce
-                document.query-selector |.app
-                , respo.dom/DomElement
+              unsafe-coerce (document.query-selector |.app) respo.dom/DomElement
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo.dom/DomElement
+          :schema $ :: 'Fn $ {} (:return 'respo.dom/DomElement)
             :args $ []
             :features $ #{} :js-ffi
         'initial-router $ %{} 'CodeEntry (:doc |)
@@ -3145,8 +2962,7 @@
               (:router/route r) (assoc store :router r)
               _ $ do (eprintln "|Unknown op:" op) store
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo-ui.schema/Store
+          :schema $ :: 'Fn $ {} (:return 'respo-ui.schema/Store)
             :args $ [] 'respo-ui.schema/Store 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.main
@@ -3487,8 +3303,7 @@
                 (:404 path) (PageRoute :not-found path)
                 _ $ PageRoute :index
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :return 'respo-ui.schema/PageRoute
+          :schema $ :: 'Fn $ {} (:return 'respo-ui.schema/PageRoute)
             :args $ [] 'respo-ui.schema/Store
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
@@ -3505,8 +3320,7 @@
     'respo-ui.util $ %{} 'FileEntry
       :defs $ {}
         'EchoWindowHost $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait EchoWindowHost
-            :document 'respo.dom/DomDocument
+          :code $ quote $ deftrait EchoWindowHost (:document 'respo.dom/DomDocument)
             .post-message! $ :: 'Fn $ {}
               :generics $ [] 'T
               :args $ [] 'T 'String 'String
@@ -3526,14 +3340,10 @@
           :schema $ :: 'Fn $ {} (:return 'String)
             :args $ [] 'String
           :tests $ []
-            %{} 'TestEntry
-              :name |escapes-html-and-spaces
-              :code $ quote $ assert= |&lt;a&gt;&nbsp;b
-                santinize-html-text "|<a> b"
-            %{} 'TestEntry
-              :name |escapes-html-entities
-              :code $ quote $ assert= |&amp;#60;script&amp;#62;
-                santinize-html-text |&#60;script&#62;
+            %{} 'TestEntry (:name |escapes-html-and-spaces)
+              :code $ quote $ assert= |&lt;a&gt;&nbsp;b (santinize-html-text "|<a> b")
+            %{} 'TestEntry (:name |escapes-html-entities)
+              :code $ quote $ assert= |&amp;#60;script&amp;#62; (santinize-html-text |&#60;script&#62;)
         'tab-echo! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn tab-echo! (data format)
             do
@@ -3550,16 +3360,12 @@
                       , 'String
                     w $ unsafe-coerce (js/window.open |about:blank |_blank) EchoWindowHost
                     document w.:document
-                  respo.dom/set-inner-html! document.:body $ str |<pre>
-                    santinize-html-text content
-                    , |</pre>
+                  respo.dom/set-inner-html! document.:body $ str |<pre> (santinize-html-text content) |</pre>
                 :edn $ let
                     content $ format-cirru-edn data
                     w $ unsafe-coerce (js/window.open |about:blank |_blank) EchoWindowHost
                     document w.:document
-                  respo.dom/set-inner-html! document.:body $ str |<pre>
-                    santinize-html-text content
-                    , |</pre>
+                  respo.dom/set-inner-html! document.:body $ str |<pre> (santinize-html-text content) |</pre>
               , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
