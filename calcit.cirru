@@ -3300,29 +3300,40 @@
                 let
                     content $ format-cirru-edn $ :: :tab-echo data
                     app |https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev
-                    w $ option:unwrap $ browser/window-open app
-                  browser/set-timeout!
-                    fn () $ w .post-message! content |https://r.tiye.me
-                    , 20
-                  browser/set-timeout!
-                    fn () $ w .post-message! content |https://r.tiye.me
-                    , 200
+                  option:fold (browser/window-open app)
+                    fn () &unit
+                    fn (window)
+                      browser/set-timeout!
+                        fn () $ window .post-message! content |https://r.tiye.me
+                        , 20
+                      browser/set-timeout!
+                        fn () $ window .post-message! content |https://r.tiye.me
+                        , 200
+                      , &unit
                 :json $ let
                     content $ unsafe-coerce
                       js/JSON.stringify (to-js-data data) js/undefined 2
                       , 'String
-                    w $ option:unwrap $ browser/window-open |about:blank
-                    document $ w :document
-                  respo.dom/set-inner-html!
-                    unsafe-coerce (document :body) 'respo.dom/DomElement
-                    str |<pre> (santinize-html-text content) |</pre>
+                  option:fold (browser/window-open |about:blank)
+                    fn () &unit
+                    fn (window)
+                      let
+                          document $ window :document
+                        respo.dom/set-inner-html!
+                          unsafe-coerce (document :body) 'respo.dom/DomElement
+                          str |<pre> (santinize-html-text content) |</pre>
+                      , &unit
                 :edn $ let
                     content $ format-cirru-edn data
-                    w $ option:unwrap $ browser/window-open |about:blank
-                    document $ w :document
-                  respo.dom/set-inner-html!
-                    unsafe-coerce (document :body) 'respo.dom/DomElement
-                    str |<pre> (santinize-html-text content) |</pre>
+                  option:fold (browser/window-open |about:blank)
+                    fn () &unit
+                    fn (window)
+                      let
+                          document $ window :document
+                        respo.dom/set-inner-html!
+                          unsafe-coerce (document :body) 'respo.dom/DomElement
+                          str |<pre> (santinize-html-text content) |</pre>
+                      , &unit
               , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
