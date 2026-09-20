@@ -31,28 +31,6 @@
           :ffi $ {} (:backend :js) (:kind :external-object)
             :names $ {} (:format |format) (:is-today? |isToday)
           :schema $ :: 'Trait
-        'UiDataset $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait UiDataset (:text 'String)
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-            :writable $ #{} :text
-          :schema $ :: 'Trait
-        'UiDomElement $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait UiDomElement (:offset-left 'Number) (:offset-top 'Number) (:client-width 'Number) (:client-height 'Number) (:style 'respo-ui.comp/UiStyle) (:dataset 'respo-ui.comp/UiDataset)
-            .query-selector $ :: 'Fn $ {}
-              :generics $ [] 'T
-              :args $ [] 'T 'String
-              :return $ :: 'JsNullish 'respo-ui.comp/UiDomElement
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-            :names $ {} (:client-height |clientHeight) (:client-width |clientWidth) (:offset-left |offsetLeft) (:offset-top |offsetTop) (:query-selector |querySelector)
-          :schema $ :: 'Trait
-        'UiStyle $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait UiStyle (:top 'String) (:bottom 'String) (:height 'String) (:left 'String) (:width 'String)
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-            :writable $ #{} :bottom :height :left :top :width
-          :schema $ :: 'Trait
         'comp-alert $ %{} 'CodeEntry
           :doc "|Render an accessible alert. Kinds are :info, :success, :warning, and :error; content may be text or a Respo node."
           :code $ quote $ defcomp comp-alert (kind content options)
@@ -640,9 +618,7 @@
           :code $ quote $ defeffect effect-dataset-text (text) (action el at?)
             when
               or (= action :update) (= action :mount)
-              let
-                  element $ unsafe-coerce el UiDomElement
-                -> element.:dataset .-text $ set! text
+              browser/element-data-set! (unsafe-coerce el 'js-ffi.browser/DomElementHost) |text text
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Effect)
             :args $ [] 'String
@@ -652,28 +628,25 @@
             when
               or (= action :mount) (= action :update)
               let
-                  root $ unsafe-coerce el UiDomElement
-                  target $ root.query-selector $ str |. style-selected-tab
-                  cursor $ root.query-selector $ str |. style-tab-highlight
+                  root $ unsafe-coerce el 'js-ffi.browser/DomElementHost
+                  target $ browser/element-query-selector root |.style-selected-tab
+                  cursor $ browser/element-query-selector root |.style-tab-highlight
                 if
-                  and (js-present? target) (js-present? cursor)
+                  and (option:some? target) (option:some? cursor)
                   let
-                      target $ unsafe-coerce target UiDomElement
-                      cursor $ unsafe-coerce cursor UiDomElement
-                      cursor-style cursor.:style
-                      left target.:offset-left
-                      width target.:client-width
-                      height target.:client-height
+                      target $ option:unwrap target
+                      cursor $ option:unwrap cursor
                     if vertical?
                       do
-                        -> cursor-style .-top $ set! $ str target.:offset-top |px
-                        -> cursor-style .-bottom $ set! |0px
-                        -> cursor-style .-height $ set! $ str height |px
+                        browser/element-set-style! cursor |top $ str (target :offset-top) |px
+                        browser/element-set-style! cursor |bottom |0px
+                        browser/element-set-style! cursor |height $ str (target :client-height) |px
                       do
-                        -> cursor-style .-left $ set! $ str left |px
-                        -> cursor-style .-width $ set! $ str width |px
+                        browser/element-set-style! cursor |left $ str (target :offset-left) |px
+                        browser/element-set-style! cursor |width $ str (target :client-width) |px
                   when (not vertical?)
-                    -> cursor.:style .-width $ set! |0px
+                    if (option:some? cursor)
+                      browser/element-set-style! (option:unwrap cursor) |width |0px
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Effect)
             :args $ [] 'Value 'Bool
@@ -1073,17 +1046,9 @@
             respo.schema :refer $ *dispatch-op
             respo-ui.schema :as schema
             |dayjs/plugin/isToday.js :default is-today
+            js-ffi.browser :as browser
     'respo-ui.comp.components $ %{} 'FileEntry
       :defs $ {}
-        'BrowserDate $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait BrowserDate
-            .to-iso-string $ :: 'Fn $ {}
-              :args $ [] 'respo-ui.comp.components/BrowserDate
-              :return 'String
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-            :names $ {} $ :to-iso-string |toISOString
-          :schema $ :: 'Trait
         'comp-components-page $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-components-page ()
             div
@@ -1575,9 +1540,7 @@
           :schema $ :: 'String
         'current-iso-string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn current-iso-string ()
-            let
-                value $ unsafe-coerce (new js/Date) BrowserDate
-              value.to-iso-string
+            :iso $ shared/date-now-snapshot
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'String)
             :args $ []
@@ -1671,6 +1634,7 @@
             respo.util.format :refer $ hsl
             respo.css :refer $ defstyle
             respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider
+            js-ffi.shared :as shared
     'respo-ui.comp.container $ %{} 'FileEntry
       :defs $ {}
         'comp-container $ %{} 'CodeEntry (:doc |)
@@ -2873,14 +2837,9 @@
             assoc schema/store :router $ initial-router
           :examples $ []
           :schema $ :: 'Ref 'respo-ui.schema/Store
-        'BrowserLocation $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait BrowserLocation (:hash 'String)
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-          :schema $ :: 'Trait
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
-            when config/dev? $ js/console.log |Dispatch: op
+            when config/dev? $ shared/console-log! $ str |Dispatch: op
             reset! *store $ updater @*store op
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
@@ -2888,9 +2847,9 @@
             :features $ #{} :js-ffi
         'get-mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn get-mount-target ()
-            let
-                document $ unsafe-coerce js/document respo.dom/DomDocument
-              unsafe-coerce (document.query-selector |.app) respo.dom/DomElement
+            unsafe-coerce
+              option:unwrap $ browser/query-selector |.app
+              , 'respo.dom/DomElement
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.dom/DomElement)
             :args $ []
@@ -2898,8 +2857,10 @@
         'initial-router $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn initial-router ()
             let
-                location $ unsafe-coerce js/location BrowserLocation
-              parse-address (slice location.:hash 1) router/dict
+                location $ browser/location-snapshot
+              parse-address
+                slice (location :hash) 1
+                , router/dict
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ []
@@ -2974,6 +2935,8 @@
             respo-router.listener :refer $ listen!
             |./calcit.build-errors :default build-errors
             |bottom-tip :default hud!
+            js-ffi.browser :as browser
+            js-ffi.shared :as shared
     'respo-ui.router $ %{} 'FileEntry
       :defs $ {}
         'dict $ %{} 'CodeEntry (:doc |)
@@ -3315,16 +3278,6 @@
             respo-router.parser :refer $ parse-address
     'respo-ui.util $ %{} 'FileEntry
       :defs $ {}
-        'EchoWindowHost $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ deftrait EchoWindowHost (:document 'respo.dom/DomDocument)
-            .post-message! $ :: 'Fn $ {}
-              :generics $ [] 'T
-              :args $ [] 'T 'String 'String
-              :return 'Unit
-          :examples $ []
-          :ffi $ {} (:backend :js) (:kind :external-object)
-            :names $ {} $ :post-message! |postMessage
-          :schema $ :: 'Trait
         'santinize-html-text $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn santinize-html-text (content)
             &str:replace
@@ -3347,21 +3300,29 @@
                 let
                     content $ format-cirru-edn $ :: :tab-echo data
                     app |https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev
-                    w $ unsafe-coerce (js/window.open app |_target) EchoWindowHost
-                  flipped js/setTimeout 20 $ fn () $ w.post-message! content |https://r.tiye.me
-                  flipped js/setTimeout 200 $ fn () $ w.post-message! content |https://r.tiye.me
+                    w $ option:unwrap $ browser/window-open app
+                  browser/set-timeout!
+                    fn () $ w .post-message! content |https://r.tiye.me
+                    , 20
+                  browser/set-timeout!
+                    fn () $ w .post-message! content |https://r.tiye.me
+                    , 200
                 :json $ let
                     content $ unsafe-coerce
                       js/JSON.stringify (to-js-data data) js/undefined 2
                       , 'String
-                    w $ unsafe-coerce (js/window.open |about:blank |_blank) EchoWindowHost
-                    document w.:document
-                  respo.dom/set-inner-html! document.:body $ str |<pre> (santinize-html-text content) |</pre>
+                    w $ option:unwrap $ browser/window-open |about:blank
+                    document $ w :document
+                  respo.dom/set-inner-html!
+                    unsafe-coerce (document :body) 'respo.dom/DomElement
+                    str |<pre> (santinize-html-text content) |</pre>
                 :edn $ let
                     content $ format-cirru-edn data
-                    w $ unsafe-coerce (js/window.open |about:blank |_blank) EchoWindowHost
-                    document w.:document
-                  respo.dom/set-inner-html! document.:body $ str |<pre> (santinize-html-text content) |</pre>
+                    w $ option:unwrap $ browser/window-open |about:blank
+                    document $ w :document
+                  respo.dom/set-inner-html!
+                    unsafe-coerce (document :body) 'respo.dom/DomElement
+                    str |<pre> (santinize-html-text content) |</pre>
               , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
@@ -3369,3 +3330,4 @@
             :features $ #{} :js-ffi
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.util
+          :require $ js-ffi.browser :as browser
