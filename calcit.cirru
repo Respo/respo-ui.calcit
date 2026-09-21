@@ -3318,9 +3318,8 @@
                     fn () &unit
                     fn (window)
                       let
-                          document $ window :document
-                        respo.dom/set-inner-html!
-                          unsafe-coerce (document :body) 'respo.dom/DomElement
+                          document window.:document
+                        respo.dom/set-inner-html! (unsafe-coerce document.:body 'respo.dom/DomElement)
                           str |<pre> (santinize-html-text content) |</pre>
                       , &unit
                 :edn $ let
@@ -3329,9 +3328,8 @@
                     fn () &unit
                     fn (window)
                       let
-                          document $ window :document
-                        respo.dom/set-inner-html!
-                          unsafe-coerce (document :body) 'respo.dom/DomElement
+                          document window.:document
+                        respo.dom/set-inner-html! (unsafe-coerce document.:body 'respo.dom/DomElement)
                           str |<pre> (santinize-html-text content) |</pre>
                       , &unit
               , &unit
