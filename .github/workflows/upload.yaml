@@ -30,6 +30,7 @@ jobs:
         run: |
           caps --strict --ci
           yarn install --immutable
+          caps deps.cirru verify --toolchain
           calcit calcit.cirru edit format
           git diff --exit-code -- calcit.cirru
           calcit calcit.cirru --check-only
@@ -43,6 +44,8 @@ jobs:
           calcit calcit.cirru analyze deprecated --summary-only --format json > .calcit/deprecated.json
           node scripts/check-calcit-upgrade-baseline.mjs
           calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
+          calcit calcit.cirru analyze dynamic-methods --max 0
+          calcit docs check-md README.md --dep ./ --failures-only
           calcit calcit.cirru js
           yarn vite build --base=./
 

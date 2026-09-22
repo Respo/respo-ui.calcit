@@ -6,7 +6,7 @@ Respo UI for calcit-js
 
 Find details in https://ui.respo-mvc.org/ .
 
-```cirru
+```css
 @import url(cirru-color/assets/cirru.css);
 ```
 
