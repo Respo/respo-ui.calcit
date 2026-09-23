@@ -44,7 +44,7 @@ jobs:
           calcit calcit.cirru analyze deprecated --summary-only --format json > .calcit/deprecated.json
           node scripts/check-calcit-upgrade-baseline.mjs
           calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
-          calcit calcit.cirru analyze dynamic-methods --max 0
+          calcit calcit.cirru analyze dynamic-methods --format json | jq -e '.data.summary.findings == 0'
           calcit docs check-md README.md --dep ./ --failures-only
           calcit calcit.cirru js
           yarn vite build --base=./

@@ -7,7 +7,7 @@ Before editing:
 ```bash
 calcit docs agents --full
 calcit docs read upgrade --full
-calcit libs readme respo.calcit --file docs/Respo-Agent.md --full
+calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
 ```
 
 The canonical source snapshot is `calcit.cirru`; do not use or add `compact.cirru`. Modify snapshots with `calcit edit` / `calcit tree`, then run `calcit calcit.cirru edit format`.
@@ -24,4 +24,3 @@ yarn install --immutable
 ```
 
 Use `calcit`, not the retired `cr` command. Query detailed syntax or migration guidance with `calcit docs read` instead of maintaining a copied manual here.
-
