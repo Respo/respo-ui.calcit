@@ -501,7 +501,8 @@
                         match item $
                           :tab value display
                           let
-                              selected? $ = selected $ %some value
+                              selected? $ and (option:some? selected)
+                                = (option:unwrap selected) value
                             div
                               {}
                                 :class-name $ str-spaced css-tab (option:unwrap-or options.:tab-class-name |) (if selected? style-selected-tab)
@@ -1192,10 +1193,10 @@
                 comp-card
                   div
                     {} $ :class-name style-avatar-row
-                    comp-avatar |CY $ %some $ respo-ui.schema/AvatarOptions :src (%none) :alt (%none) :title (%some "|Small avatar") :size (%some :small) :class-name (%none) :style (%none)
-                    comp-avatar |RS $ %some $ respo-ui.schema/AvatarOptions :src (%none) :alt (%none) :title (%some "|Default avatar") :size (%none) :class-name (%none) :style (%none)
-                    comp-avatar |UI $ %some $ respo-ui.schema/AvatarOptions :src (%none) :alt (%none) :title (%some "|Large avatar") :size (%some :large) :class-name (%none) :style (%none)
-                  %some $ respo-ui.schema/CardOptions :title (%some |Avatars) :footer (%none) :class-name (%none) :style $ %none
+                    comp-avatar |CY $ Option :some $ respo-ui.schema/AvatarOptions :src (Option :none) :alt (Option :none) :title (Option :some "|Small avatar") :size (Option :some :small) :class-name (Option :none) :style (Option :none)
+                    comp-avatar |RS $ Option :some $ respo-ui.schema/AvatarOptions :src (Option :none) :alt (Option :none) :title (Option :some "|Default avatar") :size (Option :none) :class-name (Option :none) :style (Option :none)
+                    comp-avatar |UI $ Option :some $ respo-ui.schema/AvatarOptions :src (Option :none) :alt (Option :none) :title (Option :some "|Large avatar") :size (Option :some :large) :class-name (Option :none) :style (Option :none)
+                  Option :some $ respo-ui.schema/CardOptions :title (Option :some |Avatars) :footer (Option :none) :class-name (Option :none) :style $ Option :none
                 comp-card
                   div
                     {} $ :class-name $ str-spaced css/column css/gap8
@@ -1205,7 +1206,7 @@
                     comp-alert :error "|The last deployment failed"
                     <> "|Progress · 78%" ui/text-label
                     comp-progress 78
-                  %some $ respo-ui.schema/CardOptions :title (%some "|Status summary") :footer (%none) :class-name (%none) :style $ %none
+                  Option :some $ respo-ui.schema/CardOptions :title (Option :some "|Status summary") :footer (Option :none) :class-name (Option :none) :style $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -1221,20 +1222,20 @@
                 comp-card
                   div
                     {} $ :class-name $ str-spaced css/column css/gap8
-                    comp-input | $ %some $ respo-ui.schema/InputOptions :type (%none) :placeholder (%some "|Search components") :disabled (%none) :on-input (%none) :class-name (%none) :style (%none)
-                    comp-textarea | $ %some $ respo-ui.schema/InputOptions :type (%none) :placeholder (%some "|Notes about this component") :disabled (%none) :on-input (%none) :class-name (%none) :style (%none)
-                    comp-select |calcit language-options $ %some $ respo-ui.schema/SelectOptions :disabled (%none) :on-change (%none) :class-name (%none) :style (%none)
-                    comp-switch false $ %some $ respo-ui.schema/SwitchOptions :label (%some "|Compact mode") :disabled (%none) :on-change (%none) :class-name (%none) :style (%none)
-                  %some $ respo-ui.schema/CardOptions :title (%some "|Controlled values") :footer (%none) :class-name (%none) :style $ %none
+                    comp-input | $ Option :some $ respo-ui.schema/InputOptions :type (Option :none) :placeholder (Option :some "|Search components") :disabled (Option :none) :on-input (Option :none) :class-name (Option :none) :style (Option :none)
+                    comp-textarea | $ Option :some $ respo-ui.schema/InputOptions :type (Option :none) :placeholder (Option :some "|Notes about this component") :disabled (Option :none) :on-input (Option :none) :class-name (Option :none) :style (Option :none)
+                    comp-select |calcit language-options $ Option :some $ respo-ui.schema/SelectOptions :disabled (Option :none) :on-change (Option :none) :class-name (Option :none) :style (Option :none)
+                    comp-switch false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Compact mode") :disabled (Option :none) :on-change (Option :none) :class-name (Option :none) :style (Option :none)
+                  Option :some $ respo-ui.schema/CardOptions :title (Option :some "|Controlled values") :footer (Option :none) :class-name (Option :none) :style $ Option :none
                 comp-card
                   div
                     {} $ :class-name $ str-spaced css/column css/gap8
                     comp-button "|Default action"
-                    comp-button "|Primary action" $ %some $ respo-ui.schema/ButtonOptions :kind (%some :primary) :type (%none) :disabled (%none) :on-click (%none) :class-name (%none) :style (%none)
-                    comp-button "|Danger action" $ %some $ respo-ui.schema/ButtonOptions :kind (%some :danger) :type (%none) :disabled (%none) :on-click (%none) :class-name (%none) :style (%none)
-                    comp-button "|Danger outline" $ %some $ respo-ui.schema/ButtonOptions :kind (%some :danger-outline) :type (%none) :disabled (%none) :on-click (%none) :class-name (%none) :style (%none)
-                    comp-button |Unavailable $ %some $ respo-ui.schema/ButtonOptions :kind (%none) :type (%none) :disabled (%some true) :on-click (%none) :class-name (%none) :style (%none)
-                  %some $ respo-ui.schema/CardOptions :title (%some "|Button states") :footer (%none) :class-name (%none) :style $ %none
+                    comp-button "|Primary action" $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :primary) :type (Option :none) :disabled (Option :none) :on-click (Option :none) :class-name (Option :none) :style (Option :none)
+                    comp-button "|Danger action" $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :danger) :type (Option :none) :disabled (Option :none) :on-click (Option :none) :class-name (Option :none) :style (Option :none)
+                    comp-button "|Danger outline" $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :danger-outline) :type (Option :none) :disabled (Option :none) :on-click (Option :none) :class-name (Option :none) :style (Option :none)
+                    comp-button |Unavailable $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :none) :type (Option :none) :disabled (Option :some true) :on-click (Option :none) :class-name (Option :none) :style (Option :none)
+                  Option :some $ respo-ui.schema/CardOptions :title (Option :some "|Button states") :footer (Option :none) :class-name (Option :none) :style $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -1252,29 +1253,29 @@
                     {} $ :class-name $ str-spaced css/column css/gap8
                     div
                       {} $ :class-name $ str-spaced css/row-middle css/gap8
-                      comp-skeleton $ %some $ respo-ui.schema/SkeletonOptions :label (%some "|Loading avatar") :kind (%some :circle) :width (%none) :height (%none) :class-name (%none) :style (%none)
+                      comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :some "|Loading avatar") :kind (Option :some :circle) :width (Option :none) :height (Option :none) :class-name (Option :none) :style (Option :none)
                       div
                         {} $ :class-name $ str-spaced css/column css/gap8 css/expand
-                        comp-skeleton $ %some $ respo-ui.schema/SkeletonOptions :label (%none) :kind (%none) :width (%some |48%) :height (%none) :class-name (%none) :style (%none)
-                        comp-skeleton $ %some $ respo-ui.schema/SkeletonOptions :label (%none) :kind (%none) :width (%some |72%) :height (%none) :class-name (%none) :style (%none)
+                        comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :none) :kind (Option :none) :width (Option :some |48%) :height (Option :none) :class-name (Option :none) :style (Option :none)
+                        comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :none) :kind (Option :none) :width (Option :some |72%) :height (Option :none) :class-name (Option :none) :style (Option :none)
                     comp-divider
-                    comp-skeleton $ %some $ respo-ui.schema/SkeletonOptions :label (%none) :kind (%none) :width (%none) :height (%some |72px) :class-name (%none) :style (%none)
-                  %some $ respo-ui.schema/CardOptions :title (%some "|Skeleton composition") :footer (%none) :class-name (%none) :style $ %none
-                comp-empty "|No components found" $ %some $ respo-ui.schema/EmptyOptions :icon (%none) :description (%some "|Try another search term or clear the filters.") :action (%none) :class-name (%none) :style (%none)
+                    comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :none) :kind (Option :none) :width (Option :none) :height (Option :some |72px) :class-name (Option :none) :style (Option :none)
+                  Option :some $ respo-ui.schema/CardOptions :title (Option :some "|Skeleton composition") :footer (Option :none) :class-name (Option :none) :style $ Option :none
+                comp-empty "|No components found" $ Option :some $ respo-ui.schema/EmptyOptions :icon (Option :none) :description (Option :some "|Try another search term or clear the filters.") :action (Option :none) :class-name (Option :none) :style (Option :none)
                 comp-card
                   div
                     {} $ :class-name $ str-spaced css/column css/gap8
                     div
                       {} $ :class-name $ str-spaced css/row-middle css/gap8
-                      comp-spinner $ %some $ respo-ui.schema/SpinnerOptions :label (%some "|Loading results") :class-name (%none) :style (%none)
+                      comp-spinner $ Option :some $ respo-ui.schema/SpinnerOptions :label (Option :some "|Loading results") :class-name (Option :none) :style (Option :none)
                       <> "|Loading results"
                     comp-divider
                     div
                       {} $ :class-name $ str-spaced css/row-middle css/gap8
                       comp-button |Previous
-                      comp-divider $ %some $ respo-ui.schema/DividerOptions :vertical? (%some true) :class-name (%none) :style (%none)
-                      comp-button |Next $ %some $ respo-ui.schema/ButtonOptions :kind (%some :primary) :type (%none) :disabled (%none) :on-click (%none) :class-name (%none) :style (%none)
-                  %some $ respo-ui.schema/CardOptions :title (%some "|Spinner and dividers") :footer (%none) :class-name (%none) :style $ %none
+                      comp-divider $ Option :some $ respo-ui.schema/DividerOptions :vertical? (Option :some true) :class-name (Option :none) :style (Option :none)
+                      comp-button |Next $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :primary) :type (Option :none) :disabled (Option :none) :on-click (Option :none) :class-name (Option :none) :style (Option :none)
+                  Option :some $ respo-ui.schema/CardOptions :title (Option :some "|Spinner and dividers") :footer (Option :none) :class-name (Option :none) :style $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -1328,15 +1329,15 @@
                   div
                     {} $ :class-name css/flex
                     comp-tabs
-                      respo-ui.schema/make-tabs-options selected (%none) (%none) (%none)
+                      respo-ui.schema/make-tabs-options selected (Option :none) (Option :none) (Option :none)
                       , en-tabs ignore-tab-route
                     comp-tabs
-                      respo-ui.schema/make-tabs-options selected (%none) (%none) (%none)
+                      respo-ui.schema/make-tabs-options selected (Option :none) (Option :none) (Option :none)
                       [] (:: :tab :book "|书本") (:: :tab :card "|纸牌") (:: :tab :pl "|编程语言")
                       , ignore-tab-route
                     comp-tabs
-                      respo-ui.schema/make-tabs-options selected (%none) (%none)
-                        %some $ {} $ :border-bottom
+                      respo-ui.schema/make-tabs-options selected (Option :none) (Option :none)
+                        Option :some $ {} $ :border-bottom
                           str "|1px solid " $ hsl 0 0 94
                       , en-tabs ignore-tab-route
                 =< 0 8
@@ -1346,8 +1347,8 @@
                   div
                     {} $ :class-name css/flex
                     comp-tabs
-                      respo-ui.schema/make-tabs-options selected (%some true) (%some 200)
-                        %some $ {}
+                      respo-ui.schema/make-tabs-options selected (Option :some true) (Option :some 200)
+                        Option :some $ {}
                       , en-tabs ignore-tab-route
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
@@ -1421,10 +1422,10 @@
         'language-options $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def language-options
             []
-              respo-ui.schema/SelectOption :value |calcit :label |Calcit :disabled $ %none
-              respo-ui.schema/SelectOption :value |clojure :label |Clojure :disabled $ %none
-              respo-ui.schema/SelectOption :value |haskell :label |Haskell :disabled $ %none
-              respo-ui.schema/SelectOption :value |rust :label |Rust :disabled $ %some true
+              respo-ui.schema/SelectOption :value |calcit :label |Calcit :disabled $ Option :none
+              respo-ui.schema/SelectOption :value |clojure :label |Clojure :disabled $ Option :none
+              respo-ui.schema/SelectOption :value |haskell :label |Haskell :disabled $ Option :none
+              respo-ui.schema/SelectOption :value |rust :label |Rust :disabled $ Option :some true
           :examples $ []
           :schema $ :: 'List 'respo-ui.schema/SelectOption
         'render-entry $ %{} 'CodeEntry (:doc |)
@@ -1563,7 +1564,7 @@
                           {} (:type :message)
                             :demo $ {} $ :a 1
                             :html "|code <code> cc c cc </code>"
-                          %some :json
+                          Option :some :json
                   comp-cirru-snippet "|respo-ui.util/tab-echo! data :json"
                 div
                   {} $ :class-name $ str-spaced css/row css/gap8
@@ -1575,7 +1576,7 @@
                           {} (:type :message)
                             :demo $ {} $ :a 1
                             :html "|code <code> cc c cc </code>"
-                          %some :edn
+                          Option :some :edn
                   comp-cirru-snippet "|respo-ui.util/tab-echo! data :edn"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
@@ -2090,11 +2091,11 @@
               div ({})
                 div ({}) (<> |Checkboxes ui/text-label)
                 =< 0 4
-                comp-checkbox false $ %some $ respo-ui.schema/SwitchOptions :label (%some "|Option A") :disabled (%none) :on-change (%none) :class-name (%none) :style (%none)
+                comp-checkbox false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Option A") :disabled (Option :none) :on-change (Option :none) :class-name (Option :none) :style (Option :none)
                 =< 0 4
-                comp-checkbox true $ %some $ respo-ui.schema/SwitchOptions :label (%some "|Option B (default checked)") :disabled (%none) :on-change (%none) :class-name (%none) :style (%none)
+                comp-checkbox true $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Option B (default checked)") :disabled (Option :none) :on-change (Option :none) :class-name (Option :none) :style (Option :none)
                 =< 0 4
-                comp-checkbox false $ %some $ respo-ui.schema/SwitchOptions :label (%some "|Option C (disabled)") :disabled (%some true) :on-change (%none) :class-name (%none) :style (%none)
+                comp-checkbox false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Option C (disabled)") :disabled (Option :some true) :on-change (Option :none) :class-name (Option :none) :style (Option :none)
               =< 0 8
               comp-tags-styles
           :examples $ []
@@ -2412,7 +2413,7 @@
           :code $ quote $ defstyle checkbox
             {} (|$0 ui/checkbox)
               |$0:focus $ {} (:outline :none)
-                :box-shadow $ str "|0 0 0 2px " $ hsl 220 80 80 (%some 0.3)
+                :box-shadow $ str "|0 0 0 2px " $ hsl 220 80 80 (Option :some 0.3)
           :examples $ []
           :schema $ :: 'String
         'checkbox-label $ %{} 'CodeEntry (:doc |)
@@ -2536,7 +2537,7 @@
             {} (|$0 ui/input)
               |$0:focus $ {}
                 :border $ str "|1px solid " $ hsl 200 50 75
-                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (%some 0.2)
+                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (Option :some 0.2)
           :examples $ []
           :schema $ :: 'String
         'link $ %{} 'CodeEntry (:doc |)
@@ -2567,7 +2568,7 @@
               |::-webkit-scrollbar $ {} (:width 4) (:height 4)
               |::-webkit-scrollbar-track $ {} $ :background-color (hsl 0 0 100)
               |::-webkit-scrollbar-thumb $ {} $ :background-color
-                hsl 180 40 76 $ %some 0.8
+                hsl 180 40 76 $ Option :some 0.8
               |::-webkit-scrollbar-corner $ {} $ :background-color :transparent
               |::-webkit-resizer $ {} $ :background-color :transparent
           :examples $ []
@@ -2621,7 +2622,7 @@
             {} (|$0 ui/select)
               |$0:focus $ {}
                 :border $ str "|1px solid " $ hsl 200 50 75
-                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (%some 0.2)
+                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (Option :some 0.2)
           :examples $ []
           :schema $ :: 'String
         'split-layout $ %{} 'CodeEntry
@@ -2661,7 +2662,7 @@
             {} (|$0 ui/textarea)
               |$0:focus $ {}
                 :border $ str "|1px solid " $ hsl 200 50 75
-                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (%some 0.2)
+                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (Option :some 0.2)
           :examples $ []
           :schema $ :: 'String
         'with-sidebar $ %{} 'CodeEntry
@@ -3057,7 +3058,7 @@
           :schema $ :: 'Enum
         'make-tabs-options $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn make-tabs-options (selected vertical? width style)
-            TabsOptions :selected (%some selected) :vertical? vertical? :width width :class-name (%none) :style style :tab-class-name (%none) :tab-style (%none) :selected-tab-style $ %none
+            TabsOptions :selected (Option :some selected) :vertical? vertical? :width width :class-name (Option :none) :style style :tab-class-name (Option :none) :tab-style (Option :none) :selected-tab-style $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] 'Tag (:: 'calcit.core/Option 'Bool) (:: 'calcit.core/Option 'Number)
