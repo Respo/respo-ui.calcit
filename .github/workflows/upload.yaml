@@ -38,6 +38,7 @@ jobs:
 
       - name: Validate and compile
         run: |
+          set -euo pipefail
           caps --strict --ci
           yarn install --immutable
           caps deps.cirru verify --toolchain
@@ -45,6 +46,7 @@ jobs:
           git diff --exit-code -- calcit.cirru
           calcit calcit.cirru --check-only
           calcit calcit.cirru test --require-match --summary-only --format json
+          yarn test:js
           calcit calcit.cirru analyze check-public --ns 'respo-ui.$meta' --ns respo-ui.comp --ns respo-ui.comp.components --ns respo-ui.comp.container --ns respo-ui.comp.docs --ns respo-ui.comp.fonts-page --ns respo-ui.comp.home --ns respo-ui.comp.layouts-page --ns respo-ui.comp.sidebar --ns respo-ui.comp.widgets-page --ns respo-ui.config --ns respo-ui.core --ns respo-ui.css --ns respo-ui.main --ns respo-ui.router --ns respo-ui.schema --ns respo-ui.util --summary-only --format json
           calcit calcit.cirru analyze check-examples --ns respo-ui.schema
           calcit calcit.cirru analyze check-examples --ns respo-ui.comp --js

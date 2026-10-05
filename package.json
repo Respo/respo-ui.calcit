@@ -1,7 +1,10 @@
 {
-  "version": "0.7.32-alpha.3",
+  "version": "0.7.32-alpha.4",
+  "scripts": {
+    "test:js": "node scripts/test-ui-js.mjs"
+  },
   "dependencies": {
-    "@calcit/procs": "0.27.0",
+    "@calcit/procs": "0.29.0-alpha.6",
     "copy-text-to-clipboard": "^3.2.0",
     "dayjs": "^1.11.13"
   },
