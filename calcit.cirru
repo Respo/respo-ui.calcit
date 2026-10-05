@@ -37,7 +37,7 @@
             div
               {} (:role |alert)
                 :class-name $ str-spaced style-alert
-                  case-default kind style-alert-info (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error)
+                  match kind (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error) (_ style-alert-info)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               if (literal? content) (<> content) content
@@ -77,7 +77,7 @@
                           :style $ {} $ :grid-column
                             let
                                 sp $ &map:get item :span
-                              if (some? sp) (str-spaced |span sp) |
+                              if (non-nil? sp) (str-spaced |span sp) |
                           :class-name $ str-spaced style-item $ :css-item options
                         div
                           {} $ :class-name $ str-spaced css-item-label (:css-label options)
@@ -105,11 +105,11 @@
               {}
                 :title $ respo-ui.schema/read-field options :title
                 :class-name $ str-spaced style-avatar
-                  case-default (respo-ui.schema/read-field options :size) | (:small style-avatar-small) (:large style-avatar-large)
+                  match (respo-ui.schema/read-field options :size) (:small style-avatar-small) (:large style-avatar-large) (_ |)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               if
-                some? $ respo-ui.schema/read-field options :src
+                non-nil? $ respo-ui.schema/read-field options :src
                 create-element :img $ {}
                   :src $ respo-ui.schema/read-field options :src
                   :alt $ either (respo-ui.schema/read-field options :alt) (str text)
@@ -133,7 +133,7 @@
                 :type $ either (respo-ui.schema/read-field options :type) |button
                 :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :class-name $ str-spaced
-                  case-default (respo-ui.schema/read-field options :kind) css/button (:primary css/button-primary) (:danger css/button-danger) (:danger-outline css/button-danger-outline)
+                  match (respo-ui.schema/read-field options :kind) (:primary css/button-primary) (:danger css/button-danger) (:danger-outline css/button-danger-outline) (_ css/button)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
                 :on-click $ respo-ui.schema/read-field options :on-click
@@ -157,7 +157,7 @@
                 :class-name $ str-spaced style-card $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               when
-                some? $ respo-ui.schema/read-field options :title
+                non-nil? $ respo-ui.schema/read-field options :title
                 div
                   {} $ :class-name style-card-title
                   <> $ either (respo-ui.schema/read-field options :title) |
@@ -165,7 +165,7 @@
                 {} $ :class-name style-card-body
                 if (literal? content) (<> content) content
               when
-                some? $ respo-ui.schema/read-field options :footer
+                non-nil? $ respo-ui.schema/read-field options :footer
                 div
                   {} $ :class-name style-card-footer
                   respo-ui.schema/read-field options :footer
@@ -200,13 +200,13 @@
                   fn (e d!)
                     let
                         on-change $ respo-ui.schema/read-field options :on-change
-                      when (some? on-change)
+                      when (non-nil? on-change)
                         on-change
                           or (&map:get e :checked) false
                           , d!
                     , &unit
               if
-                some? $ respo-ui.schema/read-field options :label
+                non-nil? $ respo-ui.schema/read-field options :label
                 <> $ str $ respo-ui.schema/read-field options :label
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
@@ -273,19 +273,19 @@
               div
                 {} $ :class-name style-empty-icon
                 if
-                  some? $ respo-ui.schema/read-field options :icon
+                  non-nil? $ respo-ui.schema/read-field options :icon
                   respo-ui.schema/read-field options :icon
                   <> "|◇"
               div
                 {} $ :class-name style-empty-title
                 <> title
               when
-                some? $ respo-ui.schema/read-field options :description
+                non-nil? $ respo-ui.schema/read-field options :description
                 div
                   {} $ :class-name style-empty-description
                   <> $ either (respo-ui.schema/read-field options :description) |
               when
-                some? $ respo-ui.schema/read-field options :action
+                non-nil? $ respo-ui.schema/read-field options :action
                 div ({}) (respo-ui.schema/read-field options :action)
           :examples $ [] $ quote
             comp-empty "|No results" $ %some $ %{} respo-ui.schema/EmptyOptions
@@ -351,7 +351,7 @@
                 :on-change $ fn (e d!)
                   let
                       on-change $ respo-ui.schema/read-field options :on-change
-                    when (some? on-change)
+                    when (non-nil? on-change)
                       on-change
                         str $ &map:get e :value
                         fn (op) (d! op)
@@ -381,20 +381,20 @@
           :code $ quote $ defcomp comp-skeleton (options)
             div $ {}
               :role $ if
-                some? $ respo-ui.schema/read-field options :label
+                non-nil? $ respo-ui.schema/read-field options :label
                 , |status |
               :aria-label $ respo-ui.schema/read-field options :label
               :aria-hidden $ nil? $ respo-ui.schema/read-field options :label
               :class-name $ str-spaced style-skeleton
                 if
-                  = :circle $ respo-ui.schema/read-field options :kind
+                  = :circle $ either (respo-ui.schema/read-field options :kind) :text
                   , style-skeleton-circle style-skeleton-text
                 respo-ui.schema/read-field options :class-name
               :style $ ui/merge-styles
                 {}
                   :width $ respo-ui.schema/read-field options :width
                   :height $ respo-ui.schema/read-field options :height
-                respo-ui.schema/read-field options :style
+                either (respo-ui.schema/read-field options :style) ({})
           :examples $ [] $ quote
             comp-skeleton $ %some $ %{} respo-ui.schema/SkeletonOptions
               :label $ %some "|Loading title"
@@ -448,7 +448,7 @@
                 :on-change $ fn (e d!)
                   let
                       on-change $ respo-ui.schema/read-field options :on-change
-                    when (some? on-change)
+                    when (non-nil? on-change)
                       on-change
                         or (&map:get e :checked) false
                         fn (op) (d! op)
@@ -456,7 +456,7 @@
               span $ {} $ :class-name
                 str-spaced style-switch-track $ if checked style-switch-track-checked
               when
-                some? $ respo-ui.schema/read-field options :label
+                non-nil? $ respo-ui.schema/read-field options :label
                 span ({})
                   <> $ either (respo-ui.schema/read-field options :label) |
           :examples $ [] $ quote
@@ -524,7 +524,7 @@
             div
               {}
                 :class-name $ str-spaced style-tag
-                  case-default kind | (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error)
+                  match kind (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error) (_ |)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
                 :on-click $ either (respo-ui.schema/read-field options :on-click)
@@ -2720,21 +2720,41 @@
             if config/dev? $ load-console-formatter!
             println "|Running mode:" $ if config/dev? |dev |release
             render-router!
-            add-watch *store :changes $ fn (store prev) (render-app!)
+            add-watch! *store :changes $ fn (store prev)
+              hint-fn $ {}
+                :args $ [] 'respo-ui.schema/Store 'respo-ui.schema/Store
+                :return 'Unit
+              render-app!
+              , &unit
             listen! router/dict dispatch! router/mode
-            add-watch *store :router-changes $ fn (store prev) (render-router!)
+            add-watch! *store :router-changes $ fn (store prev)
+              hint-fn $ {}
+                :args $ [] 'respo-ui.schema/Store 'respo-ui.schema/Store
+                :return 'Unit
+              render-router!
+              , &unit
             render-app!
             println "|App started!"
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Dynamic)
+          :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
             :features $ #{} :js-ffi
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
-              do (remove-watch *store :changes) (remove-watch *store :router-changes) (clear-cache!)
-                add-watch *store :changes $ fn (store prev) (render-app!)
-                add-watch *store :router-changes $ fn (store prev) (render-router!)
+              do (remove-watch! *store :changes) (remove-watch! *store :router-changes) (clear-cache!)
+                add-watch! *store :changes $ fn (store prev)
+                  hint-fn $ {}
+                    :args $ [] 'respo-ui.schema/Store 'respo-ui.schema/Store
+                    :return 'Unit
+                  render-app!
+                  , &unit
+                add-watch! *store :router-changes $ fn (store prev)
+                  hint-fn $ {}
+                    :args $ [] 'respo-ui.schema/Store 'respo-ui.schema/Store
+                    :return 'Unit
+                  render-router!
+                  , &unit
                 render-app!
                 hud! |ok~ |Ok
                 println "|Code updated!"
@@ -2743,6 +2763,7 @@
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
+            :features $ #{} :js-ffi
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
             render! (get-mount-target) (comp-container @*store) dispatch!
@@ -3090,21 +3111,92 @@
         'route-from-router $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn route-from-router (store)
             let
-                raw-route $ &list:nth
-                  assert-type (:: 'List 'Dynamic) (:path store.:router)
-                  , 0
-              match raw-route
-                (:index) (PageRoute :index)
-                (:widgets) (PageRoute :widgets)
-                (:layouts) (PageRoute :layouts)
-                (:fonts) (PageRoute :fonts)
-                (:components) (PageRoute :components)
-                (:utils) (PageRoute :utils)
-                (:404 path) (PageRoute :not-found path)
-                _ $ PageRoute :index
+                raw-path $ .unwrap-or
+                  get (:router store) :path
+                  []
+                path $ if (list? raw-path) raw-path $ raise "|Router path must be a List"
+              match (first path)
+                (:none) (PageRoute :index)
+                (:some raw-route)
+                  if (enum? raw-route)
+                    match raw-route
+                      (:index) (PageRoute :index)
+                      (:widgets) (PageRoute :widgets)
+                      (:layouts) (PageRoute :layouts)
+                      (:fonts) (PageRoute :fonts)
+                      (:components) (PageRoute :components)
+                      (:utils) (PageRoute :utils)
+                      (:404 path)
+                        PageRoute :not-found $ .join-string (respo-router.schema/path-segments path) |/
+                      _ $ PageRoute :index
+                    raise "|Router route must be an Enum"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo-ui.schema/PageRoute)
             :args $ [] 'respo-ui.schema/Store
+          :tests $ []
+            %{} 'TestEntry (:name |missing-and-empty-path)
+              :code $ quote $ do
+                assert= (PageRoute :index)
+                  route-from-router $ Store :router ({}) :states $ {}
+                assert= (PageRoute :index)
+                  route-from-router $ Store :router
+                    {} $ :path $ []
+                    , :states $ {}
+              :tags $ #{} :boundary :router
+            %{} 'TestEntry (:name |all-published-page-routes)
+              :code $ quote $ do
+                assert= (PageRoute :index)
+                  route-from-router $ Store :router (parse-address |/index.html dict) :states $ {}
+                assert= (PageRoute :index)
+                  route-from-router $ Store :router (parse-address |/dev.html dict) :states $ {}
+                assert= (PageRoute :widgets)
+                  route-from-router $ Store :router (parse-address |/widgets.html dict) :states $ {}
+                assert= (PageRoute :layouts)
+                  route-from-router $ Store :router (parse-address |/layouts.html dict) :states $ {}
+                assert= (PageRoute :fonts)
+                  route-from-router $ Store :router (parse-address |/fonts.html dict) :states $ {}
+                assert= (PageRoute :components)
+                  route-from-router $ Store :router (parse-address |/components.html dict) :states $ {}
+                assert= (PageRoute :utils)
+                  route-from-router $ Store :router (parse-address |/utils.html dict) :states $ {}
+              :tags $ #{} :regression :router
+            %{} 'TestEntry (:name |published-router-unicode-404)
+              :code $ quote $ assert= (PageRoute :not-found "|missing/中文😀")
+                route-from-router $ Store :router (parse-address "|/missing/中文😀" dict) :states $ {}
+              :tags $ #{} :boundary :router
+            %{} 'TestEntry (:name |reject-wrong-path-container)
+              :code $ quote $ assert= "|Router path must be a List"
+                try
+                  route-from-router $ Store :router
+                    {} $ :path |wrong
+                    , :states $ {}
+                  fn (error) error
+              :tags $ #{} :boundary :router
+            %{} 'TestEntry (:name |reject-non-enum-route)
+              :code $ quote $ assert= "|Router route must be an Enum"
+                try
+                  route-from-router $ Store :router
+                    {} $ :path $ [] |wrong
+                    , :states $ {}
+                  fn (error) error
+              :tags $ #{} :boundary :router
+            %{} 'TestEntry (:name |reject-wrong-404-container)
+              :code $ quote $ assert= "|[respo-router/path-segments] expected List"
+                try
+                  route-from-router $ Store :router
+                    {} $ :path $ [] (:: :404 |wrong)
+                    , :states $ {}
+                  fn (error) error
+              :tags $ #{} :boundary :router
+            %{} 'TestEntry (:name |reject-wrong-404-element)
+              :code $ quote $ assert= "|[respo-router/path-segments] expected String segment"
+                try
+                  route-from-router $ Store :router
+                    {} $ :path $ []
+                      :: :404 $ [] 1
+                    , :states $ {}
+                  fn (error) error
+              :tags $ #{} :boundary :router
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
             Store :router ({}) :states $ {}
@@ -3134,20 +3226,7 @@
               :code $ quote $ assert= |&amp;#60;script&amp;#62; (santinize-html-text |&#60;script&#62;)
         'tab-echo! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn tab-echo! (data format)
-            case-default (option:unwrap-or format :viewer)
-              let
-                  content $ format-cirru-edn $ :: :tab-echo data
-                  app |https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev
-                option:fold (browser/window-open app)
-                  fn () &unit
-                  fn (window)
-                    browser/set-timeout!
-                      fn () $ window .post-message! content |https://r.tiye.me
-                      , 20
-                    browser/set-timeout!
-                      fn () $ window .post-message! content |https://r.tiye.me
-                      , 200
-                    , &unit
+            match (option:unwrap-or format :viewer)
               :json $ let
                   content $ unsafe-coerce
                     js/JSON.stringify (to-js-data data) js/undefined 2
@@ -3169,6 +3248,19 @@
                         document window.:document
                       respo.dom/set-inner-html! (unsafe-coerce document.:body 'respo.dom/DomElement)
                         str |<pre> (santinize-html-text content) |</pre>
+                    , &unit
+              _ $ let
+                  content $ format-cirru-edn $ :: :tab-echo data
+                  app |https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev
+                option:fold (browser/window-open app)
+                  fn () &unit
+                  fn (window)
+                    browser/set-timeout!
+                      fn () $ window .post-message! content |https://r.tiye.me
+                      , 20
+                    browser/set-timeout!
+                      fn () $ window .post-message! content |https://r.tiye.me
+                      , 200
                     , &unit
             , &unit
           :examples $ []

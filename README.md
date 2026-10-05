@@ -38,8 +38,41 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 生产 COS 前缀仍为 `Respo/respo-ui.calcit/`，原服务器部署路径不变；
 生产运行排队执行，不取消正在上传的任务。Fork PR 仅构建，不使用部署 secrets。
 
-本次仅更新部署配置，保留现有 Calcit 0.27.0、依赖和质量门禁。
-Calcit 0.28.0 的类型迁移另行推进，不能将本次构建通过视为最新版本迁移完成。
+### Calcit 0.29 预发布验证
+
+候选 UI `0.7.32-alpha.4` 使用已发布 Calcit CLI/runtime `0.29.0-alpha.6`、
+Respo `0.16.114-alpha.7`、Router `0.8.28-alpha.5` 和 js-ffi `0.2.1-alpha.13`。
+模块 tag 尚未发布前，不要将候选分支视为已发布依赖。
+
+路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
+回到首页。404 payload 按 Router 的真实契约校验为 `List<String>`，再以 `/` 拼接为
+`PageRoute :not-found` 的 String，不使用 `assert-type` 假装运行时解码。
+Skeleton 缺省 kind 为文本形状，缺省 style 为无覆盖；显式 circle、可访问标签和
+样式覆盖保持不变。
+
+升级与排查优先使用现有 CLI：
+
+```bash
+caps --strict --ci
+yarn install --immutable
+caps deps.cirru verify --toolchain
+calcit calcit.cirru query context respo-ui.schema/route-from-router --format edn
+calcit calcit.cirru --check-only
+calcit calcit.cirru test --require-match
+yarn test:js
+calcit calcit.cirru analyze check-public --ns respo-ui.schema --ns respo-ui.comp
+calcit calcit.cirru js
+yarn vite build
+```
+
+完整公开检查仍覆盖原 17 个命名空间（264 个定义）；原 2 项附带测试、15 个 schema
+示例、14 个 JS component 示例及原质量预算保留。新增路由 `:tests` 在 native 与
+真实生成 JS 中重放同一份 AST；JS 另验证 3 组 skeleton 渲染。回放只通过 CLI 修改
+隔离 Snapshot，不修改 canonical 源码或模块缓存，也不修补生成文件的跨模块路径。
+组件 CSS 依赖 JS 宿主，不宣称支持 native 或 WASM 渲染。
+
+最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
+该步骤不代替 Reel/Alerts/Diary 的完整应用验收，也不代表稳定 Calcit 0.29 已就绪。
 
 ### License
 
