@@ -49,12 +49,12 @@
           :code $ quote $ defcomp comp-attributes (options)
             let
                 items $ :items options
-                item-width $ option:unwrap-or options.:item-width 160
+                item-width $ .unwrap-or (:item-width options) 160
                 item-height $ :item-height options
                 title $ :title options
                 ret $ list->
                   {}
-                    :class-name $ :class-name options
+                    :class-name $ .unwrap-or (:class-name options) |
                     :style $ ui/merge-styles
                       {} (:display :grid)
                         :grid-template-columns $ str "|repeat(auto-fit, minmax(" item-width "|px,1fr))"
@@ -78,19 +78,21 @@
                             let
                                 sp $ &map:get item :span
                               if (non-nil? sp) (str-spaced |span sp) |
-                          :class-name $ str-spaced style-item $ :css-item options
+                          :class-name $ str-spaced style-item $ .unwrap-or (:css-item options) |
                         div
-                          {} $ :class-name $ str-spaced css-item-label (:css-label options)
+                          {} $ :class-name $ str-spaced css-item-label
+                            .unwrap-or (:css-label options) |
                           <> $ &map:get item :label
                         div
-                          {} $ :class-name $ :css-value options
+                          {} $ :class-name $ .unwrap-or (:css-value options) |
                           let
                               v $ &map:get item :value
                             if (literal? v) (<> v) v
               if (option:some? title)
                 div ({})
                   div
-                    {} $ :class-name $ str-spaced style-attributes-title (:css-title options)
+                    {} $ :class-name $ str-spaced style-attributes-title
+                      .unwrap-or (:css-title options) |
                     <> $ option:unwrap-or title |
                   , ret
                 , ret
@@ -1090,12 +1092,13 @@
               =< 0 8
               div
                 {} $ :class-name $ str-spaced css/row css/gap8
-                comp-cirru-snippet "|respo-ui.comp/comp-attributes\n\n\ncomp-attributes $ {} (:title \"\\\"Attributes DEMO\")\n  :items $ [] (:: :attr \"\\\"Demo\" \"\\\"content\")\n    :: :attr \"\\\"Demo 2\" \"\\\"content 2\"\n    :: :attr-span \"\\\"DEMO 2\" \"\\\"content 2\" 2\n    :: :attr \"\\\"Demo 2\" \"\\\"content 2\"\n    :: :attr \"\\\"Demo 2\" \"\\\"content 2\"\n    :: :attr \"\\\"DEMO 3\" $ a\n      {} (:inner-text \"\\\"Demo\")\n        :href \"\\\"https://respo-mvc.org\"\n        :target \"\\\"_blank\"\n"
+                comp-cirru-snippet "|respo-ui.comp/comp-attributes\n\ncomp-attributes $ respo-ui.schema/AttributesOptions\n  :items $ [] $ :: :attr |Demo |content\n  :title $ Option :some |Attributes\n  :item-width $ Option :none\n  :item-height $ Option :none\n  :class-name $ Option :none\n  :style $ Option :none\n  :css-item $ Option :none\n  :css-label $ Option :none\n  :css-value $ Option :none\n  :css-title $ Option :none"
                 div
                   {} $ :class-name css/flex
-                  comp-attributes $ {} (:title "|Attributes DEMO")
-                    :items $ [] (:: :attr |Demo |content) (:: :attr "|Demo 2" "|content 2") (:: :attr-span "|DEMO 2" "|content 2" 2) (:: :attr "|Demo 2" "|content 2") (:: :attr "|Demo 2" "|content 2")
+                  comp-attributes $ respo-ui.schema/AttributesOptions :items
+                    [] (:: :attr |Demo |content) (:: :attr "|Demo 2" "|content 2") (:: :attr-span "|DEMO 2" "|content 2" 2) (:: :attr "|Demo 2" "|content 2") (:: :attr "|Demo 2" "|content 2")
                       :: :attr "|DEMO 3" $ a $ {} (:inner-text |Demo) (:href |https://respo-mvc.org) (:target |_blank)
+                    , :title (Option :some "|Attributes DEMO") :item-width (Option :none) :item-height (Option :none) :class-name (Option :none) :style (Option :none) :css-item (Option :none) :css-label (Option :none) :css-value (Option :none) :css-title $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []

@@ -71,6 +71,20 @@ try {
   operations.push(["edit", "schema", browser, "--input-format", "cirru", "--code",
     "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)"]);
   calls.push([browser]);
+  // Exercise every real showcase route, not only isolated component examples.
+  const pages = "respo-ui.comp.container/replay-js-pages";
+  const routes = ["index", "layouts", "widgets", "fonts", "components", "utils"];
+  const pageScenarios = routes.flatMap((route) => [["println", `|Showcase route: ${route}`], ["let", [["html", ["respo.render.html/make-string", ["comp-container",
+    ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address", `|/${route}.html`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
+    ["assert", [".includes?", "html", "|Respo UI"], `|Showcase route ${route} must render`],
+    ...(route === "components" ? ["Component examples", "Attributes DEMO", "Tabs demo"].map((text) =>
+      ["assert", [".includes?", "html", `|${text}`], `|Missing component showcase section: ${text}`]) : []),
+  ]]);
+  operations.push(["edit", "def", pages, "--input-format", "json-ast", "--code",
+    JSON.stringify(["defn", "replay-js-pages", [], ...pageScenarios, "&unit"])]);
+  operations.push(["edit", "schema", pages, "--input-format", "cirru", "--code",
+    "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)"]);
+  calls.push([pages]);
   const entry = "respo-ui.util/replay-all-attached";
   operations.push(["edit", "def", entry, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-all-attached", [], ...calls, "&unit"])]);
@@ -86,7 +100,7 @@ try {
   const generated = await import(pathToFileURL(path.join(output, "respo-ui.util.mjs")).href);
   assert.equal(typeof generated.replay_all_attached, "function");
   generated.replay_all_attached();
-  console.log(`Generated JS replay passed: ${listed.selected}/${listed.selected} attached ASTs and ${scenarios.length} skeleton render scenarios`);
+  console.log(`Generated JS replay passed: ${listed.selected}/${listed.selected} attached ASTs, ${scenarios.length} skeleton scenarios and ${routes.length} showcase routes`);
 } finally {
   assert.deepEqual(readFileSync(path.join(root, "calcit.cirru")), original, "Canonical Snapshot changed during replay");
   // This uniquely created child contains only this run's copied Snapshot and output.

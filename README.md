@@ -67,7 +67,10 @@ yarn vite build
 
 完整公开检查仍覆盖原 17 个命名空间（264 个定义）；原 2 项附带测试、15 个 schema
 示例、14 个 JS component 示例及原质量预算保留。新增路由 `:tests` 在 native 与
-真实生成 JS 中重放同一份 AST；JS 另验证 3 组 skeleton 渲染。回放只通过 CLI 修改
+真实生成 JS 中重放同一份 AST；JS 另验证 3 组 skeleton 渲染，以及首页、Layouts、
+Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Attributes demo
+使用完整的 `AttributesOptions`，组件先解包各 Option 字段再生成 CSS/DOM 属性，
+不将业务 Map 冒充具名 Struct。回放只通过 CLI 修改
 隔离 Snapshot，不修改 canonical 源码或模块缓存，也不修补生成文件的跨模块路径。
 组件 CSS 依赖 JS 宿主，不宣称支持 native 或 WASM 渲染。
 
