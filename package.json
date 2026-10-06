@@ -1,5 +1,5 @@
 {
-  "version": "0.7.32-alpha.4",
+  "version": "0.7.32-alpha.5",
   "scripts": {
     "test:js": "node scripts/test-ui-js.mjs"
   },
