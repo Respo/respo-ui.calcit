@@ -616,7 +616,9 @@
           :code $ quote $ defeffect effect-dataset-text (text) (action el at?)
             when
               or (= action :update) (= action :mount)
-              browser/element-data-set! (unsafe-coerce el 'js-ffi.browser/DomElementHost) |text text
+              if (string? text)
+                browser/element-data-set! (unsafe-coerce el 'js-ffi.browser/DomElementHost) |text text
+                raise "|effect-dataset-text expected a String text"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Effect)
             :args $ [] 'String
@@ -2693,6 +2695,7 @@
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ shared/console-log! $ str |Dispatch: op
             reset! *store $ updater @*store op
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'Dynamic
