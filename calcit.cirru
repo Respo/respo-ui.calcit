@@ -2687,7 +2687,7 @@
     'respo-ui.main $ %{} 'FileEntry
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defatom *store
+          :code $ quote $ defref *store
             assoc schema/store :router $ initial-router
           :examples $ []
           :schema $ :: 'Ref 'respo-ui.schema/Store
