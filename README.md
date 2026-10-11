@@ -84,6 +84,19 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 原来的缺少 mode 配置提示。路由表 schema 收紧为 `List<Enum>`，不改变路由数据格式；
 原预算保持不变，仍有 37 处未解决类型债务及 12 处已有 unsafe 边界，不能视为全部类型闭合。
 
+### Typed tab callbacks / 带类型的 tab 回调
+
+`comp-tabs` preserves the caller's operation type in its `on-route` callback:
+the second argument is `Fn<Op, Unit>`, not an opaque `DynFn`. The event adapter
+forwards each operation to Respo's dispatch function, like `comp-select` does.
+Callers can dispatch their own typed operations without assertions; no global
+dispatch type slot is required by this component library.
+
+`comp-tabs` 的 `on-route` 回调保留调用方的操作类型，第二个参数为
+`Fn<Op, Unit>`，而不是不能直接调用的 `DynFn`。事件适配器与 `comp-select`
+一样将操作转发给 Respo dispatch；调用方无需强转即可发送自己的带类型操作，
+组件库也不要求绑定全局 dispatch 类型槽。
+
 ### License
 
 MIT
