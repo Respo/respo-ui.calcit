@@ -38,10 +38,10 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 生产 COS 前缀仍为 `Respo/respo-ui.calcit/`，原服务器部署路径不变；
 生产运行排队执行，不取消正在上传的任务。Fork PR 仅构建，不使用部署 secrets。
 
-### Calcit 0.29 预发布验证
+### Calcit 0.29 稳定版迁移
 
-当前源码使用已发布 Calcit CLI/runtime `0.29.0-alpha.6`、
-Respo `0.16.114-alpha.8`、Router `0.8.28-alpha.6` 和 js-ffi `0.2.1-alpha.13`。
+当前候选使用 Calcit CLI/runtime `0.29.0`、
+Respo `0.16.114`、Router `0.8.28` 和 js-ffi `0.2.1`。
 模块 tag 尚未发布前，不要将候选分支视为已发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
@@ -60,7 +60,7 @@ calcit calcit.cirru query context respo-ui.schema/route-from-router --format edn
 calcit calcit.cirru --check-only
 calcit calcit.cirru test --require-match
 yarn test:js
-calcit calcit.cirru analyze check-public --ns respo-ui.schema --ns respo-ui.comp
+calcit calcit.cirru --check-only --ns respo-ui.schema --ns respo-ui.comp
 calcit calcit.cirru js
 yarn vite build
 ```
@@ -75,7 +75,14 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 组件 CSS 依赖 JS 宿主，不宣称支持 native 或 WASM 渲染。
 
 最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
-该步骤不代替 Reel/Alerts/Diary 的完整应用验收，也不代表稳定 Calcit 0.29 已就绪。
+该步骤不代替 Reel/Alerts/Diary 的完整应用验收。
+
+稳定版候选已通过严格 Caps 依赖图、CLI/runtime 配对、不可变锁文件、444 项严格
+检查（含可达依赖）、264 项完整公开定义检查、原有 9 项 native/JS 附带测试、
+15 个 schema 示例、14 个 JS component 示例和生产构建。浏览器中检查了全部 6 个
+展示入口、文本输入、checkbox/select、后退和刷新，控制台无错误；开发模式仍有
+原来的缺少 mode 配置提示。路由表 schema 收紧为 `List<Enum>`，不改变路由数据格式；
+原预算保持不变，仍有 37 处未解决类型债务及 12 处已有 unsafe 边界，不能视为全部类型闭合。
 
 ### License
 

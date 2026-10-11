@@ -2826,7 +2826,7 @@
               :: :components $ [] |components.html
               :: :utils $ [] |utils.html
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'List 'Enum
         'mode $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def mode :hash
           :examples $ []
