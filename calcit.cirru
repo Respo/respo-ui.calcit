@@ -513,14 +513,17 @@
                                   if selected?
                                     if (option:some? options.:selected-tab-style) (option:unwrap options.:selected-tab-style) ({})
                                     {}
-                                :on-click $ fn (e d!) (on-route item d!)
+                                :on-click $ fn (e d!)
+                                  on-route item $ fn (op) (d! op)
                               <> display
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] (:: 'respo-ui.schema/TabsOptions 'Value) (:: 'List 'Item)
               :: 'Fn $ {} (:return 'Unit)
-                :args $ [] (:: 'respo-ui.schema/TabRoute 'Value) 'DynFn
-            :generics $ [] 'Value 'Item
+                :args $ [] (:: 'respo-ui.schema/TabRoute 'Value)
+                  :: 'Fn $ {} (:return 'Unit)
+                    :args $ [] 'Op
+            :generics $ [] 'Value 'Item 'Op
         'comp-tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-tag (kind content options)
             div
@@ -1422,8 +1425,10 @@
           :code $ quote $ defn ignore-tab-route (route dispatch!) &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] (:: 'respo-ui.schema/TabRoute 'Value) 'DynFn
-            :generics $ [] 'Value
+            :args $ [] (:: 'respo-ui.schema/TabRoute 'Value)
+              :: 'Fn $ {} (:return 'Unit)
+                :args $ [] 'Op
+            :generics $ [] 'Value 'Op
         'language-options $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def language-options
             []
