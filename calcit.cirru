@@ -213,7 +213,7 @@
                 :style $ respo-ui.schema/read-field options :style
               input $ {} (:type |checkbox) (:class-name css/checkbox) (:checked checked)
                 :disabled $ or (respo-ui.schema/read-field options :disabled) false
-                :on $ {} $ :change
+                :on $ {} $ :input
                   fn (e d!)
                     hint-fn $ {}
                       :args $ [] (:: 'Map 'Tag 'Dynamic)
@@ -483,7 +483,7 @@
                 :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :aria-label $ respo-ui.schema/read-field options :label
                 :class-name style-switch-input
-                :on-change $ fn (e d!)
+                :on-input $ fn (e d!)
                   hint-fn $ {}
                     :args $ [] (:: 'Map 'Tag 'Dynamic)
                       :: 'Fn $ {}
