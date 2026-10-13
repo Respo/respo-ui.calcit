@@ -40,8 +40,8 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 
 ### Calcit 0.29 稳定版迁移
 
-当前 0.7.36 候选使用 Calcit CLI/runtime `0.29.3`、
-Respo `0.16.117`、Router `0.8.31` 和 js-ffi `0.2.2`。
+当前 0.7.37 候选使用 Calcit CLI/runtime `0.29.3`、
+Respo `0.16.118`、Router `0.8.32` 和 js-ffi `0.2.2`。
 模块 tag 尚未发布前，不要将候选分支视为已发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
@@ -83,7 +83,7 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 展示入口、文本输入、checkbox/select、后退和刷新，控制台无错误；开发模式仍有
 原来的缺少 mode 配置提示。路由表 schema 收紧为 `List<Enum>`，不改变路由数据格式；
 原预算保持不变，仍有 37 处未解决类型债务及 12 处已有 unsafe 边界，不能视为全部类型闭合。
-这些历史结果不能代替 0.7.36 候选在新正式依赖上的完整验收。
+这些历史结果不能代替 0.7.37 候选在新正式依赖上的完整验收。
 
 0.7.36 的 demo updater 在操作边界检查状态 cursor 的 List 容器、导航 String 和
 路由 Map。状态更新复用原 `update-state-tree`，校验外层状态 Map 后写回已知 Store 字段，
@@ -98,10 +98,20 @@ forwards each operation to Respo's dispatch function, like `comp-select` does.
 Callers can dispatch their own typed operations without assertions; no global
 dispatch type slot is required by this component library.
 
+In the 0.7.37 migration candidate, `tabs` is `List<TabRoute<Value>>`, matching
+`TabsOptions<Value>` and the callback's route value. Construct each item with
+`respo-ui.schema/TabRoute :tab value label`; the label is a String. Existing
+Map or anonymous Enum items must be migrated at the caller before upgrading.
+The component no longer maintains an untyped item-normalization branch.
+
 `comp-tabs` 的 `on-route` 回调保留调用方的操作类型，第二个参数为
 `Fn<Op, Unit>`，而不是不能直接调用的 `DynFn`。事件适配器与 `comp-select`
 一样将操作转发给 Respo dispatch；调用方无需强转即可发送自己的带类型操作，
 组件库也不要求绑定全局 dispatch 类型槽。
+
+0.7.37 候选要求项目列表为 `List<TabRoute<Value>>`，与选择值及回调关联。
+旧 Map/匿名 Enum 项目需在升级调用方时改用已有的具名 `TabRoute` 构造器，
+保留原 value/label；这里不放宽成 Dynamic，也不新增兼容改写规则。
 
 ### License
 
