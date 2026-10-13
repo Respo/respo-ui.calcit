@@ -40,7 +40,9 @@
                   match kind (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error) (_ style-alert-info)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-              if (literal? content) (<> content) content
+              if (literal? content)
+                <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
+                , content
           :examples $ [] $ quote (comp-alert :success "|Changes saved")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag 'Content $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
@@ -82,18 +84,24 @@
                         div
                           {} $ :class-name $ str-spaced css-item-label
                             .unwrap-or (:css-label options) |
-                          <> $ &map:get item :label
+                          <> $ if
+                            nil? $ &map:get item :label
+                            , | $ respo.util.format/scalar-attribute-text (&map:get item :label)
                         div
                           {} $ :class-name $ .unwrap-or (:css-value options) |
                           let
                               v $ &map:get item :value
-                            if (literal? v) (<> v) v
+                            if (literal? v)
+                              <> $ if (nil? v) | $ respo.util.format/scalar-attribute-text v
+                              , v
               if (option:some? title)
                 div ({})
                   div
                     {} $ :class-name $ str-spaced style-attributes-title
                       .unwrap-or (:css-title options) |
-                    <> $ option:unwrap-or title |
+                    <> $ if
+                      nil? $ option:unwrap-or title |
+                      , | $ respo.util.format/scalar-attribute-text (option:unwrap-or title |)
                   , ret
                 , ret
           :examples $ []
@@ -139,7 +147,9 @@
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
                 :on-click $ respo-ui.schema/read-field options :on-click
-              if (literal? content) (<> content) content
+              if (literal? content)
+                <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
+                , content
           :examples $ [] $ quote
             comp-button |Save $ %some $ %{} respo-ui.schema/ButtonOptions
               :kind $ %some :primary
@@ -162,10 +172,15 @@
                 non-nil? $ respo-ui.schema/read-field options :title
                 div
                   {} $ :class-name style-card-title
-                  <> $ either (respo-ui.schema/read-field options :title) |
+                  <> $ if
+                    nil? $ either (respo-ui.schema/read-field options :title) |
+                    , | $ respo.util.format/scalar-attribute-text
+                      either (respo-ui.schema/read-field options :title) |
               div
                 {} $ :class-name style-card-body
-                if (literal? content) (<> content) content
+                if (literal? content)
+                  <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
+                  , content
               when
                 non-nil? $ respo-ui.schema/read-field options :footer
                 div
@@ -198,13 +213,24 @@
                 :style $ respo-ui.schema/read-field options :style
               input $ {} (:type |checkbox) (:class-name css/checkbox) (:checked checked)
                 :disabled $ or (respo-ui.schema/read-field options :disabled) false
-                :on $ {} $ :change
+                :on $ {} $ :input
                   fn (e d!)
+                    hint-fn $ {}
+                      :args $ [] (:: 'Map 'Tag 'Dynamic)
+                        :: 'Fn $ {}
+                          :args $ [] 'Op
+                          :return 'Unit
+                      :return 'Unit
                     let
                         on-change $ respo-ui.schema/read-field options :on-change
                       when (non-nil? on-change)
                         on-change
-                          or (&map:get e :checked) false
+                          match
+                            try-decode-map-as
+                              or (&map:get e :checked) false
+                              , 'Bool
+                            (:ok checked-value) checked-value
+                            (:err message) (raise message)
                           , d!
                     , &unit
               if
@@ -351,12 +377,22 @@
                 :class-name $ str-spaced css/select $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
                 :on-change $ fn (e d!)
+                  hint-fn $ {}
+                    :args $ [] (:: 'Map 'Tag 'Dynamic)
+                      :: 'Fn $ {}
+                        :args $ [] 'Op
+                        :return 'Unit
+                    :return 'Unit
                   let
                       on-change $ respo-ui.schema/read-field options :on-change
                     when (non-nil? on-change)
                       on-change
                         str $ &map:get e :value
-                        fn (op) (d! op)
+                        fn (op)
+                          hint-fn $ {}
+                            :args $ [] 'Op
+                            :return 'Unit
+                          d! op
                   , &unit
               -> items $ map $ fn (item)
                 let
@@ -447,13 +483,28 @@
                 :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :aria-label $ respo-ui.schema/read-field options :label
                 :class-name style-switch-input
-                :on-change $ fn (e d!)
+                :on-input $ fn (e d!)
+                  hint-fn $ {}
+                    :args $ [] (:: 'Map 'Tag 'Dynamic)
+                      :: 'Fn $ {}
+                        :args $ [] 'Op
+                        :return 'Unit
+                    :return 'Unit
                   let
                       on-change $ respo-ui.schema/read-field options :on-change
                     when (non-nil? on-change)
                       on-change
-                        or (&map:get e :checked) false
-                        fn (op) (d! op)
+                        match
+                          try-decode-map-as
+                            or (&map:get e :checked) false
+                            , 'Bool
+                          (:ok checked-value) checked-value
+                          (:err message) (raise message)
+                        fn (op)
+                          hint-fn $ {}
+                            :args $ [] 'Op
+                            :return 'Unit
+                          d! op
                   , &unit
               span $ {} $ :class-name
                 str-spaced style-switch-track $ if checked style-switch-track-checked
@@ -488,42 +539,45 @@
                   div $ {} $ :class-name
                     str-spaced style-tab-highlight $ if vertical? style-tab-vertical-highlight
                   , & $ -> tabs $ map
-                    fn (info)
-                      let
-                          item $ cond
-                              enum? info
-                              match info $
-                                :tab value display
-                                respo-ui.schema/TabRoute :tab value $ str display
-                            (map? info)
-                              respo-ui.schema/TabRoute :tab
-                                or (&map:get info :value) (&map:get info :name)
-                                str $ or (&map:get info :display) (&map:get info :title)
-                            true $ raise "|Unknown tab value"
-                        match item $
-                          :tab value display
-                          let
-                              selected? $ and (option:some? selected)
-                                = (option:unwrap selected) value
-                            div
-                              {}
-                                :class-name $ str-spaced css-tab (option:unwrap-or options.:tab-class-name |) (if selected? style-selected-tab)
-                                :style $ ui/merge-styles
-                                  if (option:some? options.:tab-style) (option:unwrap options.:tab-style) ({})
-                                  if selected?
-                                    if (option:some? options.:selected-tab-style) (option:unwrap options.:selected-tab-style) ({})
-                                    {}
-                                :on-click $ fn (e d!)
-                                  on-route item $ fn (op) (d! op)
-                              <> display
+                    fn (item)
+                      hint-fn $ {}
+                        :args $ [] $ :: 'respo-ui.schema/TabRoute 'Value
+                        :return 'respo.schema/Element
+                      match item $
+                        :tab value display
+                        let
+                            selected? $ and (option:some? selected)
+                              = (option:unwrap selected) value
+                          div
+                            {}
+                              :class-name $ str-spaced css-tab (option:unwrap-or options.:tab-class-name |) (if selected? style-selected-tab)
+                              :style $ ui/merge-styles
+                                if (option:some? options.:tab-style) (option:unwrap options.:tab-style) ({})
+                                if selected?
+                                  if (option:some? options.:selected-tab-style) (option:unwrap options.:selected-tab-style) ({})
+                                  {}
+                              :on-click $ fn (e d!)
+                                hint-fn $ {}
+                                  :args $ [] (:: 'Map 'Tag 'Dynamic)
+                                    :: 'Fn $ {}
+                                      :args $ [] 'Op
+                                      :return 'Unit
+                                  :return 'Unit
+                                on-route item $ fn (op)
+                                  hint-fn $ {}
+                                    :args $ [] 'Op
+                                    :return 'Unit
+                                  d! op
+                            <> display
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
-            :args $ [] (:: 'respo-ui.schema/TabsOptions 'Value) (:: 'List 'Item)
+            :args $ [] (:: 'respo-ui.schema/TabsOptions 'Value)
+              :: 'List $ :: 'respo-ui.schema/TabRoute 'Value
               :: 'Fn $ {} (:return 'Unit)
                 :args $ [] (:: 'respo-ui.schema/TabRoute 'Value)
                   :: 'Fn $ {} (:return 'Unit)
                     :args $ [] 'Op
-            :generics $ [] 'Value 'Item 'Op
+            :generics $ [] 'Value 'Op
         'comp-tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-tag (kind content options)
             div
@@ -534,7 +588,7 @@
                 :style $ respo-ui.schema/read-field options :style
                 :on-click $ either (respo-ui.schema/read-field options :on-click)
                   fn $ e d!
-              <> content
+              <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag 'Content $ :: 'calcit.core/Option 'respo-ui.schema/ButtonOptions
@@ -1326,7 +1380,7 @@
           :code $ quote $ defcomp comp-demo-tabs ()
             let
                 selected :book
-                en-tabs $ [] (:: :tab :book |Book) (:: :tab :card |Card) (:: :tab :pl "|Programming language")
+                en-tabs $ [] (respo-ui.schema/TabRoute :tab :book |Book) (respo-ui.schema/TabRoute :tab :card |Card) (respo-ui.schema/TabRoute :tab :pl "|Programming language")
               div ({})
                 div
                   {} $ :class-name css-title
@@ -1341,7 +1395,7 @@
                       , en-tabs ignore-tab-route
                     comp-tabs
                       respo-ui.schema/make-tabs-options selected (Option :none) (Option :none) (Option :none)
-                      [] (:: :tab :book "|书本") (:: :tab :card "|纸牌") (:: :tab :pl "|编程语言")
+                      [] (respo-ui.schema/TabRoute :tab :book "|书本") (respo-ui.schema/TabRoute :tab :card "|纸牌") (respo-ui.schema/TabRoute :tab :pl "|编程语言")
                       , ignore-tab-route
                     comp-tabs
                       respo-ui.schema/make-tabs-options selected (Option :none) (Option :none)
@@ -1598,11 +1652,7 @@
           :schema $ :: 'String
         'random-count $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn random-count ()
-            unsafe-coerce
-              js/Math.floor $ unsafe-coerce
-                * 100 $ unsafe-coerce (js/Math.random) 'Number
-                , 'Number
-              , 'Number
+            floor $ * 100 $ js-ffi.contract/expect-number |Math.random (js/Math.random)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Number)
             :args $ []
@@ -2001,7 +2051,14 @@
           :schema $ :: 'String
         'on-route $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-route (path-name)
-            fn (e dispatch!) (dispatch! :router/nav path-name)
+            fn (e dispatch!)
+              hint-fn $ {}
+                :args $ [] (:: 'Map 'Tag 'Dynamic)
+                  :: 'Fn $ {}
+                    :args $ [] 'Dynamic
+                    :return 'Unit
+                :return 'Unit
+              dispatch! $ :: :router/nav path-name
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
             :args $ [] 'String
@@ -2746,6 +2803,7 @@
               , &unit
             render-app!
             println "|App started!"
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
@@ -3256,9 +3314,7 @@
           :code $ quote $ defn tab-echo! (data format)
             match (option:unwrap-or format :viewer)
               :json $ let
-                  content $ unsafe-coerce
-                    js/JSON.stringify (to-js-data data) js/undefined 2
-                    , 'String
+                  content $ js-ffi.contract/expect-string |JSON.stringify $ js/JSON.stringify (to-js-data data) js/undefined 2
                 option:fold (browser/window-open |about:blank)
                   fn () &unit
                   fn (window)

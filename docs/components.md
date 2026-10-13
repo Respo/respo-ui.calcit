@@ -64,13 +64,15 @@ comp-checkbox enabled? $ {}
 
 ### `comp-select (value items ? options)`
 
-A controlled native select. Each item is a map containing `:value`, `:label`, and optional `:disabled`. Options support `:disabled`, `:on-change`, `:class-name`, and `:style`; `:on-change` receives `(next-value d!)`.
+A controlled native select. Each item is a `SelectOption` record containing
+`:value`, `:label`, and optional `:disabled`. Options support `:disabled`,
+`:on-change`, `:class-name`, and `:style`; `:on-change` receives `(next-value d!)`.
 
 ```cirru
 def language-options $ []
-  %{}? SelectOption (:value |calcit) (:label |Calcit)
-  %{}? SelectOption (:value |clojure) (:label |Clojure)
-  %{}? SelectOption (:value |rust) (:label |Rust) (:disabled true)
+  SelectOption :value |calcit :label |Calcit
+  SelectOption :value |clojure :label |Clojure
+  SelectOption :value |rust :label |Rust :disabled $ Option :some true
 
 comp-select language language-options $ {}
   :on-change $ fn (next-value d!)
@@ -222,7 +224,17 @@ comp-attributes $ {}
 
 ### `comp-tabs (options tabs on-route)`
 
-`tabs` accepts `(:: :tab value display)` tuples or maps containing `:value`/`:name` and `:display`/`:title`. Inputs are normalized to `TabRoute<Value>`, which is passed to `on-route` together with the Respo dispatcher. Options use `TabsOptions<Value>` and include `:selected`, `:vertical?`, `:width`, `:class-name`, `:style`, `:tab-class-name`, `:tab-style`, and `:selected-tab-style`.
+`tabs` is a `List<TabRoute<Value>>`. Import `TabRoute` from `respo-ui.schema`
+and construct each item with `TabRoute :tab value display`. The same nominal
+item is passed to `on-route` together with the Respo dispatcher. Options use
+`TabsOptions<Value>` and include `:selected`, `:vertical?`, `:width`,
+`:class-name`, `:style`, `:tab-class-name`, `:tab-style`, and `:selected-tab-style`.
+
+When upgrading to 0.7.37, replace anonymous `(:: :tab value display)` items and
+maps with the named constructor, preserving their values and labels. Map
+`:value`/`:name` becomes `value`, and `:display`/`:title` becomes `display`;
+these old inputs are no longer normalized. Projects pinned to earlier releases
+are unaffected.
 
 ### `comp-tag (kind content ? options)`
 
