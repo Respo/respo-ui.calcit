@@ -40,8 +40,8 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 
 ### Calcit 0.29 稳定版迁移
 
-当前候选使用 Calcit CLI/runtime `0.29.1`、
-Respo `0.16.116`、Router `0.8.30` 和 js-ffi `0.2.1`。
+当前 0.7.36 候选使用 Calcit CLI/runtime `0.29.3`、
+Respo `0.16.117`、Router `0.8.31` 和 js-ffi `0.2.2`。
 模块 tag 尚未发布前，不要将候选分支视为已发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
@@ -77,12 +77,18 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
 该步骤不代替 Reel/Alerts/Diary 的完整应用验收。
 
-稳定版候选已通过严格 Caps 依赖图、CLI/runtime 配对、不可变锁文件、444 项严格
+此前 0.7.35 组合已通过严格 Caps 依赖图、CLI/runtime 配对、不可变锁文件、444 项严格
 检查（含可达依赖）、264 项完整公开定义检查、原有 9 项 native/JS 附带测试、
 15 个 schema 示例、14 个 JS component 示例和生产构建。浏览器中检查了全部 6 个
 展示入口、文本输入、checkbox/select、后退和刷新，控制台无错误；开发模式仍有
 原来的缺少 mode 配置提示。路由表 schema 收紧为 `List<Enum>`，不改变路由数据格式；
 原预算保持不变，仍有 37 处未解决类型债务及 12 处已有 unsafe 边界，不能视为全部类型闭合。
+这些历史结果不能代替 0.7.36 候选在新正式依赖上的完整验收。
+
+0.7.36 的 demo updater 在操作边界检查状态 cursor 的 List 容器、导航 String 和
+路由 Map。状态更新复用原 `update-state-tree`，校验外层状态 Map 后写回已知 Store 字段，
+不把已知 Struct 再交给 Map decoder，不插入业务默认值。原根路径及嵌套 String/Number
+key 行为保持，未知操作仍返回原 Store。动态状态值和路由载荷的后续收窄仍是未完成项。
 
 ### Typed tab callbacks / 带类型的 tab 回调
 

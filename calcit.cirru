@@ -2794,10 +2794,27 @@
         'updater $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn updater (store op)
             match op
-              (:states cursor s) (update-states store cursor s)
+              (:states cursor s)
+                match
+                  try-decode-map-as cursor $ :: 'List 'Dynamic
+                  (:ok checked-cursor)
+                    match
+                      try-decode-map-as
+                        update-state-tree (:states store) checked-cursor s
+                        :: 'Map 'Tag 'Dynamic
+                      (:ok states) (assoc store :states states)
+                      (:err error) (raise error)
+                  (:err error) (raise error)
               (:router/nav t)
-                assoc store :router $ parse-address t router/dict
-              (:router/route r) (assoc store :router r)
+                match (try-decode-map-as t 'String)
+                  (:ok path)
+                    assoc store :router $ parse-address path router/dict
+                  (:err error) (raise error)
+              (:router/route r)
+                match
+                  try-decode-map-as r $ :: 'Map 'Tag 'Dynamic
+                  (:ok route) (assoc store :router route)
+                  (:err error) (raise error)
               _ $ do (eprintln "|Unknown op:" op) store
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo-ui.schema/Store)
@@ -2806,7 +2823,7 @@
         :code $ quote $ ns respo-ui.main
           :require
             respo.core :refer $ render! clear-cache!
-            respo.cursor :refer $ update-states
+            [] respo.cursor :refer $ [] update-state-tree
             respo-ui.comp.container :refer $ comp-container
             respo-ui.router :as router
             respo-ui.schema :as schema
