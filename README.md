@@ -40,8 +40,8 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 
 ### Calcit 0.29 稳定版迁移
 
-当前 0.7.37 候选使用 Calcit CLI/runtime `0.29.3`、
-Respo `0.16.118`、Router `0.8.32` 和 js-ffi `0.2.2`。
+当前 0.7.38 候选使用 Calcit CLI/runtime `0.29.3`、
+Respo `0.16.119`、Router `0.8.33` 和 js-ffi `0.2.2`。
 模块 tag 尚未发布前，不要将候选分支视为已发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
