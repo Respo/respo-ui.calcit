@@ -23,11 +23,8 @@ acyclic and allows releases to use stable tags without cross-version pins.
 使用本地轻量 `respo-ui.comp.docs/comp-doc-block`，从而保持依赖图无环，并允许
 所有模块使用稳定 tag 发版而不产生交叉版本 pin。
 
-CI installs the released graph with `caps --strict --ci`, checks Snapshot
-format/types/tests/deprecations, and then builds with Node 24/Vite.
-
 CI 使用 `caps --strict --ci` 安装正式发布图，检查 Snapshot
-格式、类型、测试与弃用调用，再使用 Node 24/Vite 构建。
+格式、严格类型、附带测试与实际 JS/SSR 语义，再使用 Node 24/Vite 构建。
 
 ### COS / CDN 部署
 
@@ -60,7 +57,7 @@ yarn install --immutable
 caps deps.cirru verify --toolchain
 calcit calcit.cirru query context respo-ui.schema/route-from-router --format edn
 calcit calcit.cirru --check-only
-calcit calcit.cirru test --require-match
+calcit calcit.cirru test --exclude-tag js-only --require-match
 yarn test:js
 calcit calcit.cirru --check-only --ns respo-ui.schema --ns respo-ui.comp
 calcit calcit.cirru js
@@ -68,7 +65,7 @@ yarn vite build
 ```
 
 完整公开检查仍覆盖原 17 个命名空间（264 个定义）；原 2 项附带测试、15 个 schema
-示例、14 个 JS component 示例及原质量预算保留。新增路由 `:tests` 在 native 与
+示例和 14 个 JS component 示例保留。新增路由 `:tests` 在 native 与
 真实生成 JS 中重放同一份 AST；JS 另验证 3 组 skeleton 渲染，以及首页、Layouts、
 Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Attributes demo
 使用完整的 `AttributesOptions`，组件先解包各 Option 字段再生成 CSS/DOM 属性，
@@ -84,13 +81,29 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 15 个 schema 示例、14 个 JS component 示例和生产构建。浏览器中检查了全部 6 个
 展示入口、文本输入、checkbox/select、后退和刷新，控制台无错误；开发模式仍有
 原来的缺少 mode 配置提示。路由表 schema 收紧为 `List<Enum>`，不改变路由数据格式；
-原预算保持不变，仍有 37 处未解决类型债务及 12 处已有 unsafe 边界，不能视为全部类型闭合。
+当时仍有未解决类型债务及已有 unsafe 边界，不能视为全部类型闭合。
 这些历史结果不能代替 0.7.37 候选在新正式依赖上的完整验收。
 
 0.7.36 的 demo updater 在操作边界检查状态 cursor 的 List 容器、导航 String 和
 路由 Map。状态更新复用原 `update-state-tree`，校验外层状态 Map 后写回已知 Store 字段，
 不把已知 Struct 再交给 Map decoder，不插入业务默认值。原根路径及嵌套 String/Number
 key 行为保持，未知操作仍返回原 Store。动态状态值和路由载荷的后续收窄仍是未完成项。
+
+### Option 原语迁移与验证
+
+组件内部使用公开 `get` 返回的 Option，明确区分缺失与存在的值；checkbox/switch
+保留原缺省与 Bool 校验，select 保留原字符串转换和错误传播。属性表缺失 value 时
+仍不生成节点，不用空文本节点替代；`false`、`0`、空字符串和已有子节点保持原行为。
+组件参数与业务回调类型不变，不增加 Dynamic 或 unsafe。
+
+验证保留原 9 项 native 测试，JS 重放全部 10 项附带测试（包含新增的
+`js-only` 属性渲染回归），并通过真实生成的事件回调验证缺失、nil、有效值、错误
+载荷和 dispatch 失败。原 3 组 skeleton 与 6 个展示入口 SSR、严格检查、示例、
+dynamic-method 零命中、文档、构建及浏览器交互验收继续保留。
+
+移除过期的汇总/逐定义纯计数基线，以严格类型和可观察行为判断正确性；不以
+Dynamic、nil 等出现次数替代类型安全，不提高预算或放宽类型。历史记录中的旧预算
+只表示当时的验证方式。新正式配对 CLI/runtime 与依赖图验收完成前不发布本次迁移。
 
 ### Typed tab callbacks / 带类型的 tab 回调
 

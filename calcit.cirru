@@ -77,23 +77,26 @@
                       div
                         {}
                           :style $ {} $ :grid-column
-                            let
-                                sp $ &map:get item :span
-                              if (non-nil? sp) (str-spaced |span sp) |
+                            match (get item :span)
+                              (:some sp)
+                                if (non-nil? sp) (str-spaced |span sp) |
+                              (:none) |
                           :class-name $ str-spaced style-item $ .unwrap-or (:css-item options) |
                         div
                           {} $ :class-name $ str-spaced css-item-label
                             .unwrap-or (:css-label options) |
-                          <> $ if
-                            nil? $ &map:get item :label
-                            , | $ respo.util.format/scalar-attribute-text (&map:get item :label)
+                          <> $ match (get item :label)
+                            (:some label-value)
+                              if (nil? label-value) | $ respo.util.format/scalar-attribute-text label-value
+                            (:none) |
                         div
                           {} $ :class-name $ .unwrap-or (:css-value options) |
-                          let
-                              v $ &map:get item :value
-                            if (literal? v)
-                              <> $ if (nil? v) | $ respo.util.format/scalar-attribute-text v
-                              , v
+                          match (get item :value)
+                            (:some v)
+                              if (literal? v)
+                                <> $ if (nil? v) | $ respo.util.format/scalar-attribute-text v
+                                , v
+                            (:none) nil
               if (option:some? title)
                 div ({})
                   div
@@ -108,6 +111,28 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'respo-ui.schema/AttributesOptions 'Item
             :generics $ [] 'Item
+          :tests $ [] $ %{} 'TestEntry (:name |absence-migration-attributes)
+            :code $ quote $ let
+                render $ fn (items)
+                  hint-fn $ {}
+                    :generics $ [] 'Item
+                    :args $ [] $ :: 'List 'Item
+                    :return 'String
+                  respo.render.html/make-string $ comp-attributes $ respo-ui.schema/AttributesOptions :items items :title (Option :none) :item-width (Option :none) :item-height (Option :none) :class-name (Option :none) :style (Option :none) :css-item (Option :none) :css-label (Option :none) :css-value (Option :none) :css-title (Option :none)
+                absent-html $ render $ [] (&{})
+                nil-html $ render $ [] (&{} :span nil :label nil :value nil)
+                mixed-html $ render $ [] (&{} :span 0 :label 0 :value false) (&{} :span 2 :label |empty :value |) (&{} :span false :label false :value 0)
+                child-html $ render $ []
+                  &{} :label |child :value $ respo.core/<> |child-boundary
+              assert= absent-html nil-html
+              assert= true $ .includes? mixed-html "|span 0"
+              assert= true $ .includes? mixed-html "|span 2"
+              assert= true $ .includes? mixed-html "|span false"
+              assert= true $ .includes? mixed-html |>false<
+              assert= true $ .includes? mixed-html |>0<
+              assert= false $ .includes? mixed-html |>nil<
+              assert= true $ .includes? child-html |child-boundary
+            :tags $ #{} :js-only :migration
         'comp-avatar $ %{} 'CodeEntry
           :doc "|Render initials or an image avatar. Options: :src, :alt, :title, :size (:small or :large), :class-name, and :style."
           :code $ quote $ defcomp comp-avatar (text options)
@@ -227,7 +252,9 @@
                         on-change
                           match
                             try-decode-map-as
-                              or (&map:get e :checked) false
+                              match (get e :checked)
+                                (:some checked-value) (or checked-value false)
+                                (:none) false
                               , 'Bool
                             (:ok checked-value) checked-value
                             (:err message) (raise message)
@@ -387,7 +414,9 @@
                       on-change $ respo-ui.schema/read-field options :on-change
                     when (non-nil? on-change)
                       on-change
-                        str $ &map:get e :value
+                        match (get e :value)
+                          (:some event-value) (str event-value)
+                          (:none) |
                         fn (op)
                           hint-fn $ {}
                             :args $ [] 'Op
@@ -496,7 +525,9 @@
                       on-change
                         match
                           try-decode-map-as
-                            or (&map:get e :checked) false
+                            match (get e :checked)
+                              (:some checked-value) (or checked-value false)
+                              (:none) false
                             , 'Bool
                           (:ok checked-value) checked-value
                           (:err message) (raise message)

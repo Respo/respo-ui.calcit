@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import * as c from "@calcit/procs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const cli = process.env.CALCIT_BIN ?? "calcit";
@@ -85,6 +86,27 @@ try {
   operations.push(["edit", "schema", pages, "--input-format", "cirru", "--code",
     "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)"]);
   calls.push([pages]);
+  // Build typed callbacks in Calcit, then invoke the actual DOM-host handlers.
+  // The event table intentionally exposes opaque host-callable functions.
+  for (const [name, type] of [["checkbox", "Bool"], ["switch", "Bool"], ["select", "String"]]) {
+    const helper = `replay-${name}-event`;
+    const component = name === "select"
+      ? "comp-select |a ([] $ respo-ui.schema/SelectOption :value |a :label |A :disabled $ Option :none)"
+      : `comp-${name} false`;
+    const options = name === "select"
+      ? "respo-ui.schema/SelectOptions :disabled (Option :none) :class-name (Option :none) :style (Option :none)"
+      : "respo-ui.schema/SwitchOptions :label (Option :none) :disabled (Option :none) :class-name (Option :none) :style (Option :none)";
+    operations.push(["edit", "def", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code", `quote $ defn ${helper} ()
+  ${component} $ Option :some $ ${options} :on-change
+    Option :some $ fn (value d!)
+      hint-fn $ {} (:return 'Unit)
+        :args $ [] '${type}
+          :: 'Fn $ {} (:args $ [] '${type}) (:return 'Unit)
+      d! value`]);
+    operations.push(["edit", "schema", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code",
+      "quote $ :: 'Fn $ {} (:args $ []) (:return 'respo.schema/Component)"]);
+    calls.push([`respo-ui.comp/${helper}`]);
+  }
   const entry = "respo-ui.util/replay-all-attached";
   operations.push(["edit", "def", entry, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-all-attached", [], ...calls, "&unit"])]);
@@ -100,7 +122,53 @@ try {
   const generated = await import(pathToFileURL(path.join(output, "respo-ui.util.mjs")).href);
   assert.equal(typeof generated.replay_all_attached, "function");
   generated.replay_all_attached();
-  console.log(`Generated JS replay passed: ${listed.selected}/${listed.selected} attached ASTs, ${scenarios.length} skeleton scenarios and ${routes.length} showcase routes`);
+  const components = await import(pathToFileURL(path.join(output, "respo-ui.comp.mjs")).href);
+  const field = (value, name) => value.get(c.newTag(name));
+  const elements = (option) => {
+    if (option.tag.value === "none") return [];
+    assert.equal(option.tag.value, "some");
+    const node = option.get(1);
+    if (node.tag.value === "component") return elements(field(node.get(1), "tree"));
+    assert.equal(node.tag.value, "element");
+    const element = node.get(1);
+    const children = field(element, "children");
+    return [element, ...Array.from({ length: children.len() }, (_, i) =>
+      elements(field(children.get(i), "node"))).flat()];
+  };
+  const eventHandler = (name, elementName, eventName) => {
+    const component = components[`replay_${name}_event`]();
+    const element = elements(field(component, "tree")).find(element => field(element, "name").value === elementName);
+    assert.ok(element, `${name} must render its native ${elementName}`);
+    const handler = field(element, "event").get(c.newTag(eventName));
+    assert.equal(typeof handler, "function", `${name} must expose its DOM event handler`);
+    return handler;
+  };
+  for (const name of ["checkbox", "switch"]) {
+    const handler = eventHandler(name, "input", "input");
+    for (const [input, expected] of [["{}", false], ["{} (:checked nil)", false],
+      ["{} (:checked false)", false], ["{} (:checked true)", true]]) {
+      const dispatched = [];
+      assert.equal(handler(c.parse_cirru_edn(input), value => { dispatched.push(value); }), undefined);
+      assert.deepEqual(dispatched, [expected], `${name}: ${input}`);
+    }
+    for (const input of ["{} (:checked |wrong)", "{} (:checked 0)", "{} (:checked |)"]) {
+      const dispatched = [];
+      assert.throws(() => handler(c.parse_cirru_edn(input), value => { dispatched.push(value); }), /Bool|bool/);
+      assert.deepEqual(dispatched, [], "rejected checked payload must not dispatch");
+    }
+    const failure = new Error(`${name} dispatch failure`);
+    assert.throws(() => handler(c.parse_cirru_edn("{} (:checked true)"), () => { throw failure; }), error => error === failure);
+  }
+  const select = eventHandler("select", "select", "change");
+  for (const [input, expected] of [["{}", ""], ["{} (:value nil)", ""], ["{} (:value false)", "false"],
+    ["{} (:value 0)", "0"], ["{} (:value |)", ""], ["{} (:value |中文😀)", "中文😀"]]) {
+    const dispatched = [];
+    assert.equal(select(c.parse_cirru_edn(input), value => { dispatched.push(value); }), undefined);
+    assert.deepEqual(dispatched, [expected], `select: ${input}`);
+  }
+  const failure = new Error("select dispatch failure");
+  assert.throws(() => select(c.parse_cirru_edn("{} (:value |a)"), () => { throw failure; }), error => error === failure);
+  console.log(`Generated JS replay passed: ${listed.selected}/${listed.selected} attached ASTs, ${scenarios.length} skeleton scenarios, ${routes.length} showcase routes and checked/value host-event boundaries`);
 } finally {
   assert.deepEqual(readFileSync(path.join(root, "calcit.cirru")), original, "Canonical Snapshot changed during replay");
   // This uniquely created child contains only this run's copied Snapshot and output.
