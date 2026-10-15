@@ -2881,7 +2881,7 @@
         :code $ quote $ ns respo-ui.main
           :require
             respo.core :refer $ render! clear-cache!
-            [] respo.cursor :refer $ [] update-state-tree
+            respo.cursor :refer $ update-state-tree
             respo-ui.comp.container :refer $ comp-container
             respo-ui.router :as router
             respo-ui.schema :as schema
