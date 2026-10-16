@@ -35,14 +35,13 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 生产 COS 前缀仍为 `Respo/respo-ui.calcit/`，原服务器部署路径不变；
 生产运行排队执行，不取消正在上传的任务。Fork PR 仅构建，不使用部署 secrets。
 
-### Calcit 0.30 稳定版迁移
+### Calcit 0.30.1 配对迁移
 
-使用者影响：UI `0.7.40` 候选协调使用 Respo `0.16.120`、Router `0.8.35`
-和正式 JS-FFI `0.2.3`，Calcit CLI/runtime 同步固定正式 `0.30.0`。
-本 patch 不改变组件 API、样式、路由或渲染行为；应用其他模块也需请求相同的
-Respo / JS-FFI 版本，不能只改根依赖或放宽 Caps 严格解析。
-应用若仍锁定 Router `0.8.34`，也需同步升级为 `0.8.35`；不要只升级根依赖，
-或放宽 Caps strict 来掩盖精确版本冲突。本模块正式发版前，不要将候选分支视为已发布依赖。
+使用者影响：UI `0.7.41` 候选使用已发布的 Respo `0.16.122`、Router `0.8.36`
+和 JS-FFI `0.2.3`，Calcit CLI/runtime 成对固定为已发布的 `0.30.1-alpha.4`。
+这是使用预发布编译器的迁移候选，不是 Calcit 稳定版支持声明。本次不改变组件 API、
+样式、路由或渲染行为；应用中的其他模块也需请求相同的 Respo / Router / JS-FFI
+版本，不能只改根依赖或放宽 Caps strict。本模块发版前，不要把候选分支当作发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
 回到首页。404 payload 按 Router 的真实契约校验为 `List<String>`，再以 `/` 拼接为
@@ -65,8 +64,8 @@ calcit calcit.cirru js
 yarn vite build
 ```
 
-完整公开检查仍覆盖原 17 个命名空间（264 个定义）；原 2 项附带测试、15 个 schema
-示例和 14 个 JS component 示例保留。新增路由 `:tests` 在 native 与
+完整公开检查覆盖原 17 个命名空间（264 个定义）；原 9 项 native、10 项 JS
+附带测试、15 个 schema 示例和 14 个 JS component 示例保留。路由 `:tests` 在 native 与
 真实生成 JS 中重放同一份 AST；JS 另验证 3 组 skeleton 渲染，以及首页、Layouts、
 Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Attributes demo
 使用完整的 `AttributesOptions`，组件先解包各 Option 字段再生成 CSS/DOM 属性，
@@ -77,23 +76,11 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
 该步骤不代替 Reel/Alerts/Diary 的完整应用验收。
 
-0.7.40 候选不修改 Snapshot、组件 API、样式或业务回调，只更新正式工具链与
-Router 版本，并让 CI 显式断言 strict workflow 成功。原 9 项 native、10 项
-JS 附带断言、15 个 schema 示例、14 个 JS component 示例、3 组 skeleton 与
-6 个展示页 SSR 均保留。完整公开检查为 264/264，完整 strict 通过；现有
-37 处未解决 Dynamic（35 个定义）和已有 FFI unsafe 边界仍存在，不宣称类型债务清零。
-
-面向 0.30.1 的只读探测另行记录：正式 Respo `0.16.120` 的 Option 原语用法
-仍会阻塞 alpha.4；临时仅替换为 Respo PR #269 后，UI core/comp 公开定义
-116/116 通过。这不是正式依赖图验收，也不把本模块或消费者固定到 alpha。
-
-此前 0.7.35 组合已通过严格 Caps 依赖图、CLI/runtime 配对、不可变锁文件、444 项严格
-检查（含可达依赖）、264 项完整公开定义检查、原有 9 项 native/JS 附带测试、
-15 个 schema 示例、14 个 JS component 示例和生产构建。浏览器中检查了全部 6 个
-展示入口、文本输入、checkbox/select、后退和刷新，控制台无错误；开发模式仍有
-原来的缺少 mode 配置提示。路由表 schema 收紧为 `List<Enum>`，不改变路由数据格式；
-当时仍有未解决类型债务及已有 unsafe 边界，不能视为全部类型闭合。
-这些历史结果不能代替 0.7.37 候选在新正式依赖上的完整验收。
+本次不修改 Snapshot；通过正常 Caps 安装和不可变 Yarn 锁文件验证完整发布图，
+不替换模块缓存或修补生成 JS。完整公开检查为 264/264，完整 strict 通过；
+6 个真实浏览器展示入口、文本输入、checkbox/select、后退和刷新均完成回归，
+控制台无 warning/error。现有开放样式值、状态载荷和 FFI unsafe 边界仍需逐项收窄，
+本次依赖配对不表示类型债务清零。
 
 0.7.36 的 demo updater 在操作边界检查状态 cursor 的 List 容器、导航 String 和
 路由 Map。状态更新复用原 `update-state-tree`，校验外层状态 Map 后写回已知 Store 字段，
