@@ -35,13 +35,14 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 生产 COS 前缀仍为 `Respo/respo-ui.calcit/`，原服务器部署路径不变；
 生产运行排队执行，不取消正在上传的任务。Fork PR 仅构建，不使用部署 secrets。
 
-### Calcit 0.29 稳定版迁移
+### Calcit 0.30 稳定版迁移
 
-使用者影响：UI `0.7.39` 候选协调使用 Respo `0.16.120`、Router `0.8.34`
-和正式 JS-FFI `0.2.3`，Calcit CLI/runtime 仍固定正式 `0.29.3`。
+使用者影响：UI `0.7.40` 候选协调使用 Respo `0.16.120`、Router `0.8.35`
+和正式 JS-FFI `0.2.3`，Calcit CLI/runtime 同步固定正式 `0.30.0`。
 本 patch 不改变组件 API、样式、路由或渲染行为；应用其他模块也需请求相同的
 Respo / JS-FFI 版本，不能只改根依赖或放宽 Caps 严格解析。
-Respo、Router 和本模块正式发版前，不要将候选分支视为已发布依赖。
+应用若仍锁定 Router `0.8.34`，也需同步升级为 `0.8.35`；不要只升级根依赖，
+或放宽 Caps strict 来掩盖精确版本冲突。本模块正式发版前，不要将候选分支视为已发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
 回到首页。404 payload 按 Router 的真实契约校验为 `List<String>`，再以 `/` 拼接为
@@ -75,6 +76,16 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 
 最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
 该步骤不代替 Reel/Alerts/Diary 的完整应用验收。
+
+0.7.40 候选不修改 Snapshot、组件 API、样式或业务回调，只更新正式工具链与
+Router 版本，并让 CI 显式断言 strict workflow 成功。原 9 项 native、10 项
+JS 附带断言、15 个 schema 示例、14 个 JS component 示例、3 组 skeleton 与
+6 个展示页 SSR 均保留。完整公开检查为 264/264，完整 strict 通过；现有
+37 处未解决 Dynamic（35 个定义）和已有 FFI unsafe 边界仍存在，不宣称类型债务清零。
+
+面向 0.30.1 的只读探测另行记录：正式 Respo `0.16.120` 的 Option 原语用法
+仍会阻塞 alpha.4；临时仅替换为 Respo PR #269 后，UI core/comp 公开定义
+116/116 通过。这不是正式依赖图验收，也不把本模块或消费者固定到 alpha。
 
 此前 0.7.35 组合已通过严格 Caps 依赖图、CLI/runtime 配对、不可变锁文件、444 项严格
 检查（含可达依赖）、264 项完整公开定义检查、原有 9 项 native/JS 附带测试、
