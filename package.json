@@ -1,10 +1,10 @@
 {
-  "version": "0.7.39",
+  "version": "0.7.40",
   "scripts": {
     "test:js": "node scripts/test-ui-js.mjs"
   },
   "dependencies": {
-    "@calcit/procs": "0.29.3",
+    "@calcit/procs": "0.30.0",
     "copy-text-to-clipboard": "^3.2.0",
     "dayjs": "^1.11.13"
   },
