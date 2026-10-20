@@ -5072,7 +5072,7 @@
           :code $ quote $ def blue-50 "|var(--rui-blue-50)"
           :examples $ []
           :schema $ :: 'String
-        'blue-500 $ %{} 'CodeEntry (:doc "|Default: hsl(220 78% 56%)")
+        'blue-500 $ %{} 'CodeEntry (:doc "|Default: hsl(220 78% 54%)")
           :code $ quote $ def blue-500 "|var(--rui-blue-500)"
           :examples $ []
           :schema $ :: 'String
@@ -5297,7 +5297,7 @@
               DesignToken :group |palette :name |gray-200 :value "|hsl(220 16% 92%)" :note |
               DesignToken :group |palette :name |gray-300 :value "|hsl(220 14% 84%)" :note |
               DesignToken :group |palette :name |gray-400 :value "|hsl(220 12% 70%)" :note |
-              DesignToken :group |palette :name |gray-500 :value "|hsl(220 10% 55%)" :note |
+              DesignToken :group |palette :name |gray-500 :value "|hsl(220 10% 46%)" :note |
               DesignToken :group |palette :name |gray-600 :value "|hsl(220 12% 42%)" :note |
               DesignToken :group |palette :name |gray-700 :value "|hsl(220 16% 30%)" :note |
               DesignToken :group |palette :name |gray-800 :value "|hsl(220 20% 20%)" :note |
@@ -5306,7 +5306,7 @@
               DesignToken :group |palette :name |blue-100 :value "|hsl(220 85% 93%)" :note |
               DesignToken :group |palette :name |blue-200 :value "|hsl(220 80% 85%)" :note |
               DesignToken :group |palette :name |blue-300 :value "|hsl(220 80% 74%)" :note |
-              DesignToken :group |palette :name |blue-500 :value "|hsl(220 78% 56%)" :note |
+              DesignToken :group |palette :name |blue-500 :value "|hsl(220 78% 54%)" :note |
               DesignToken :group |palette :name |blue-600 :value "|hsl(220 72% 48%)" :note |
               DesignToken :group |palette :name |blue-700 :value "|hsl(220 70% 40%)" :note |
               DesignToken :group |palette :name |green-50 :value "|hsl(145 55% 96%)" :note |
@@ -5471,7 +5471,7 @@
           :code $ quote $ def gray-50 "|var(--rui-gray-50)"
           :examples $ []
           :schema $ :: 'String
-        'gray-500 $ %{} 'CodeEntry (:doc "|Default: hsl(220 10% 55%)")
+        'gray-500 $ %{} 'CodeEntry (:doc "|Default: hsl(220 10% 46%)")
           :code $ quote $ def gray-500 "|var(--rui-gray-500)"
           :examples $ []
           :schema $ :: 'String
