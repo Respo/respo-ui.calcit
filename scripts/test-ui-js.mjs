@@ -88,14 +88,12 @@ try {
   calls.push([pages]);
   // Build typed callbacks in Calcit, then invoke the actual DOM-host handlers.
   // The event table intentionally exposes opaque host-callable functions.
-  for (const [name, type] of [["checkbox", "Bool"], ["switch", "Bool"], ["select", "String"]]) {
+  for (const [name, type] of [["checkbox", "Bool"], ["switch", "Bool"], ["select", "String"], ["radio-group", "String"]]) {
     const helper = `replay-${name}-event`;
-    const component = name === "select"
-      ? "comp-select |a ([] $ respo-ui.schema/SelectOption :value |a :label |A :disabled $ Option :none)"
-      : `comp-${name} false`;
-    const options = name === "select"
-      ? "respo-ui.schema/SelectOptions :disabled (Option :none) :class-name (Option :none) :style (Option :none)"
-      : "respo-ui.schema/SwitchOptions :label (Option :none) :disabled (Option :none) :class-name (Option :none) :style (Option :none)";
+    const items = "([] (respo-ui.schema/SelectOption :value |a :label |A) (respo-ui.schema/SelectOption :value |b :label |B))";
+    const component = { select: `comp-select |a ${items}`, "radio-group": `comp-radio-group |a ${items}` }[name] ?? `comp-${name} false`;
+    const options = { select: "respo-ui.schema/SelectOptions", "radio-group": "respo-ui.schema/RadioGroupOptions" }[name]
+      ?? "respo-ui.schema/SwitchOptions";
     operations.push(["edit", "def", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code", `quote $ defn ${helper} ()
   ${component} $ Option :some $ ${options} :on-change
     Option :some $ fn (value d!)
@@ -168,6 +166,16 @@ try {
   }
   const failure = new Error("select dispatch failure");
   assert.throws(() => select(c.parse_cirru_edn("{} (:value |a)"), () => { throw failure; }), error => error === failure);
+  // Radio inputs dispatch their own item value, whatever the host event carries.
+  const radios = elements(field(components.replay_radio_group_event(), "tree"))
+    .filter(element => field(element, "name").value === "input");
+  assert.equal(radios.length, 2, "radio group must render one input per item");
+  for (const [index, expected] of [[0, "a"], [1, "b"]]) {
+    const dispatched = [];
+    const handler = field(radios[index], "event").get(c.newTag("change"));
+    assert.equal(handler(c.parse_cirru_edn("{}"), value => { dispatched.push(value); }), undefined);
+    assert.deepEqual(dispatched, [expected], `radio-group: item ${index}`);
+  }
   console.log(`Generated JS replay passed: ${listed.selected}/${listed.selected} attached ASTs, ${scenarios.length} skeleton scenarios, ${routes.length} showcase routes and checked/value host-event boundaries`);
 } finally {
   assert.deepEqual(readFileSync(path.join(root, "calcit.cirru")), original, "Canonical Snapshot changed during replay");

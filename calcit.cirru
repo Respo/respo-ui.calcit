@@ -154,6 +154,91 @@
             comp-avatar |CY $ Option :some $ respo-ui.schema/AvatarOptions :title (Option :some "|Chen Yong") :size (Option :some :large)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/AvatarOptions
+        'comp-badge $ %{} 'CodeEntry
+          :doc "|Render a small count or status badge. Options: :kind (:info, :success, :warning, :error), :dot? (render a dot and expose content as aria-label), :class-name, and :style."
+          :code $ quote $ defcomp comp-badge (content options)
+            let
+                dot? $ or (respo-ui.schema/read-field options :dot?) false
+              span
+                {}
+                  :class-name $ str-spaced style-badge
+                    match
+                      either (respo-ui.schema/read-field options :kind) :neutral
+                      :info style-badge-info
+                      :success style-badge-success
+                      :warning style-badge-warning
+                      :error style-badge-error
+                      _ |
+                    if dot? style-badge-dot
+                    respo-ui.schema/read-field options :class-name
+                  :aria-label $ if dot? content
+                  :style $ respo-ui.schema/read-field options :style
+                if dot? nil $ <> content
+          :examples $ [] $ quote
+            comp-badge |12 $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :error)
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/BadgeOptions
+          :tests $ [] $ %{} 'TestEntry (:name |render-options)
+            :code $ quote $ let
+                count-html $ respo.render.html/make-string $ comp-badge |12
+                  Option :some $ respo-ui.schema/BadgeOptions :kind $ Option :some :success
+                dot-html $ respo.render.html/make-string $ comp-badge "|3 unread"
+                  Option :some $ respo-ui.schema/BadgeOptions :dot? $ Option :some true
+                plain-html $ respo.render.html/make-string $ comp-badge |new (Option :none)
+              assert= true $ .includes? count-html |>12<
+              assert= true $ .includes? count-html |style-badge-success
+              assert= true $ .includes? dot-html |style-badge-dot
+              assert= true $ .includes? dot-html "|aria-label=\"3 unread\""
+              assert= false $ .includes? dot-html "|>3 unread<"
+              assert= true $ .includes? plain-html |>new<
+            :tags $ #{} :js-only
+        'comp-breadcrumb $ %{} 'CodeEntry
+          :doc "|Render a breadcrumb trail. Items with :href render links; the last item is marked aria-current=page. Options: :separator (default /), :class-name, and :style."
+          :code $ quote $ defcomp comp-breadcrumb (items options)
+            let
+                separator $ either (respo-ui.schema/read-field options :separator) |/
+                last-idx $ dec $ count items
+              create-element :nav
+                {} (:aria-label |Breadcrumb)
+                  :class-name $ str-spaced style-breadcrumb $ respo-ui.schema/read-field options :class-name
+                  :style $ respo-ui.schema/read-field options :style
+                create-list-element :ol
+                  {} $ :class-name style-breadcrumb-list
+                  -> items $ map-indexed $ fn (idx item)
+                    [] (str idx)
+                      create-element :li
+                        {} $ :class-name style-breadcrumb-item
+                        if (= idx last-idx)
+                          span $ {} (:aria-current |page) (:class-name style-breadcrumb-current) (:inner-text item.:label)
+                          match item.:href
+                            (:some href)
+                              a $ {} (:href href) (:class-name style-breadcrumb-link) (:inner-text item.:label)
+                            (:none)
+                              span $ {} $ :inner-text item.:label
+                        if (< idx last-idx)
+                          span $ {} (:class-name style-breadcrumb-separator) (:aria-hidden |true) (:inner-text separator)
+          :examples $ [] $ quote
+            comp-breadcrumb
+              []
+                respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/
+                respo-ui.schema/BreadcrumbItem :label |Components
+              Option :none
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] (:: 'List 'respo-ui.schema/BreadcrumbItem) (:: 'calcit.core/Option 'respo-ui.schema/BreadcrumbOptions)
+          :tests $ [] $ %{} 'TestEntry (:name |render-links)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-breadcrumb
+                  []
+                    respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/
+                    respo-ui.schema/BreadcrumbItem :label |Docs
+                    respo-ui.schema/BreadcrumbItem :label |Badge :href $ Option :some |#/badge
+                  Option :some $ respo-ui.schema/BreadcrumbOptions :separator $ Option :some "|›"
+              assert= true $ .includes? html "|href=\"#/\""
+              assert= true $ .includes? html |>Docs<
+              assert= false $ .includes? html "|href=\"#/badge\""
+              assert= true $ .includes? html "|aria-current=\"page\""
+              assert= true $ .includes? html "|>›<"
+            :tags $ #{} :js-only
         'comp-button $ %{} 'CodeEntry
           :doc "|Render a native button with Respo UI variants. Options: :kind (:primary, :danger, :danger-outline), :type, :disabled, :on-click, :class-name, :style."
           :code $ quote $ defcomp comp-button (content options)
@@ -327,6 +412,52 @@
             comp-empty "|No results" $ Option :some $ respo-ui.schema/EmptyOptions :description (Option :some "|Try another search term.")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/EmptyOptions
+        'comp-field $ %{} 'CodeEntry
+          :doc "|Wrap a form control with a label, optional description, and error message. Options: :for (id of the labelled control), :description, :error (rendered with role=alert), :required?, :class-name, and :style."
+          :code $ quote $ defcomp comp-field (label control options)
+            div
+              {}
+                :class-name $ str-spaced style-field $ respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              create-element :label
+                {} (:class-name style-field-label)
+                  :for $ respo-ui.schema/read-field options :for
+                <> label
+                if (respo-ui.schema/read-field options :required?)
+                  span $ {} (:class-name style-field-required) (:aria-hidden |true) (:inner-text |*)
+              , control
+                when
+                  non-nil? $ respo-ui.schema/read-field options :description
+                  div
+                    {} $ :class-name style-field-description
+                    <> $ either (respo-ui.schema/read-field options :description) |
+                when
+                  non-nil? $ respo-ui.schema/read-field options :error
+                  div
+                    {} (:class-name style-field-error) (:role |alert)
+                    <> $ either (respo-ui.schema/read-field options :error) |
+          :examples $ [] $ quote
+            comp-field |Email
+              comp-input | $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |you@example.com)
+              Option :some $ respo-ui.schema/FieldOptions :description (Option :some "|Used for notifications.") :required? $ Option :some true
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String 'Control $ :: 'calcit.core/Option 'respo-ui.schema/FieldOptions
+            :generics $ [] 'Control
+          :tests $ [] $ %{} 'TestEntry (:name |render-options)
+            :code $ quote $ let
+                control $ comp-input | $ Option :none
+                html $ respo.render.html/make-string $ comp-field |Email control
+                  Option :some $ respo-ui.schema/FieldOptions :for (Option :some |email) :description (Option :some |Hint) :error (Option :some |Invalid) :required? $ Option :some true
+                plain $ respo.render.html/make-string $ comp-field |Name control (Option :none)
+              assert= true $ .includes? html "|for=\"email\""
+              assert= true $ .includes? html |>Hint<
+              assert= true $ .includes? html "|role=\"alert\""
+              assert= true $ .includes? html |>Invalid<
+              assert= true $ .includes? html |style-field-required
+              assert= true $ .includes? plain |>Name<
+              assert= false $ .includes? plain "|role=\"alert\""
+              assert= false $ .includes? plain |style-field-required
+            :tags $ #{} :js-only
         'comp-input $ %{} 'CodeEntry
           :doc "|Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-input (value options)
@@ -342,6 +473,44 @@
             comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Search)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/InputOptions
+        'comp-pagination $ %{} 'CodeEntry
+          :doc "|Render page buttons for a 1-based page out of total pages, collapsing distant pages into gaps. Options: :siblings (pages beside the current one, default 1), :on-change (receives the next page and d!), :class-name, and :style."
+          :code $ quote $ defcomp comp-pagination (page total options)
+            let
+                siblings $ match options
+                  (:some o) (option:unwrap-or o.:siblings 1)
+                  (:none) 1
+              create-list-element :nav
+                {} (:aria-label |Pagination)
+                  :class-name $ str-spaced style-pagination $ respo-ui.schema/read-field options :class-name
+                  :style $ respo-ui.schema/read-field options :style
+                concat
+                  [] $ [] |prev $ render-page-button page total (dec page) "|‹" "|Previous page" options
+                  -> (pagination-pages page total siblings)
+                    map-indexed $ fn (idx n)
+                      if (= n 0)
+                        [] (str |gap- idx)
+                          span $ {} (:class-name style-pagination-gap) (:aria-hidden |true) (:inner-text "|…")
+                        [] (str |page- n)
+                          render-page-button page total n (str n) (str "|Page " n) options
+                  [] $ [] |next $ render-page-button page total (inc page) "|›" "|Next page" options
+          :examples $ [] $ quote
+            comp-pagination 5 20 $ Option :some $ respo-ui.schema/PaginationOptions :siblings (Option :some 1)
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Number 'Number $ :: 'calcit.core/Option (:: 'respo-ui.schema/PaginationOptions 'Op)
+            :generics $ [] 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |render-and-current)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-pagination 5 10 (Option :none)
+                first-html $ respo.render.html/make-string $ comp-pagination 1 3 (Option :none)
+              assert= true $ .includes? html "|aria-label=\"Pagination\""
+              assert= true $ .includes? html "|aria-current=\"page\""
+              assert= true $ .includes? html |style-pagination-current
+              assert= true $ .includes? html "|…"
+              assert= true $ .includes? html "|aria-label=\"Page 10\""
+              assert= false $ .includes? html "|disabled=\"true\""
+              assert= true $ .includes? first-html "|disabled=\"true\""
+            :tags $ #{} :js-only
         'comp-placeholder $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-placeholder (text)
             div
@@ -365,6 +534,63 @@
           :examples $ [] $ quote (comp-progress 72)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Number $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
+        'comp-radio-group $ %{} 'CodeEntry
+          :doc "|Render a controlled radio group from SelectOption items. Options: :name, :label (group aria-label), :vertical?, :disabled, :on-change (receives the picked value and d!), :class-name, and :style."
+          :code $ quote $ defcomp comp-radio-group (value items options)
+            create-list-element :div
+              {} (:role |radiogroup)
+                :aria-label $ respo-ui.schema/read-field options :label
+                :class-name $ str-spaced style-radio-group
+                  if (respo-ui.schema/read-field options :vertical?) style-radio-group-vertical
+                  respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              -> items $ map $ fn (item)
+                let
+                    item-value item.:value
+                    disabled? $ or (respo-ui.schema/read-field options :disabled) (option:unwrap-or item.:disabled false)
+                  [] item-value $ create-element :label
+                    {} $ :class-name $ str-spaced style-radio-item (if disabled? style-control-disabled)
+                    input $ {} (:type |radio) (:value item-value)
+                      :name $ respo-ui.schema/read-field options :name
+                      :checked $ = value item-value
+                      :disabled disabled?
+                      :class-name style-radio-input
+                      :on-change $ fn (e d!)
+                        hint-fn $ {}
+                          :args $ [] (:: 'Map 'Tag 'Dynamic)
+                            :: 'Fn $ {}
+                              :args $ [] 'Op
+                              :return 'Unit
+                          :return 'Unit
+                        let
+                            on-change $ respo-ui.schema/read-field options :on-change
+                          when (non-nil? on-change) (on-change item-value d!)
+                        , &unit
+                    span ({}) (<> item.:label)
+          :examples $ [] $ quote
+            comp-radio-group |calcit
+              [] (respo-ui.schema/SelectOption :value |calcit :label |Calcit) (respo-ui.schema/SelectOption :value |clojure :label |Clojure)
+              Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |language) :label $ Option :some |Language
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String (:: 'List 'respo-ui.schema/SelectOption)
+              :: 'calcit.core/Option $ :: 'respo-ui.schema/RadioGroupOptions 'Op
+            :generics $ [] 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |render-options)
+            :code $ quote $ let
+                items $ [] (respo-ui.schema/SelectOption :value |a :label |Alpha)
+                  respo-ui.schema/SelectOption :value |b :label |Beta :disabled $ Option :some true
+                html $ respo.render.html/make-string $ comp-radio-group |a items
+                  Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |pick) :label (Option :some "|Pick one") :vertical? $ Option :some true
+                plain $ respo.render.html/make-string $ comp-radio-group |b items (Option :none)
+              assert= true $ .includes? html "|role=\"radiogroup\""
+              assert= true $ .includes? html "|aria-label=\"Pick one\""
+              assert= true $ .includes? html "|name=\"pick\""
+              assert= true $ .includes? html |style-radio-group-vertical
+              assert= true $ .includes? html |>Alpha<
+              assert= true $ .includes? html |style-control-disabled
+              assert= false $ .includes? plain |style-radio-group-vertical
+              assert= false $ .includes? plain |name=
+            :tags $ #{} :js-only
         'comp-select $ %{} 'CodeEntry
           :doc "|Render a controlled native select from keyed option maps. Each item uses :value, :label, and optional :disabled; :on-change receives the next value and d!."
           :code $ quote $ defcomp comp-select (value items options)
@@ -455,6 +681,54 @@
             comp-spinner $ Option :some $ respo-ui.schema/SpinnerOptions :label (Option :some "|Loading results")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/SpinnerOptions
+        'comp-steps $ %{} 'CodeEntry
+          :doc "|Render a step indicator. current is the 0-based active step; earlier steps show as done. Items carry :title and optional :description. Options: :vertical?, :class-name, and :style."
+          :code $ quote $ defcomp comp-steps (current items options)
+            create-list-element :ol
+              {}
+                :class-name $ str-spaced style-steps
+                  if (respo-ui.schema/read-field options :vertical?) style-steps-vertical
+                  respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              -> items $ map-indexed $ fn (idx item)
+                [] (str idx)
+                  create-element :li
+                    {}
+                      :class-name $ str-spaced style-step $ if (= idx current) style-step-current
+                      :aria-current $ if (= idx current) |step
+                    span $ {}
+                      :class-name $ str-spaced style-step-marker $ cond
+                          < idx current
+                          , style-step-marker-done
+                        (= idx current) style-step-marker-current
+                        true |
+                      :inner-text $ if (< idx current) "|✓" $ str (inc idx)
+                    div ({})
+                      div $ {} (:class-name style-step-title) (:inner-text item.:title)
+                      match item.:description
+                        (:some description)
+                          div $ {} (:class-name style-step-description) (:inner-text description)
+                        (:none) nil
+          :examples $ [] $ quote
+            comp-steps 1
+              [] (respo-ui.schema/StepItem :title |Account) (respo-ui.schema/StepItem :title |Profile) (respo-ui.schema/StepItem :title |Done)
+              Option :none
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Number (:: 'List 'respo-ui.schema/StepItem) (:: 'calcit.core/Option 'respo-ui.schema/StepsOptions)
+          :tests $ [] $ %{} 'TestEntry (:name |render-status)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-steps 1
+                  [] (respo-ui.schema/StepItem :title |Account)
+                    respo-ui.schema/StepItem :title |Profile :description $ Option :some |About
+                    respo-ui.schema/StepItem :title |Done
+                  Option :some $ respo-ui.schema/StepsOptions :vertical? $ Option :some true
+              assert= true $ .includes? html |style-step-marker-done
+              assert= true $ .includes? html "|>✓<"
+              assert= true $ .includes? html "|aria-current=\"step\""
+              assert= true $ .includes? html |>About<
+              assert= true $ .includes? html |>3<
+              assert= true $ .includes? html |style-steps-vertical
+            :tags $ #{} :js-only
         'comp-switch $ %{} 'CodeEntry
           :doc "|Render a controlled accessible switch backed by a native checkbox. Options: :label, :disabled, :on-change, :class-name, and :style."
           :code $ quote $ defcomp comp-switch (checked options)
@@ -706,6 +980,73 @@
           :schema $ :: 'Fn $ {} (:return 'Bool)
             :args $ [] 'Value
             :generics $ [] 'Value
+        'pagination-pages $ %{} 'CodeEntry
+          :doc "|Page numbers shown by comp-pagination for a 1-based page, the total page count, and how many siblings sit beside the current page. 0 marks a collapsed gap."
+          :code $ quote $ defn pagination-pages (page total siblings)
+            let
+                window $ inc $ * 2 siblings
+              if
+                <= total $ + window 4
+                range 1 $ inc total
+                let
+                    start $ &max 2 $ &min (- page siblings) (- total window)
+                    end $ dec $ + start window
+                  concat ([] 1)
+                    cond
+                        = start 2
+                        []
+                      (= start 3) ([] 2)
+                      true $ [] 0
+                    range start $ inc end
+                    cond
+                        = end $ dec total
+                        []
+                      (= end (- total 2))
+                        [] $ dec total
+                      true $ [] 0
+                    [] total
+          :examples $ [] $ quote (pagination-pages 5 20 1)
+          :schema $ :: 'Fn $ {}
+            :args $ [] 'Number 'Number 'Number
+            :return $ :: 'List 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |window-and-gaps)
+            :code $ quote $ do
+              assert= ([] 1 2 3 4 5) (pagination-pages 3 5 1)
+              assert= ([] 1 2 3 4 5 6 7) (pagination-pages 1 7 1)
+              assert= ([] 1 2 3 4 0 10) (pagination-pages 1 10 1)
+              assert= ([] 1 0 4 5 6 0 10) (pagination-pages 5 10 1)
+              assert= ([] 1 2 3 4 5 0 10) (pagination-pages 4 10 1)
+              assert= ([] 1 0 7 8 9 10) (pagination-pages 10 10 1)
+              assert=
+                [] 1 0 8 9 10 11 12 0 20
+                pagination-pages 10 20 2
+            :tags $ #{} :boundary
+        'render-page-button $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-page-button (page total target text label options)
+            let
+                current? $ and (= target page)
+                  = text $ str target
+                disabled? $ or (< target 1) (> target total)
+              button $ {} (:type |button) (:inner-text text) (:aria-label label) (:disabled disabled?)
+                :aria-current $ if current? |page
+                :class-name $ str-spaced style-pagination-item $ if current? style-pagination-current
+                :on-click $ fn (e d!)
+                  hint-fn $ {}
+                    :args $ [] (:: 'Map 'Tag 'Dynamic)
+                      :: 'Fn $ {}
+                        :args $ [] 'Op
+                        :return 'Unit
+                    :return 'Unit
+                  let
+                      on-change $ respo-ui.schema/read-field options :on-change
+                    when
+                      and (non-nil? on-change) (not current?) (not disabled?)
+                      on-change target d!
+                  , &unit
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'Number 'Number 'Number 'String 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/PaginationOptions 'Op)
+            :generics $ [] 'Op
         'style-alert $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert
             {} $ |& $ {} (:padding "|10px 12px") (:border "|1px solid transparent") (:border-radius |6px) (:line-height |1.5)
@@ -773,6 +1114,79 @@
         'style-avatar-small $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-avatar-small
             {} $ |& $ {} (:width |24px) (:height |24px) (:font-size |10px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width |20px) (:height |20px) (:padding "|0 6px") (:border-radius |10px) (:font-size 12) (:font-weight 500) (:line-height 1) (:white-space :nowrap)
+              :color $ hsl 0 0 30
+              :background-color $ hsl 0 0 92
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-dot $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-dot
+            {} $ |& $ {} (:min-width |8px) (:width |8px) (:height |8px) (:padding 0) (:border-radius |50%)
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-error $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-error
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 0 75 52
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-info $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-info
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 210 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-success $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-success
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 140 60 40
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-warning $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-warning
+            {} $ |& $ {}
+              :color $ hsl 30 90 20
+              :background-color $ hsl 40 95 60
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb
+            {} $ |& $ {} (:font-size 14) (:line-height |20px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-current
+            {} $ |& $ {} (:font-weight 500)
+              :color $ hsl 0 0 15
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-item
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |6px)
+              :color $ hsl 0 0 45
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-link $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-link
+            {}
+              |& $ {} (:color :inherit) (:text-decoration :none)
+              |&:hover $ {} (:text-decoration :underline)
+                :color $ hsl 200 80 40
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-list $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-list
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap |6px) (:margin 0) (:padding 0) (:list-style :none)
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-separator $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-separator
+            {} $ |& $ {}
+              :color $ hsl 0 0 70
           :examples $ []
           :schema $ :: 'String
         'style-card $ %{} 'CodeEntry (:doc |)
@@ -894,6 +1308,35 @@
               :color $ hsl 220 20 25
           :examples $ []
           :schema $ :: 'String
+        'style-field $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field
+            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:gap |6px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-description $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-description
+            {} $ |& $ {} (:font-size 12) (:line-height |18px)
+              :color $ hsl 0 0 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-error $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-error
+            {} $ |& $ {} (:font-size 12) (:line-height |18px)
+              :color $ hsl 0 70 44
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-label $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-label
+            {} $ |& $ {} (:font-size 14) (:font-weight 500) (:line-height |20px)
+              :color $ hsl 0 0 20
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-required $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-required
+            {} $ |& $ {} (:margin-left |4px)
+              :color $ hsl 0 70 50
+          :examples $ []
+          :schema $ :: 'String
         'style-item $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-item
             {}
@@ -907,6 +1350,38 @@
                 :box-shadow $ str "|0 0 4px 1px " $ hsl 0 0 0 0.08
           :examples $ []
           :schema $ :: 'String
+        'style-pagination $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap |4px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-pagination-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination-current
+            {}
+              |&& $ {} (:color :white) (:cursor :default)
+                :background-color $ hsl 200 80 50
+                :border-color $ hsl 200 80 50
+              "|&&:hover:not(:disabled)" $ {} $ :color :white
+          :examples $ []
+          :schema $ :: 'String
+        'style-pagination-gap $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination-gap
+            {} $ |& $ {} (:min-width |24px) (:text-align :center)
+              :color $ hsl 0 0 60
+          :examples $ []
+          :schema $ :: 'String
+        'style-pagination-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination-item
+            {}
+              |& $ {} (:min-width |32px) (:height |32px) (:padding "|0 8px") (:border-radius |6px) (:font-size 14) (:cursor :pointer) (:background-color :white)
+                :border $ str "|1px solid " $ hsl 0 0 86
+                :color $ hsl 0 0 25
+              "|&:hover:not(:disabled)" $ {}
+                :border-color $ hsl 200 80 50
+                :color $ hsl 200 80 40
+              |&:disabled $ {} (:cursor :not-allowed) (:opacity 0.4)
+          :examples $ []
+          :schema $ :: 'String
         'style-progress $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-progress
             {} $ |& $ {} (:width |100%) (:height |8px) (:overflow :hidden) (:border-radius |999px)
@@ -918,6 +1393,27 @@
             {} $ |& $ {} (:height |100%) (:border-radius |inherit)
               :background-color $ hsl 220 80 62
               :transition "|width 180ms ease"
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-group $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-group
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap "|8px 16px")
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-group-vertical $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-group-vertical
+            {} $ |& $ {} (:flex-direction :column) (:align-items :flex-start) (:gap |8px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-input $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-input
+            {} $ |& $ {} (:margin 0) (:width |16px) (:height |16px) (:cursor :inherit)
+              :accent-color $ hsl 200 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-item
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |6px) (:cursor :pointer) (:line-height |20px)
           :examples $ []
           :schema $ :: 'String
         'style-selected-tab $ %{} 'CodeEntry (:doc |)
@@ -957,6 +1453,59 @@
                 :animation "|respo-ui-spin 700ms linear infinite"
               "|@keyframes respo-ui-spin" $ {} $ |to
                 {} $ :transform "|rotate(360deg)"
+          :examples $ []
+          :schema $ :: 'String
+        'style-step $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step
+            {} $ |& $ {} (:display :flex) (:align-items :flex-start) (:gap |8px)
+              :color $ hsl 0 0 35
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-current
+            {} $ |& $ {} (:font-weight 500)
+              :color $ hsl 0 0 15
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-description $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-description
+            {} $ |& $ {} (:font-size 12) (:line-height |18px) (:font-weight 400)
+              :color $ hsl 0 0 55
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-marker $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-marker
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:flex-shrink 0) (:box-sizing :border-box) (:width |24px) (:height |24px) (:border-radius |50%) (:font-size 12)
+              :border $ str "|1px solid " $ hsl 0 0 80
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-marker-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-marker-current
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 200 80 50
+              :border-color $ hsl 200 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-marker-done $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-marker-done
+            {} $ |& $ {}
+              :color $ hsl 200 80 40
+              :border-color $ hsl 200 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-title
+            {} $ |& $ {} (:font-size 14) (:line-height |24px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-steps $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-steps
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:gap "|12px 24px") (:margin 0) (:padding 0) (:list-style :none)
+          :examples $ []
+          :schema $ :: 'String
+        'style-steps-vertical $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-steps-vertical
+            {} $ |& $ {} (:flex-direction :column) (:gap |16px)
           :examples $ []
           :schema $ :: 'String
         'style-switch-input $ %{} 'CodeEntry (:doc |)
@@ -1098,6 +1647,7 @@
                   render-entry |https://github.com/Respo/respo-message.calcit |respo-message
                   render-entry |https://github.com/Respo/respo-markdown.calcit |respo-markdown
               comp-demo-form-controls
+              comp-demo-navigation
               comp-demo-data-display
               comp-demo-loading-states
               comp-divider
@@ -1274,6 +1824,23 @@
                     comp-button "|Danger outline" $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :danger-outline)
                     comp-button |Unavailable $ Option :some $ respo-ui.schema/ButtonOptions :disabled (Option :some true)
                   Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Button states"
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap16
+                    comp-field |Language
+                      comp-radio-group |calcit language-options $ Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |demo-language) :label (Option :some |Language)
+                      Option :some $ respo-ui.schema/FieldOptions :description $ Option :some "|Radio groups share SelectOption items with comp-select."
+                    comp-field |Email
+                      comp-input | $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |you@example.com)
+                      Option :some $ respo-ui.schema/FieldOptions :error (Option :some "|Enter an email address.") :required? $ Option :some true
+                    div
+                      {} $ :class-name $ str-spaced css/row-middle css/gap8
+                      comp-badge |3 $ Option :none
+                      comp-badge |12 $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :info)
+                      comp-badge |New $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :success)
+                      comp-badge |99+ $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :error)
+                      comp-badge "|Unread messages" $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :warning) :dot? (Option :some true)
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Choices, fields and badges"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -1314,6 +1881,43 @@
                       comp-divider $ Option :some $ respo-ui.schema/DividerOptions :vertical? (Option :some true)
                       comp-button |Next $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :primary)
                   Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Spinner and dividers"
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ []
+        'comp-demo-navigation $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defcomp comp-demo-navigation ()
+            div
+              {} $ :class-name style-demo-section
+              div
+                {} $ :class-name style-section-title
+                <> |Navigation
+              div
+                {} $ :class-name style-demo-grid
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap16
+                    comp-breadcrumb
+                      []
+                        respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/index.html
+                        respo-ui.schema/BreadcrumbItem :label |Components :href $ Option :some |#/components.html
+                        respo-ui.schema/BreadcrumbItem :label |Navigation
+                      Option :none
+                    comp-pagination 6 20 $ Option :none
+                    comp-pagination 2 5 $ Option :none
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Breadcrumb and pagination"
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap16
+                    comp-steps 1
+                      [] (respo-ui.schema/StepItem :title |Account) (respo-ui.schema/StepItem :title |Profile) (respo-ui.schema/StepItem :title |Review)
+                      Option :none
+                    comp-steps 2
+                      []
+                        respo-ui.schema/StepItem :title "|Create project" :description $ Option :some "|Pick a name and template."
+                        respo-ui.schema/StepItem :title "|Add members" :description $ Option :some "|Invite people by email."
+                        respo-ui.schema/StepItem :title |Deploy :description $ Option :some "|Ship the first build."
+                      Option :some $ respo-ui.schema/StepsOptions :vertical? $ Option :some true
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some |Steps
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -1532,7 +2136,7 @@
             respo-ui.css :as css
             respo.util.format :refer $ hsl
             respo.css :refer $ defstyle
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider comp-radio-group comp-field comp-badge comp-breadcrumb comp-pagination comp-steps
             js-ffi.shared :as shared
     'respo-ui.comp.container $ %{} 'FileEntry
       :defs $ {}
@@ -2915,6 +3519,28 @@
           :examples $ [] $ quote
             AvatarOptions :title (Option :some "|Chen Yong") :size $ Option :some :large
           :schema $ :: 'Enum
+        'BadgeOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct BadgeOptions
+            :kind $ :: 'Option 'Tag
+            :dot? $ :: 'Option 'Bool
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            BadgeOptions :dot? $ Option :some true
+          :schema $ :: 'Enum
+        'BreadcrumbItem $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct BreadcrumbItem (:label 'String)
+            :href $ :: 'Option 'String
+          :examples $ [] $ quote
+            BreadcrumbItem :label |Home :href $ Option :some |#/
+          :schema $ :: 'Enum
+        'BreadcrumbOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct BreadcrumbOptions
+            :separator $ :: 'Option 'String
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ []
+          :schema $ :: 'Enum
         'ButtonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style."
           :code $ quote $ defstruct ButtonOptions
@@ -2957,6 +3583,17 @@
           :examples $ [] $ quote
             EmptyOptions :description $ Option :some "|Try another search term."
           :schema $ :: 'Enum
+        'FieldOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct FieldOptions
+            :for $ :: 'Option 'String
+            :description $ :: 'Option 'String
+            :error $ :: 'Option 'String
+            :required? $ :: 'Option 'Bool
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            FieldOptions :error $ Option :some "|Required field"
+          :schema $ :: 'Enum
         'InputOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct InputOptions
             :type $ :: 'Option 'String
@@ -2971,6 +3608,22 @@
           :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:components) (:utils) (:not-found 'String)
           :examples $ []
           :schema $ :: 'EnumDef
+        'PaginationOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct PaginationOptions
+            [] $ quote Op
+            :siblings $ :: 'Option 'Number
+            :on-change $ :: 'Option $ :: 'Fn
+              {}
+                :args $ [] 'Number $ :: 'Fn
+                  {}
+                    :args $ [] $ quote Op
+                    :return 'Unit
+                :return 'Unit
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            PaginationOptions :siblings $ Option :some 2
+          :schema $ :: 'Enum
         'PresentationOptions $ %{} 'CodeEntry
           :doc "|Shared typed class-name and style options for presentation-only components."
           :code $ quote $ defstruct PresentationOptions
@@ -2978,6 +3631,25 @@
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
             PresentationOptions :class-name $ Option :some |status
+          :schema $ :: 'Enum
+        'RadioGroupOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct RadioGroupOptions
+            [] $ quote Op
+            :name $ :: 'Option 'String
+            :label $ :: 'Option 'String
+            :vertical? $ :: 'Option 'Bool
+            :disabled $ :: 'Option 'Bool
+            :on-change $ :: 'Option $ :: 'Fn
+              {}
+                :args $ [] 'String $ :: 'Fn
+                  {}
+                    :args $ [] $ quote Op
+                    :return 'Unit
+                :return 'Unit
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            RadioGroupOptions :name $ Option :some |language
           :schema $ :: 'Enum
         'SelectOption $ %{} 'CodeEntry
           :doc "|A typed native select item with string value and label plus optional disabled state."
@@ -3022,6 +3694,19 @@
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
             SpinnerOptions :label $ Option :some "|Loading results"
+          :schema $ :: 'Enum
+        'StepItem $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct StepItem (:title 'String)
+            :description $ :: 'Option 'String
+          :examples $ [] $ quote
+            StepItem :title |Profile :description $ Option :some "|Tell us about you"
+          :schema $ :: 'Enum
+        'StepsOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct StepsOptions
+            :vertical? $ :: 'Option 'Bool
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ []
           :schema $ :: 'Enum
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
