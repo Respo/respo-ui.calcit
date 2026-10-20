@@ -359,6 +359,41 @@
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/ButtonOptions
+        'comp-collapse $ %{} 'CodeEntry
+          :doc "|Render a native details/summary disclosure. Content may be text or a Respo node. Options: :open? (initial state), :name (details sharing a name open one at a time), :class-name, and :style."
+          :code $ quote $ defcomp comp-collapse (title content options)
+            create-element :details
+              {}
+                :open $ respo-ui.schema/read-field options :open?
+                :name $ respo-ui.schema/read-field options :name
+                :class-name $ str-spaced style-collapse $ respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              create-element :summary
+                {} $ :class-name style-collapse-summary
+                <> title
+              div
+                {} $ :class-name style-collapse-body
+                if (literal? content)
+                  <> $ respo.util.format/scalar-attribute-text content
+                  , content
+          :examples $ [] $ quote
+            comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ Option :some $ respo-ui.schema/CollapseOptions :open? (Option :some true)
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String 'Content $ :: 'calcit.core/Option 'respo-ui.schema/CollapseOptions
+            :generics $ [] 'Content
+          :tests $ [] $ %{} 'TestEntry (:name |render-disclosure)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-collapse |Title |Body
+                  Option :some $ respo-ui.schema/CollapseOptions :open? (Option :some true) :name $ Option :some |faq
+                closed $ respo.render.html/make-string $ comp-collapse |Title (respo.core/<> |Node) (Option :none)
+              assert= true $ .includes? html |<details
+              assert= true $ .includes? html "|name=\"faq\""
+              assert= true $ .includes? html "|open=\"true\""
+              assert= true $ .includes? html |>Title<
+              assert= true $ .includes? html |>Body<
+              assert= false $ .includes? closed |open=
+              assert= true $ .includes? closed |>Node<
+            :tags $ #{} :js-only
         'comp-copy $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-copy (code f)
             div
@@ -473,6 +508,31 @@
             comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Search)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/InputOptions
+        'comp-kbd $ %{} 'CodeEntry
+          :doc "|Render a keyboard shortcut from key names, joined with +. Options: :class-name and :style."
+          :code $ quote $ defcomp comp-kbd (key-names options)
+            create-list-element :span
+              {}
+                :class-name $ str-spaced style-kbd-group $ respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              -> key-names $ map-indexed $ fn (idx key)
+                [] (str idx)
+                  if (= idx 0)
+                    create-element :kbd $ {} (:class-name style-kbd) (:inner-text key)
+                    span ({})
+                      span $ {} (:class-name style-kbd-plus) (:aria-hidden |true) (:inner-text |+)
+                      create-element :kbd $ {} (:class-name style-kbd) (:inner-text key)
+          :examples $ [] $ quote
+            comp-kbd ([] |Ctrl |K) (Option :none)
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] (:: 'List 'String) (:: 'calcit.core/Option 'respo-ui.schema/PresentationOptions)
+          :tests $ [] $ %{} 'TestEntry (:name |render-keys)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-kbd ([] |Ctrl |Shift |P) (Option :none)
+              assert= true $ .includes? html |>Ctrl</kbd>
+              assert= true $ .includes? html |>P</kbd>
+              assert= 2 $ dec $ count (.split html |>+<)
+            :tags $ #{} :js-only
         'comp-pagination $ %{} 'CodeEntry
           :doc "|Render page buttons for a 1-based page out of total pages, collapsing distant pages into gaps. Options: :siblings (pages beside the current one, default 1), :on-change (receives the next page and d!), :class-name, and :style."
           :code $ quote $ defcomp comp-pagination (page total options)
@@ -873,6 +933,34 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String
             :features $ #{} :js-ffi
+        'comp-tooltip $ %{} 'CodeEntry
+          :doc "|Show a CSS-only tooltip when the content is hovered or focused. Options: :placement (:top by default, or :bottom), :class-name, and :style."
+          :code $ quote $ defcomp comp-tooltip (content tip options)
+            span
+              {}
+                :class-name $ str-spaced style-tooltip
+                  match (respo-ui.schema/read-field options :placement) (:bottom style-tooltip-bottom) (_ |)
+                  respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              if (literal? content)
+                <> $ respo.util.format/scalar-attribute-text content
+                , content
+              span $ {} (:role |tooltip) (:class-name style-tooltip-tip) (:inner-text tip)
+          :examples $ [] $ quote
+            comp-tooltip |Save "|Saves the draft" $ Option :some $ respo-ui.schema/TooltipOptions :placement (Option :some :bottom)
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Content 'String $ :: 'calcit.core/Option 'respo-ui.schema/TooltipOptions
+            :generics $ [] 'Content
+          :tests $ [] $ %{} 'TestEntry (:name |render-tip)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-tooltip |Save |Hint
+                  Option :some $ respo-ui.schema/TooltipOptions :placement $ Option :some :bottom
+                top $ respo.render.html/make-string $ comp-tooltip |Save |Hint (Option :none)
+              assert= true $ .includes? html "|role=\"tooltip\""
+              assert= true $ .includes? html |>Hint<
+              assert= true $ .includes? html |style-tooltip-bottom
+              assert= false $ .includes? top |style-tooltip-bottom
+            :tags $ #{} :js-only
         'copy-handler $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn copy-handler (code)
             fn (e d!) (copy! code) &unit
@@ -1238,6 +1326,27 @@
               |&:active $ {} (:transform "|scale(1.1)") (:transition-duration |0ms)
           :examples $ []
           :schema $ :: 'String
+        'style-collapse $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-collapse
+            {} $ |& $ {} (:border-radius |8px) (:background-color :white)
+              :border $ str "|1px solid " $ hsl 0 0 90
+          :examples $ []
+          :schema $ :: 'String
+        'style-collapse-body $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-collapse-body
+            {} $ |& $ {} (:padding "|0 14px 12px") (:font-size 14) (:line-height |22px)
+              :color $ hsl 0 0 35
+          :examples $ []
+          :schema $ :: 'String
+        'style-collapse-summary $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-collapse-summary
+            {}
+              |& $ {} (:padding "|10px 14px") (:font-size 14) (:font-weight 500) (:cursor :pointer) (:list-style-position :inside)
+              |&:hover $ {} $ :background-color (hsl 0 0 97)
+              |&:focus-visible $ {} (:outline-offset |-2px)
+                :outline $ str "|2px solid " $ hsl 200 80 50
+          :examples $ []
+          :schema $ :: 'String
         'style-control-disabled $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-control-disabled
             {} $ |& $ {} (:opacity 0.5) (:cursor :not-allowed)
@@ -1348,6 +1457,25 @@
               |$0:hover $ {}
                 :background-color $ hsl 0 0 100
                 :box-shadow $ str "|0 0 4px 1px " $ hsl 0 0 0 0.08
+          :examples $ []
+          :schema $ :: 'String
+        'style-kbd $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-kbd
+            {} $ |& $ {} (:display :inline-block) (:min-width |20px) (:padding "|1px 6px") (:border-radius |4px) (:font-family "|ui-monospace, SFMono-Regular, Menlo, monospace") (:font-size 12) (:line-height |18px) (:text-align :center) (:background-color :white)
+              :color $ hsl 0 0 25
+              :border $ str "|1px solid " $ hsl 0 0 82
+              :box-shadow $ str "|inset 0 -1px 0 " $ hsl 0 0 82
+          :examples $ []
+          :schema $ :: 'String
+        'style-kbd-group $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-kbd-group
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |4px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-kbd-plus $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-kbd-plus
+            {} $ |& $ {} (:margin-right |4px) (:font-size 12)
+              :color $ hsl 0 0 55
           :examples $ []
           :schema $ :: 'String
         'style-pagination $ %{} 'CodeEntry (:doc |)
@@ -1613,6 +1741,24 @@
               |div&:hover $ {} $ :background-color (hsl 60 98 49)
           :examples $ []
           :schema $ :: 'String
+        'style-tooltip $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-tooltip
+            {}
+              |& $ {} (:position :relative) (:display :inline-flex)
+              "|&:hover > [role=tooltip], &:focus-within > [role=tooltip]" $ {} (:opacity 1) (:visibility :visible)
+          :examples $ []
+          :schema $ :: 'String
+        'style-tooltip-bottom $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-tooltip-bottom
+            {} $ "|& > [role=tooltip]" $ {} (:top "|calc(100% + 6px)") (:bottom :auto)
+          :examples $ []
+          :schema $ :: 'String
+        'style-tooltip-tip $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-tooltip-tip
+            {} $ |& $ {} (:position :absolute) (:bottom "|calc(100% + 6px)") (:left |50%) (:transform "|translateX(-50%)") (:z-index 10) (:padding "|4px 8px") (:border-radius |4px) (:font-size 12) (:line-height |18px) (:white-space :nowrap) (:color :white) (:pointer-events :none) (:opacity 0) (:visibility :hidden) (:transition "|opacity 120ms ease")
+              :background-color $ hsl 0 0 15
+          :examples $ []
+          :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp
           :require
@@ -1648,6 +1794,7 @@
                   render-entry |https://github.com/Respo/respo-markdown.calcit |respo-markdown
               comp-demo-form-controls
               comp-demo-navigation
+              comp-demo-disclosure
               comp-demo-data-display
               comp-demo-loading-states
               comp-divider
@@ -1795,6 +1942,43 @@
                     <> "|Progress · 78%" ui/text-label
                     comp-progress 78
                   Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Status summary"
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ []
+        'comp-demo-disclosure $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defcomp comp-demo-disclosure ()
+            div
+              {} $ :class-name style-demo-section
+              div
+                {} $ :class-name style-section-title
+                <> "|Disclosure and hints"
+              div
+                {} $ :class-name style-demo-grid
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap8
+                    comp-collapse "|What does Respo UI include?" "|Form controls, navigation, feedback and display components with typed options." $ Option :some $ respo-ui.schema/CollapseOptions :open? (Option :some true) :name (Option :some |demo-faq)
+                    comp-collapse "|Does it need JavaScript to toggle?" "|No. The panel is a native details element, so the browser handles toggling and keyboard access." $ Option :some $ respo-ui.schema/CollapseOptions :name (Option :some |demo-faq)
+                    comp-collapse "|Can I put nodes inside?"
+                      comp-kbd ([] |Ctrl |K) (Option :none)
+                      Option :some $ respo-ui.schema/CollapseOptions :name $ Option :some |demo-faq
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some |Collapse
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap16
+                    div
+                      {} $ :class-name $ str-spaced css/row-middle css/gap8
+                      <> "|Search with"
+                      comp-kbd ([] |Ctrl |K) (Option :none)
+                      <> |or
+                      comp-kbd ([] "|⌘" |Shift |P) (Option :none)
+                    div
+                      {}
+                        :class-name $ str-spaced css/row-middle css/gap16
+                        :style $ {} $ :padding-top |28px
+                      comp-tooltip (comp-button |Save) "|Saves the current draft" $ Option :none
+                      comp-tooltip (comp-button |Publish) "|Shown below the trigger" $ Option :some $ respo-ui.schema/TooltipOptions :placement (Option :some :bottom)
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Keyboard and tooltip"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -2136,7 +2320,7 @@
             respo-ui.css :as css
             respo.util.format :refer $ hsl
             respo.css :refer $ defstyle
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider comp-radio-group comp-field comp-badge comp-breadcrumb comp-pagination comp-steps
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider comp-radio-group comp-field comp-badge comp-breadcrumb comp-pagination comp-steps comp-collapse comp-kbd comp-tooltip
             js-ffi.shared :as shared
     'respo-ui.comp.container $ %{} 'FileEntry
       :defs $ {}
@@ -3563,6 +3747,15 @@
           :examples $ [] $ quote
             CardOptions :title $ Option :some |Summary
           :schema $ :: 'Enum
+        'CollapseOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct CollapseOptions
+            :open? $ :: 'Option 'Bool
+            :name $ :: 'Option 'String
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            CollapseOptions :name $ Option :some |faq
+          :schema $ :: 'Enum
         'DividerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-divider, including vertical orientation."
           :code $ quote $ defstruct DividerOptions
@@ -3754,6 +3947,14 @@
             :selected-tab-style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
             TabsOptions :selected $ Option :some :book
+          :schema $ :: 'Enum
+        'TooltipOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct TooltipOptions
+            :placement $ :: 'Option 'Tag
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            TooltipOptions :placement $ Option :some :bottom
           :schema $ :: 'Enum
         'read-field $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defmacro read-field (value field)
