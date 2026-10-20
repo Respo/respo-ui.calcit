@@ -48,9 +48,15 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
   sharing `:name`, `role`/`aria-*` attributes for state.
 - Reuse existing item structs (`SelectOption` serves both select and radio
   group) before adding new ones.
-- New components go into the components page (`comp-components-page`) under
-  the matching section, and the referred names go into that namespace's
-  `respo-ui.comp :refer` list.
+- New components get a `demo-block` in the matching category of the components
+  page (`comp-demo-form-controls`, `comp-demo-navigation`, and so on), a chip in
+  `comp-component-index`, and a name in that namespace's `respo-ui.comp :refer`
+  list. `demo-block id title options-struct description & exprs` renders the
+  expressions live and shows the same expressions as Cirru code, generated when
+  the macro expands, so write short struct names (`ButtonOptions`, referred from
+  `respo-ui.schema`) and wrap siblings in one `div` only when the layout needs it.
+  Also add the component id to `componentIds` in `scripts/test-ui-js.mjs`, which
+  is hand-written; the replay test then checks that the new block renders.
 
 ## Styles
 

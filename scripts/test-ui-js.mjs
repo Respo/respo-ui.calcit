@@ -75,10 +75,15 @@ try {
   // Exercise every real showcase route, not only isolated component examples.
   const pages = "respo-ui.comp.container/replay-js-pages";
   const routes = ["index", "layouts", "widgets", "fonts", "components", "utils"];
+  // Every exported component needs a demo block on the components page.
+  const categoryTitles = ["Form controls", "Navigation", "Disclosure and hints", "Feedback", "Data display", "Code and utilities"];
+  const componentIds = ["button", "input", "textarea", "select", "checkbox", "switch", "radio-group", "field", "tabs", "breadcrumb",
+    "pagination", "steps", "collapse", "tooltip", "kbd", "alert", "progress", "spinner", "skeleton", "empty", "badge", "card", "avatar",
+    "tag", "attributes", "divider", "time", "cirru-snippet", "snippet", "copy", "close", "placeholder", "catoptric-text"];
   const pageScenarios = routes.flatMap((route) => [["println", `|Showcase route: ${route}`], ["let", [["html", ["respo.render.html/make-string", ["comp-container",
     ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address", `|/${route}.html`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
     ["assert", [".includes?", "html", "|Respo UI"], `|Showcase route ${route} must render`],
-    ...(route === "components" ? ["Component examples", "Attributes DEMO", "Tabs demo"].map((text) =>
+    ...(route === "components" ? [...categoryTitles, ...componentIds.map((id) => `id="demo-${id}"`)].map((text) =>
       ["assert", [".includes?", "html", `|${text}`], `|Missing component showcase section: ${text}`]) : []),
   ]]);
   operations.push(["edit", "def", pages, "--input-format", "json-ast", "--code",
