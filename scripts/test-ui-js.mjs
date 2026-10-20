@@ -88,13 +88,14 @@ try {
   calls.push([pages]);
   // Build typed callbacks in Calcit, then invoke the actual DOM-host handlers.
   // The event table intentionally exposes opaque host-callable functions.
-  for (const [name, type] of [["checkbox", "Bool"], ["switch", "Bool"], ["select", "String"], ["radio-group", "String"], ["input", "String"], ["textarea", "String"]]) {
+  for (const [name, type] of [["checkbox", "Bool"], ["switch", "Bool"], ["select", "String"], ["radio-group", "String"], ["input", "String"], ["textarea", "String"], ["pagination", "Number"]]) {
     const helper = `replay-${name}-event`;
     const items = "([] (respo-ui.schema/SelectOption :value |a :label |A) (respo-ui.schema/SelectOption :value |b :label |B))";
     const component = { select: `comp-select |a ${items}`, "radio-group": `comp-radio-group |a ${items}`,
-      input: "comp-input |a", textarea: "comp-textarea |a" }[name] ?? `comp-${name} false`;
+      input: "comp-input |a", textarea: "comp-textarea |a", pagination: "comp-pagination 2 3" }[name] ?? `comp-${name} false`;
     const options = { select: "respo-ui.schema/SelectOptions", "radio-group": "respo-ui.schema/RadioGroupOptions",
-      input: "respo-ui.schema/InputOptions", textarea: "respo-ui.schema/InputOptions" }[name]
+      input: "respo-ui.schema/InputOptions", textarea: "respo-ui.schema/InputOptions",
+      pagination: "respo-ui.schema/PaginationOptions" }[name]
       ?? "respo-ui.schema/SwitchOptions";
     operations.push(["edit", "def", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code", `quote $ defn ${helper} ()
   ${component} $ Option :some $ ${options} :on-change
@@ -185,6 +186,16 @@ try {
     const handler = field(radios[index], "event").get(c.newTag("change"));
     assert.equal(handler(c.parse_cirru_edn("{}"), value => { dispatched.push(value); }), undefined);
     assert.deepEqual(dispatched, [expected], `radio-group: item ${index}`);
+  }
+  // Page buttons dispatch their target page; the current page does not dispatch.
+  const pageButtons = elements(field(components.replay_pagination_event(), "tree"))
+    .filter(element => field(element, "name").value === "button");
+  assert.equal(pageButtons.length, 5, "pagination 2 of 3 renders prev, three pages and next");
+  for (const [index, expected] of [[0, [1]], [1, [1]], [2, []], [3, [3]], [4, [3]]]) {
+    const dispatched = [];
+    const handler = field(pageButtons[index], "event").get(c.newTag("click"));
+    assert.equal(handler(c.parse_cirru_edn("{}"), value => { dispatched.push(value); }), undefined);
+    assert.deepEqual(dispatched, expected, `pagination: button ${index}`);
   }
   console.log(`Generated JS replay passed: ${listed.selected}/${listed.selected} attached ASTs, ${scenarios.length} skeleton scenarios, ${routes.length} showcase routes and checked/value host-event boundaries`);
 } finally {

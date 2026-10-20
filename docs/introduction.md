@@ -13,7 +13,7 @@ It is not an npm component package. JavaScript dependencies are installed by the
 ```cirru
 {} (:calcit-version |0.30.1-alpha.4)
   :dependencies $ {}
-    |Respo/respo-ui.calcit |0.7.41
+    |Respo/respo-ui.calcit |0.8.0
 ```
 
 ```bash

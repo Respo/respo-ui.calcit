@@ -18,7 +18,7 @@ Add the tagged Calcit module to `deps.cirru`:
 ```cirru
 {} (:calcit-version |0.30.1-alpha.4)
   :dependencies $ {}
-    |Respo/respo-ui.calcit |0.7.41
+    |Respo/respo-ui.calcit |0.8.0
 ```
 
 Then synchronize modules with `caps` and import only the APIs you use:

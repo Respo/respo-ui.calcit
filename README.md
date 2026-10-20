@@ -10,6 +10,18 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
+### 0.8.0
+
+New components: `comp-radio-group`, `comp-field`, `comp-badge`, `comp-breadcrumb`,
+`comp-pagination`, `comp-steps`, `comp-collapse`, `comp-kbd` and `comp-tooltip`.
+`comp-input` and `comp-textarea` take an `:on-change` callback that receives the
+value and `d!`. The full list with signatures and examples is in
+[docs/components.md](docs/components.md); it is generated from the definitions.
+
+新增组件：单选组、表单字段、徽标、面包屑、分页、步骤条、折叠面板、按键提示和
+文字提示。`comp-input` 与 `comp-textarea` 新增 `:on-change`，回调收到输入值和 `d!`。
+完整列表见 [docs/components.md](docs/components.md)。依赖版本与 0.7.41 相同。
+
 ### Dependency boundary
 
 `respo-ui` provides styles and UI primitives. It depends on the lower-level
