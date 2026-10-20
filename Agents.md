@@ -55,6 +55,8 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
   expressions live and shows the same expressions as Cirru code, generated when
   the macro expands, so write short struct names (`ButtonOptions`, referred from
   `respo-ui.schema`) and wrap siblings in one `div` only when the layout needs it.
+  Also add the component id to `componentIds` in `scripts/test-ui-js.mjs`, which
+  is hand-written; the replay test then checks that the new block renders.
 
 ## Styles
 

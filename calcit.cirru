@@ -2021,7 +2021,7 @@
               demo-block |checkbox |comp-checkbox |SwitchOptions "|Controlled native checkbox with an optional label."
                 comp-checkbox true $ Option :some $ SwitchOptions :label (Option :some |Subscribed)
                 comp-checkbox false $ Option :some $ SwitchOptions :label (Option :some |Unchecked)
-              demo-block |switch |comp-switch |SwitchOptions "|Accessible switch backed by a checkbox with role=switch."
+              demo-block |switch |comp-switch |SwitchOptions "|Switch-styled native checkbox with an optional label."
                 comp-switch true $ Option :some $ SwitchOptions :label (Option :some "|Compact mode")
                 comp-switch false $ Option :some $ SwitchOptions :label (Option :some |Disabled) :disabled (Option :some true)
               demo-block |radio-group |comp-radio-group |RadioGroupOptions "|Visible choices that share a :name. Supports vertical layout and disabled items." $ comp-radio-group |calcit language-options $ Option :some
@@ -2053,7 +2053,7 @@
                   TabsOptions :selected (Option :some :card) :vertical? (Option :some true) :width $ Option :some 160
                   [] (TabRoute :tab :book |Book) (TabRoute :tab :card |Card) (TabRoute :tab :pl |Language)
                   , ignore-tab-route
-              demo-block |breadcrumb |comp-breadcrumb |BreadcrumbItem "|A trail of links ending with the current page." $ comp-breadcrumb
+              demo-block |breadcrumb |comp-breadcrumb |BreadcrumbOptions "|A trail of links ending with the current page." $ comp-breadcrumb
                 []
                   BreadcrumbItem :label |Home :href $ Option :some |#/index.html
                   BreadcrumbItem :label |Components :href $ Option :some |#/components.html
@@ -2159,8 +2159,8 @@
             :args $ [] 'String 'String 'String
         'render-chip $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-chip (id)
-            div
-              {} (:class-name style-index-chip)
+            button
+              {} (:type |button) (:class-name style-index-chip)
                 :on-click $ on-jump $ str |#demo- id
               <> id
           :examples $ []
@@ -2197,8 +2197,8 @@
           :code $ quote $ defn render-index-group (cat-id title ids)
             div
               {} $ :class-name style-index-group
-              div
-                {} (:class-name style-index-title)
+              button
+                {} (:type |button) (:class-name style-index-title)
                   :on-click $ on-jump $ str |#category- cat-id
                 <> title
               list->
@@ -2293,9 +2293,10 @@
           :schema $ :: 'String
         'style-index-chip $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-index-chip
-            {} $ |& $ {} (:padding "|2px 8px") (:border-radius |10px) (:font-family ui/font-code) (:font-size |12px) (:cursor :pointer) (:transition "|background-color 120ms")
-              :color $ hsl 220 45 38
-              :background-color $ hsl 220 60 96
+            {}
+              |& $ {} (:padding "|2px 8px") (:border |none) (:border-radius |10px) (:font-family ui/font-code) (:font-size |12px) (:cursor :pointer) (:transition "|background-color 120ms")
+                :color $ hsl 220 45 38
+                :background-color $ hsl 220 60 96
               |&:hover $ {} $ :background-color (hsl 220 70 92)
           :examples $ []
           :schema $ :: 'String
@@ -2312,8 +2313,10 @@
           :schema $ :: 'String
         'style-index-title $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-index-title
-            {} $ |& $ {} (:margin-bottom |8px) (:font-size |13px) (:font-weight |600) (:cursor :pointer)
-              :color $ hsl 220 18 24
+            {}
+              |& $ {} (:display :block) (:margin-bottom |8px) (:padding |0) (:border |none) (:background :none) (:font-family :inherit) (:font-size |13px) (:font-weight |600) (:cursor :pointer) (:text-align :left)
+                :color $ hsl 220 18 24
+              |&:hover $ {} $ :color (hsl 220 55 40)
           :examples $ []
           :schema $ :: 'String
         'style-page-hero $ %{} 'CodeEntry (:doc |)
@@ -2344,7 +2347,7 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.components
           :require
-            respo.core :refer $ defcomp >> div a <> pre code list->
+            respo.core :refer $ defcomp >> div a <> pre code list-> button
             respo.comp.space :refer $ =<
             respo-ui.core :as ui
             respo-ui.css :as css
@@ -3537,10 +3540,18 @@
           :schema $ :: 'String
         'select $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle select
-            {} (|$0 ui/select)
+            {}
+              |$0 $ merge ui/select $ {} (:appearance :none) (:background-color :white) (:background-repeat :no-repeat) (:background-position "|right 8px center") (:padding "|0 28px 0 8px") (:transition "|border-color 120ms")
+                :color $ hsl 220 15 20
+                :background-image "|url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%238a93a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")"
+              "|$0:hover:not(:disabled)" $ {} $ :border
+                str "|1px solid " $ hsl 220 15 65
               |$0:focus $ {}
                 :border $ str "|1px solid " $ hsl 200 50 75
                 :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (Option :some 0.2)
+              |$0:disabled $ {} (:cursor :not-allowed)
+                :color $ hsl 220 10 62
+                :background-color $ hsl 220 15 97
           :examples $ []
           :schema $ :: 'String
         'split-layout $ %{} 'CodeEntry
