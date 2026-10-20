@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import * as c from "@calcit/procs";
@@ -74,17 +74,20 @@ try {
   calls.push([browser]);
   // Exercise every real showcase route, not only isolated component examples.
   const pages = "respo-ui.comp.container/replay-js-pages";
-  const routes = ["index", "layouts", "widgets", "fonts", "components", "utils"];
+  const routes = ["index", "design", "layouts", "widgets", "fonts", "components", "utils"];
   // Every exported component needs a demo block on the components page.
   const categoryTitles = ["Form controls", "Navigation", "Disclosure and hints", "Feedback", "Data display", "Code and utilities"];
   const componentIds = ["button", "input", "textarea", "select", "checkbox", "switch", "radio-group", "field", "tabs", "breadcrumb",
     "pagination", "steps", "collapse", "tooltip", "kbd", "alert", "progress", "spinner", "skeleton", "empty", "badge", "card", "avatar",
     "tag", "attributes", "divider", "time", "cirru-snippet", "snippet", "copy", "close", "placeholder", "catoptric-text"];
+  const designSections = ["color", "typography", "spacing", "shape", "sizing", "elevation", "motion", "conventions", "usage"];
   const pageScenarios = routes.flatMap((route) => [["println", `|Showcase route: ${route}`], ["let", [["html", ["respo.render.html/make-string", ["comp-container",
     ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address", `|/${route}.html`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
     ["assert", [".includes?", "html", "|Respo UI"], `|Showcase route ${route} must render`],
     ...(route === "components" ? [...categoryTitles, ...componentIds.map((id) => `id="demo-${id}"`)].map((text) =>
       ["assert", [".includes?", "html", `|${text}`], `|Missing component showcase section: ${text}`]) : []),
+    ...(route === "design" ? designSections.map((id) => `id="design-${id}"`).map((text) =>
+      ["assert", [".includes?", "html", `|${text}`], `|Missing design system section: ${text}`]) : []),
   ]]);
   operations.push(["edit", "def", pages, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-js-pages", [], ...pageScenarios, "&unit"])]);
@@ -128,6 +131,14 @@ try {
   const generated = await import(pathToFileURL(path.join(output, "respo-ui.util.mjs")).href);
   assert.equal(typeof generated.replay_all_attached, "function");
   generated.replay_all_attached();
+  // Every var(--rui-*) in the generated code must name a declared design token.
+  const declared = new Set([...original.toString().matchAll(/DesignToken :group \S+ :name \|([\w-]+)/g)].map((m) => m[1]));
+  assert.ok(declared.size > 100, "design tokens must be declared in respo-ui.tokens/design-tokens");
+  for (const file of readdirSync(output).filter((name) => name.startsWith("respo-ui.") && name.endsWith(".mjs"))) {
+    for (const [, name] of readFileSync(path.join(output, file), "utf8").matchAll(/var\(--rui-([\w-]+)\)/g)) {
+      assert.ok(declared.has(name), `${file} reads undeclared token --rui-${name}`);
+    }
+  }
   const components = await import(pathToFileURL(path.join(output, "respo-ui.comp.mjs")).href);
   const field = (value, name) => value.get(c.newTag(name));
   const elements = (option) => {

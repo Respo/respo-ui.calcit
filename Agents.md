@@ -63,6 +63,11 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
 
 ## Styles
 
+- Design tokens live in `respo-ui.tokens` and are documented in
+  `docs/design-system.md` and on the site's Design system page. Read colors,
+  sizes, radii, shadows and durations through `tokens/<name>` instead of
+  writing `hsl` values or pixel literals. Add a token to `design-tokens` (the
+  `:root` style and the page are generated from it) and give it a matching def.
 - `defstyle` generates class names such as `style-badge__respo-ui_comp`, so
   never write another style's class name into a selector. Apply the class
   directly, or target children by attribute (`"|&:hover > [role=tooltip]"`).
