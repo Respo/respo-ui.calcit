@@ -1712,12 +1712,12 @@
           :schema $ :: 'String
         'style-switch-input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-input
-            {} $ |& $ {} (:position :absolute) (:width |1px) (:height |1px) (:opacity 0) (:pointer-events :none)
+            {} $ |& $ {} (:position :absolute) (:top 0) (:left 0) (:width |1px) (:height |1px) (:margin 0) (:opacity 0) (:pointer-events :none)
           :examples $ []
           :schema $ :: 'String
         'style-switch-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-label
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |8px) (:cursor :pointer) (:user-select :none)
+            {} $ |& $ {} (:position :relative) (:display :inline-flex) (:align-items :center) (:gap |8px) (:cursor :pointer) (:user-select :none)
           :examples $ []
           :schema $ :: 'String
         'style-switch-track $ %{} 'CodeEntry (:doc |)
@@ -1726,7 +1726,7 @@
               |& $ {} (:position :relative) (:display :inline-block) (:width |36px) (:height |20px) (:border-radius |999px)
                 :background-color $ hsl 220 12 82
                 :transition "|background-color 160ms ease"
-              |&::after $ {} (:content ||) (:position :absolute) (:top |2px) (:left |2px) (:width |16px) (:height |16px) (:border-radius |50%) (:background-color :white)
+              |&::after $ {} (:content "|\"\"") (:position :absolute) (:top |2px) (:left |2px) (:width |16px) (:height |16px) (:border-radius |50%) (:background-color :white)
                 :box-shadow $ str "|0 1px 4px " $ hsl 0 0 0 0.2
                 :transition "|transform 160ms ease"
           :examples $ []
