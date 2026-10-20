@@ -2348,6 +2348,7 @@
                   (:widgets) :widgets
                   (:layouts) :layouts
                   (:fonts) :fonts
+                  (:design) :design
                   (:components) :components
                   (:utils) :utils
                   (:not-found _) :not-found
@@ -2367,6 +2368,7 @@
                       (:widgets) (comp-widgets-page)
                       (:layouts) (comp-layouts-page)
                       (:fonts) (comp-fonts-page)
+                      (:design) (comp-design-page)
                       (:components) (comp-components-page)
                       (:utils) (comp-utils-page)
                       (:not-found pp)
@@ -2422,7 +2424,9 @@
             :args $ []
         'css-content $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-content
-            {} $ |$0 $ {} (:flex |1) (:min-width |0) (:overflow-y :auto) (:box-sizing :border-box) (:padding "|8px 32px 48px")
+            {}
+              |$0 $ {} (:flex |1) (:min-width |0) (:overflow-y :auto) (:box-sizing :border-box) (:padding "|8px 32px 48px")
+              |$0$0 $ {} (:contained "|@media (max-width: 760px)") (:padding "|8px 16px 48px")
           :examples $ []
           :schema $ :: 'String
         'css-content-home $ %{} 'CodeEntry (:doc |)
@@ -2455,12 +2459,546 @@
             respo-ui.comp.widgets-page :refer $ comp-widgets-page
             respo-ui.comp.layouts-page :refer $ comp-layouts-page
             respo-ui.comp.fonts-page :refer $ comp-fonts-page
+            respo-ui.comp.design-page :refer $ comp-design-page
             respo-ui.comp.components :refer $ comp-components-page
             respo.css :refer $ defstyle
             respo-ui.css :as css
             respo-ui.config :refer $ dev?
             respo-ui.util :refer $ tab-echo!
             respo-ui.comp :refer $ comp-cirru-snippet
+    'respo-ui.comp.design-page $ %{} 'FileEntry
+      :defs $ {}
+        'DesignNote $ %{} 'CodeEntry (:doc "|A titled paragraph on the design system page.")
+          :code $ quote $ defstruct DesignNote (:title 'String) (:body 'String)
+          :examples $ []
+          :schema $ :: 'StructDef
+        'TokenGroup $ %{} 'CodeEntry (:doc "|A titled set of token names shown together.")
+          :code $ quote $ defstruct TokenGroup (:title 'String)
+            :names $ :: 'List 'String
+          :examples $ []
+          :schema $ :: 'StructDef
+        'color-groups $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def color-groups
+            []
+              TokenGroup :title |Text :names $ [] |color-text |color-text-secondary |color-text-muted |color-text-disabled |color-text-inverse
+              TokenGroup :title "|Surface and border" :names $ [] |color-bg |color-surface |color-surface-subtle |color-surface-muted |color-border |color-border-strong
+              TokenGroup :title |Primary :names $ [] |color-primary |color-primary-hover |color-primary-active |color-primary-soft |color-primary-border |color-focus
+              TokenGroup :title |Info :names $ [] |color-info |color-info-soft |color-info-border |color-info-text
+              TokenGroup :title |Success :names $ [] |color-success |color-success-soft |color-success-border |color-success-text
+              TokenGroup :title |Warning :names $ [] |color-warning |color-warning-soft |color-warning-border |color-warning-text
+              TokenGroup :title |Danger :names $ [] |color-danger |color-danger-soft |color-danger-border |color-danger-text |color-overlay
+          :examples $ []
+          :schema $ :: 'List 'respo-ui.comp.design-page/TokenGroup
+        'comp-design-page $ %{} 'CodeEntry
+          :doc "|Design system page: principles, every token and the component conventions."
+          :code $ quote $ defcomp comp-design-page ()
+            div
+              {} $ :class-name style-page
+              div
+                {} $ :class-name style-hero
+                div
+                  {} $ :class-name style-eyebrow
+                  <> |Foundations
+                div
+                  {} $ :class-name style-title
+                  <> "|Design system"
+                div
+                  {} $ :class-name style-lead
+                  <> "|One set of tokens and rules behind every Respo UI component. Tokens are CSS custom properties named --rui-*, declared on :root by respo-ui.tokens, and read in Calcit through defs such as tokens/color-primary. Override the variables to theme an app; never write raw colors or sizes inside a component."
+              render-principles
+              render-section-head |color |Color "|A neutral gray ramp carries the interface. Blue is the single accent for actions, selection and focus. Green, amber and red only signal state. Components use the semantic names below, not the palette."
+              render-palette
+              render-color-groups
+              render-section-head |typography |Typography "|Hind for interface text, Source Code Pro for code and keys, Josefin Sans only for brand titles. Body and controls use text-md; labels and descriptions step down to text-sm."
+              render-token-table (tokens-of |font) :font
+              render-token-table (tokens-of |text) :text
+              render-section-head |spacing |Spacing "|Every padding, gap and offset comes from a 4px grid. Components own their inner spacing; space between components belongs to layout classes such as css/stack and css/cluster."
+              render-token-table (tokens-of |space) :space
+              render-section-head |shape |Shape "|Four radii: sm for small marks, md for controls, lg for containers, full for pills."
+              render-token-table (tokens-of |radius) :radius
+              render-section-head |sizing "|Control sizing" "|All interactive controls share three heights so they line up in a toolbar or a form row. md is the default."
+              render-token-table (tokens-of |control) :control
+              render-section-head |elevation |Elevation "|Shadows are reserved for surfaces that float. Resting cards use a border; hover and popovers lift with shadows; focus uses its own ring."
+              render-token-table (tokens-of |shadow) :shadow
+              render-section-head |motion "|Motion and layers" "|Transitions animate color, opacity and transform only, with duration-fast for hover and press. Layers keep floating surfaces in a fixed order."
+              render-token-table (tokens-of |motion) :plain
+              render-token-table (tokens-of |layer) :plain
+              render-section-head |conventions "|Component conventions" "|Rules every component follows. New components and reviews check against this list."
+              render-rules
+              render-section-head |usage "|Using tokens" "|Read tokens in defstyle through respo-ui.tokens. To theme an app, override the variables after the library styles load."
+              div
+                {} $ :class-name style-usage
+                comp-cirru-snippet "|ns app.comp.panel\n  :require\n    respo-ui.tokens :as tokens\n    respo.css :refer $ defstyle\n\ndefstyle style-panel $ {}\n  |& $ {} (:padding tokens/space-4) (:border-radius tokens/radius-lg)\n    :background-color tokens/color-surface\n    :border $ str \"|1px solid \" tokens/color-border" $ Option :none
+                comp-snippet "|:root {\n  --rui-blue-500: hsl(262 70% 56%);\n  --rui-blue-600: hsl(262 64% 48%);\n  --rui-radius-md: 4px;\n}" $ Option :none
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ []
+        'palette-families $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def palette-families ([] |gray |blue |green |amber |red)
+          :examples $ []
+          :schema $ :: 'List 'String
+        'principles $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def principles
+            []
+              DesignNote :title "|Quiet by default" :body "|Neutral surfaces and one accent. Color appears only when it means something: an action, a selection or a state."
+              DesignNote :title "|Native first" :body "|Buttons, inputs, selects, details and checkboxes are native elements, so keyboard and screen reader behaviour come for free."
+              DesignNote :title "|Controlled state" :body "|Values come in as arguments and changes go out through :on-change. Components keep no hidden state."
+              DesignNote :title "|One geometry" :body "|Sizes come from a 4px grid, three control heights and four radii, so components line up without tweaks."
+          :examples $ []
+          :schema $ :: 'List 'respo-ui.comp.design-page/DesignNote
+        'render-color-groups $ %{} 'CodeEntry
+          :doc "|Semantic colors as swatch cards, one row per role."
+          :code $ quote $ defn render-color-groups ()
+            list->
+              {} $ :class-name style-color-groups
+              map color-groups $ fn (group)
+                [] group.:title $ div ({})
+                  div
+                    {} $ :class-name style-group-title
+                    <> group.:title
+                  list->
+                    {} $ :class-name style-swatch-grid
+                    map
+                      filter (tokens-of |color)
+                        fn (token) (includes? group.:names token.:name)
+                      fn (token)
+                        [] token.:name $ div
+                          {} $ :class-name style-swatch-card
+                          div $ {} (:class-name style-swatch-color)
+                            :style $ {} $ :background-color (token-var token.:name)
+                          div
+                            {} $ :class-name style-swatch-meta
+                            div
+                              {} $ :class-name style-code
+                              <> $ str |tokens/ token.:name
+                            div
+                              {} $ :class-name style-value
+                              <> token.:value
+                            div
+                              {} $ :class-name style-swatch-note
+                              <> token.:note
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ []
+        'render-palette $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-palette ()
+            list->
+              {} $ :class-name style-palette
+              map palette-families $ fn (family)
+                [] family $ div
+                  {} $ :class-name style-palette-row
+                  div
+                    {} $ :class-name style-palette-name
+                    <> family
+                  list->
+                    {} $ :class-name style-palette-ramp
+                    map
+                      filter (tokens-of |palette)
+                        fn (token)
+                          starts-with? token.:name $ str family |-
+                      fn (token)
+                        [] token.:name $ div
+                          {} (:class-name style-ramp-step) (:title token.:value)
+                          div $ {} (:class-name style-ramp-chip)
+                            :style $ {} $ :background-color (token-var token.:name)
+                          div
+                            {} $ :class-name style-ramp-label
+                            <> $ &str:replace token.:name (str family |-) |
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ []
+        'render-principles $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-principles ()
+            list->
+              {} $ :class-name style-principles
+              map principles $ fn (item)
+                let
+                    title item.:title
+                    body item.:body
+                  [] title $ div
+                    {} $ :class-name style-principle
+                    div
+                      {} $ :class-name style-principle-title
+                      <> title
+                    div
+                      {} $ :class-name style-principle-body
+                      <> body
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ []
+        'render-rules $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-rules ()
+            list->
+              {} $ :class-name style-rules
+              map rules $ fn (item)
+                let
+                    title item.:title
+                    body item.:body
+                  [] title $ div
+                    {} $ :class-name style-rule
+                    div
+                      {} $ :class-name style-rule-title
+                      <> title
+                    div
+                      {} $ :class-name style-principle-body
+                      <> body
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ []
+        'render-sample $ %{} 'CodeEntry
+          :doc "|Visual sample of one token, chosen by the kind of table."
+          :code $ quote $ defn render-sample (kind token)
+            let
+                css-ref $ token-var token.:name
+              case-default kind
+                div
+                  {} $ :class-name style-sample-plain
+                  <> token.:value
+                :swatch $ div $ {} (:class-name style-sample-swatch)
+                  :style $ {} $ :background-color css-ref
+                :font $ div
+                  {} (:class-name style-sample-text)
+                    :style $ {} $ :font-family css-ref
+                  <> "|Aa 组件 0123"
+                :text $ div
+                  {} (:class-name style-sample-text)
+                    :style $ if (starts-with? token.:name |text-)
+                      {} $ :font-size css-ref
+                      if (starts-with? token.:name |weight-)
+                        {} $ :font-weight css-ref
+                        {} $ :line-height css-ref
+                  <> |Aa
+                :space $ div $ {} (:class-name style-sample-space)
+                  :style $ {} $ :width css-ref
+                :radius $ div $ {} (:class-name style-sample-radius)
+                  :style $ {} $ :border-radius css-ref
+                :control $ div
+                  {} (:class-name style-sample-control)
+                    :style $ if (ends-with? token.:name |-padding)
+                      {} $ :padding-inline css-ref
+                      {} $ :height css-ref
+                  <> |Button
+                :shadow $ div $ {} (:class-name style-sample-shadow)
+                  :style $ {} $ :box-shadow css-ref
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'Tag 'respo-ui.tokens/DesignToken
+        'render-section-head $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-section-head (id title lead)
+            div
+              {}
+                :id $ str |design- id
+                :class-name style-section-head
+              div
+                {} $ :class-name style-section-title
+                <> title
+              div
+                {} $ :class-name style-section-lead
+                <> lead
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'String 'String 'String
+        'render-token-table $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-token-table (tokens kind)
+            div
+              {} $ :class-name style-table
+              div
+                {} $ :class-name $ str-spaced style-row style-row-head
+                <> |Sample
+                <> |Token
+                <> |Usage
+              list-> ({})
+                map tokens $ fn (token)
+                  [] token.:name $ div
+                    {} $ :class-name style-row
+                    div
+                      {} $ :class-name style-cell-sample
+                      render-sample kind token
+                    div ({})
+                      div
+                        {} $ :class-name style-code
+                        <> $ str |tokens/ token.:name
+                      div
+                        {} $ :class-name style-value
+                        <> $ str |--rui- token.:name "| · " token.:value
+                    div
+                      {} $ :class-name style-note
+                      <> token.:note
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] (:: 'List 'respo-ui.tokens/DesignToken) 'Tag
+        'rules $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def rules
+            []
+              DesignNote :title |Sizes :body "|Controls take :size :sm, :md or :lg: heights control-sm/md/lg, horizontal padding control-*-padding, font text-sm, text-md or text-lg. Default is :md. Controls use radius-md; tags, badges and kbd use radius-sm."
+              DesignNote :title |States :body "|Every interactive element styles hover, active, :focus-visible and disabled. Focus adds focus-ring and never removes the outline without it. Disabled uses color-text-disabled on color-surface-muted, cursor not-allowed and no hover."
+              DesignNote :title |Intent :body "|:kind picks the intent: :info, :success, :warning or :error, mapped to the info, success, warning and danger tokens. Solid fills use color-*; soft surfaces use color-*-soft, color-*-border and color-*-text."
+              DesignNote :title |Validation :body "|An invalid field gets a color-danger border, aria-invalid and a message in color-danger-text below it. Required marks use color-danger-text."
+              DesignNote :title |Spacing :body "|Inner padding and gaps use space-* tokens. A component sets no outer margin; the parent layout spaces its children."
+              DesignNote :title |Text :body "|Body and controls: text-md, leading-normal. Labels: text-sm, weight-medium. Captions: text-xs, color-text-muted. Titles use weight-semibold, not the display font."
+              DesignNote :title |Motion :body "|Animate color, background, opacity and transform with duration-fast and ease. Expanding content uses duration-normal. Wrap anything larger in prefers-reduced-motion."
+              DesignNote :title |Accessibility :body "|Text contrast is at least 4.5:1. Icon-only controls carry aria-label. Targets are at least 24px. State is exposed with aria attributes, not only color."
+              DesignNote :title |Naming :body "|Options structs are named <Component>Options in respo-ui.schema. Style defs are style-<component>-<part>. Components read tokens/<name> and never contain raw hsl values or pixel literals outside the scale."
+          :examples $ []
+          :schema $ :: 'List 'respo-ui.comp.design-page/DesignNote
+        'style-cell-sample $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-cell-sample
+            {} $ |& $ {} (:display :flex) (:align-items :center) (:min-height tokens/control-md) (:min-width 0) (:overflow :hidden)
+          :examples $ []
+          :schema $ :: 'String
+        'style-code $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-code
+            {} $ |& $ {} (:font-family tokens/font-mono) (:font-size tokens/text-xs) (:color tokens/color-text) (:overflow-wrap :anywhere)
+          :examples $ []
+          :schema $ :: 'String
+        'style-color-groups $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-color-groups
+            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:gap tokens/space-6) (:margin-top tokens/space-8)
+          :examples $ []
+          :schema $ :: 'String
+        'style-eyebrow $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-eyebrow
+            {} $ |& $ {} (:font-size tokens/text-sm) (:font-weight tokens/weight-semibold) (:color tokens/color-primary) (:line-height tokens/leading-normal)
+          :examples $ []
+          :schema $ :: 'String
+        'style-group-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-group-title
+            {} $ |& $ {} (:margin-bottom tokens/space-2) (:font-size tokens/text-sm) (:font-weight tokens/weight-semibold) (:color tokens/color-text-secondary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero
+            {} $ |& $ {} (:padding "|32px 0 8px") (:max-width |760px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-lead $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-lead
+            {} $ |& $ {} (:margin-top tokens/space-3) (:font-size tokens/text-lg) (:line-height tokens/leading-relaxed) (:color tokens/color-text-secondary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-note $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-note
+            {} $ |& $ {} (:color tokens/color-text-secondary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-page $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-page
+            {} $ |& $ {} (:max-width |1080px) (:padding-bottom tokens/space-16) (:color tokens/color-text)
+          :examples $ []
+          :schema $ :: 'String
+        'style-palette $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-palette
+            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:gap tokens/space-3) (:margin-bottom tokens/space-6)
+          :examples $ []
+          :schema $ :: 'String
+        'style-palette-name $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-palette-name
+            {} $ |& $ {} (:width |56px) (:flex-shrink 0) (:font-family tokens/font-mono) (:font-size tokens/text-sm) (:color tokens/color-text-secondary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-palette-ramp $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-palette-ramp
+            {} $ |& $ {} (:display :flex) (:flex 1) (:min-width 0) (:gap tokens/space-1) (:overflow-x :auto)
+          :examples $ []
+          :schema $ :: 'String
+        'style-palette-row $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-palette-row
+            {} $ |& $ {} (:display :flex) (:align-items :center) (:gap tokens/space-4)
+          :examples $ []
+          :schema $ :: 'String
+        'style-principle $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-principle
+            {} $ |& $ {} (:padding tokens/space-5) (:border-radius tokens/radius-lg) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border
+              :border-top $ str "|3px solid " tokens/color-primary
+          :examples $ []
+          :schema $ :: 'String
+        'style-principle-body $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-principle-body
+            {} $ |& $ {} (:margin-top tokens/space-2) (:font-size tokens/text-sm) (:line-height tokens/leading-normal) (:color tokens/color-text-secondary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-principle-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-principle-title
+            {} $ |& $ {} (:font-size tokens/text-lg) (:font-weight tokens/weight-semibold) (:line-height tokens/leading-tight)
+          :examples $ []
+          :schema $ :: 'String
+        'style-principles $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-principles
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(220px, 1fr))") (:gap tokens/space-4) (:margin-top tokens/space-8)
+          :examples $ []
+          :schema $ :: 'String
+        'style-ramp-chip $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-ramp-chip
+            {} $ |& $ {} (:height tokens/control-lg) (:border-radius tokens/radius-md)
+              :box-shadow $ str "|inset 0 0 0 1px " tokens/color-border
+          :examples $ []
+          :schema $ :: 'String
+        'style-ramp-label $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-ramp-label
+            {} $ |& $ {} (:margin-top tokens/space-1) (:font-family tokens/font-mono) (:font-size tokens/text-xs) (:line-height tokens/leading-normal) (:color tokens/color-text-muted)
+          :examples $ []
+          :schema $ :: 'String
+        'style-ramp-step $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-ramp-step
+            {} $ |& $ {} (:flex "|1 0 56px") (:max-width |96px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-row $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-row
+            {}
+              |& $ {} (:display :grid)
+                :grid-template-columns "|112px minmax(160px, 1.2fr) minmax(140px, 1fr) minmax(160px, 1.4fr)"
+                :gap tokens/space-4
+                :align-items :center
+                :padding "|10px 16px"
+                :font-size tokens/text-sm
+                :line-height tokens/leading-normal
+                :border-top $ str "|1px solid " tokens/color-border
+              |&:first-child $ {} $ :border-top :none
+          :examples $ []
+          :schema $ :: 'String
+        'style-row-head $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-row-head
+            {} $ |& $ {} (:font-size tokens/text-xs) (:font-weight tokens/weight-semibold) (:text-transform :uppercase) (:letter-spacing |0.04em) (:color tokens/color-text-muted) (:background-color tokens/color-surface-subtle)
+          :examples $ []
+          :schema $ :: 'String
+        'style-rule $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-rule
+            {} $ |& $ {} (:padding tokens/space-4) (:border-radius tokens/radius-lg) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border
+          :examples $ []
+          :schema $ :: 'String
+        'style-rule-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-rule-title
+            {} $ |& $ {} (:font-size tokens/text-md) (:font-weight tokens/weight-semibold) (:line-height tokens/leading-tight)
+          :examples $ []
+          :schema $ :: 'String
+        'style-rules $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-rules
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(300px, 1fr))") (:gap tokens/space-3)
+          :examples $ []
+          :schema $ :: 'String
+        'style-sample-control $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sample-control
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:height tokens/control-md) (:padding-inline tokens/control-md-padding) (:border-radius tokens/radius-md) (:font-size tokens/text-sm) (:color tokens/color-text) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border-strong
+          :examples $ []
+          :schema $ :: 'String
+        'style-sample-plain $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sample-plain
+            {} $ |& $ {} (:font-family tokens/font-mono) (:font-size tokens/text-xs) (:color tokens/color-text-secondary) (:overflow-wrap :anywhere)
+          :examples $ []
+          :schema $ :: 'String
+        'style-sample-radius $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sample-radius
+            {} $ |& $ {} (:width tokens/control-lg) (:height tokens/control-lg) (:background-color tokens/color-primary-soft)
+              :border $ str "|2px solid " tokens/color-primary
+          :examples $ []
+          :schema $ :: 'String
+        'style-sample-shadow $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sample-shadow
+            {} $ |& $ {} (:width |72px) (:height tokens/control-md) (:border-radius tokens/radius-md) (:background-color tokens/color-surface)
+          :examples $ []
+          :schema $ :: 'String
+        'style-sample-space $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sample-space
+            {} $ |& $ {} (:height tokens/space-3) (:border-radius tokens/radius-sm) (:background-color tokens/color-primary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-sample-swatch $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sample-swatch
+            {} $ |& $ {} (:width |72px) (:height tokens/control-md) (:border-radius tokens/radius-md)
+              :box-shadow $ str "|inset 0 0 0 1px " tokens/color-border
+          :examples $ []
+          :schema $ :: 'String
+        'style-sample-text $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sample-text
+            {} $ |& $ {} (:white-space :nowrap) (:line-height tokens/leading-tight)
+          :examples $ []
+          :schema $ :: 'String
+        'style-section-head $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-section-head
+            {} $ |& $ {} (:margin-top tokens/space-12) (:margin-bottom tokens/space-4) (:scroll-margin-top tokens/space-4) (:max-width |760px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-section-lead $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-section-lead
+            {} $ |& $ {} (:margin-top tokens/space-2) (:font-size tokens/text-md) (:line-height tokens/leading-normal) (:color tokens/color-text-secondary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-section-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-section-title
+            {} $ |& $ {} (:font-size tokens/text-2xl) (:font-weight tokens/weight-semibold) (:line-height tokens/leading-tight)
+          :examples $ []
+          :schema $ :: 'String
+        'style-swatch-card $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-swatch-card
+            {} $ |& $ {} (:border-radius tokens/radius-lg) (:overflow :hidden) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border
+          :examples $ []
+          :schema $ :: 'String
+        'style-swatch-color $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-swatch-color
+            {} $ |& $ {} (:height |56px)
+              :border-bottom $ str "|1px solid " tokens/color-border
+          :examples $ []
+          :schema $ :: 'String
+        'style-swatch-grid $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-swatch-grid
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fill, minmax(150px, 1fr))") (:gap tokens/space-3)
+          :examples $ []
+          :schema $ :: 'String
+        'style-swatch-meta $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-swatch-meta
+            {} $ |& $ {} (:padding "|8px 12px 10px") (:line-height tokens/leading-normal)
+          :examples $ []
+          :schema $ :: 'String
+        'style-swatch-note $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-swatch-note
+            {} $ |& $ {} (:margin-top tokens/space-1) (:font-size tokens/text-xs) (:color tokens/color-text-secondary)
+          :examples $ []
+          :schema $ :: 'String
+        'style-table $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-table
+            {} $ |& $ {} (:margin-bottom tokens/space-4) (:border-radius tokens/radius-lg) (:overflow :hidden) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border
+          :examples $ []
+          :schema $ :: 'String
+        'style-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-title
+            {} $ |& $ {} (:margin-top tokens/space-1) (:font-size tokens/text-3xl) (:font-weight tokens/weight-semibold) (:line-height tokens/leading-tight)
+          :examples $ []
+          :schema $ :: 'String
+        'style-usage $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-usage
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(min(100%, 420px), 1fr))") (:gap tokens/space-4) (:align-items :start)
+          :examples $ []
+          :schema $ :: 'String
+        'style-value $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-value
+            {} $ |& $ {} (:font-family tokens/font-mono) (:font-size tokens/text-xs) (:color tokens/color-text-muted) (:overflow-wrap :anywhere)
+          :examples $ []
+          :schema $ :: 'String
+        'token-var $ %{} 'CodeEntry (:doc "|CSS var() reference for a token name.")
+          :code $ quote $ defn token-var (name) (str "|var(--rui-" name "|)")
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'String)
+            :args $ [] 'String
+        'tokens-of $ %{} 'CodeEntry (:doc "|Tokens of one group, in declaration order.")
+          :code $ quote $ defn tokens-of (group)
+            filter tokens/design-tokens $ fn (token) (= token.:group group)
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ [] 'String
+            :return $ :: 'List 'respo-ui.tokens/DesignToken
+      :ns $ %{} 'NsEntry (:doc "|Design system page of the showcase site.")
+        :code $ quote $ ns respo-ui.comp.design-page
+          :require
+            respo.core :refer $ defcomp div <> list->
+            respo.css :refer $ defstyle
+            respo-ui.tokens :as tokens
+            respo-ui.comp :refer $ comp-cirru-snippet comp-snippet
     'respo-ui.comp.docs $ %{} 'FileEntry
       :defs $ {} $ 'comp-doc-block
         %{} 'CodeEntry (:doc |)
@@ -3138,6 +3676,14 @@
               div
                 {} $ :class-name style-nav-title
                 <> |Foundations
+              render-nav-item |design.html "|Design system" $ = route-name :design
+              when (= route-name :design)
+                list-> ({})
+                  map design-sections $ fn (section)
+                    [] section.:id $ div
+                      {} (:class-name css-nav-sub)
+                        :on-click $ on-jump $ str |#design- section.:id
+                      <> section.:title
               render-nav-item |layouts.html |Layouts $ = route-name :layouts
               render-nav-item |fonts.html |Fonts $ = route-name :fonts
               div
@@ -3172,6 +3718,7 @@
                   <> config/version
               div
                 {} $ :class-name style-topbar-nav
+                render-top-link |design.html |Design $ = route-name :design
                 render-top-link |components.html |Components $ = route-name :components
                 render-top-link |layouts.html |Layouts $ = route-name :layouts
                 render-top-link |widgets.html |Widgets $ = route-name :widgets
@@ -3243,6 +3790,21 @@
               |$0:hover $ {} $ :background-color (hsl 0 0 97)
           :examples $ []
           :schema $ :: 'String
+        'design-sections $ %{} 'CodeEntry
+          :doc "|Sections of the design system page, linked from the side navigation."
+          :code $ quote $ def design-sections
+            []
+              ComponentGroup :id |color :title |Color :items $ []
+              ComponentGroup :id |typography :title |Typography :items $ []
+              ComponentGroup :id |spacing :title |Spacing :items $ []
+              ComponentGroup :id |shape :title |Shape :items $ []
+              ComponentGroup :id |sizing :title "|Control sizing" :items $ []
+              ComponentGroup :id |elevation :title |Elevation :items $ []
+              ComponentGroup :id |motion :title "|Motion and layers" :items $ []
+              ComponentGroup :id |conventions :title |Conventions :items $ []
+              ComponentGroup :id |usage :title "|Using tokens" :items $ []
+          :examples $ []
+          :schema $ :: 'List 'respo-ui.comp.sidebar/ComponentGroup
         'on-jump $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-jump (selector)
             fn (e d!)
@@ -3361,8 +3923,10 @@
           :schema $ :: 'String
         'style-sidenav $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-sidenav
-            {} $ |& $ {} (:width |232px) (:flex-shrink 0) (:box-sizing :border-box) (:overflow-y :auto) (:padding "|20px 12px 48px 20px")
-              :border-right $ str "|1px solid " $ hsl 220 15 94
+            {}
+              |& $ {} (:width |232px) (:flex-shrink 0) (:box-sizing :border-box) (:overflow-y :auto) (:padding "|20px 12px 48px 20px")
+                :border-right $ str "|1px solid " $ hsl 220 15 94
+              |&& $ {} (:contained "|@media (max-width: 760px)") (:display :none)
           :examples $ []
           :schema $ :: 'String
         'style-topbar $ %{} 'CodeEntry (:doc |)
@@ -4215,6 +4779,7 @@
               :: :index $ [] |index.html
               :: :dev $ [] |dev.html
               :: :fonts $ [] |fonts.html
+              :: :design $ [] |design.html
               :: :widgets $ [] |widgets.html
               :: :layouts $ [] |layouts.html
               :: :components $ [] |components.html
@@ -4363,7 +4928,7 @@
           :examples $ []
           :schema $ :: 'StructDef
         'PageRoute $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:components) (:utils) (:not-found 'String)
+          :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:design) (:components) (:utils) (:not-found 'String)
           :examples $ []
           :schema $ :: 'EnumDef
         'PaginationOptions $ %{} 'CodeEntry (:doc |)
@@ -4559,6 +5124,7 @@
                       (:widgets) (PageRoute :widgets)
                       (:layouts) (PageRoute :layouts)
                       (:fonts) (PageRoute :fonts)
+                      (:design) (PageRoute :design)
                       (:components) (PageRoute :components)
                       (:utils) (PageRoute :utils)
                       (:404 path)
@@ -4590,6 +5156,8 @@
                   route-from-router $ Store :router (parse-address |/layouts.html dict) :states $ {}
                 assert= (PageRoute :fonts)
                   route-from-router $ Store :router (parse-address |/fonts.html dict) :states $ {}
+                assert= (PageRoute :design)
+                  route-from-router $ Store :router (parse-address |/design.html dict) :states $ {}
                 assert= (PageRoute :components)
                   route-from-router $ Store :router (parse-address |/components.html dict) :states $ {}
                 assert= (PageRoute :utils)
@@ -4642,6 +5210,656 @@
           :require
             respo-ui.router :refer $ dict
             respo-router.parser :refer $ parse-address
+    'respo-ui.tokens $ %{} 'FileEntry
+      :defs $ {}
+        'DesignToken $ %{} 'CodeEntry
+          :doc "|One design token: its group, CSS variable name without the --rui- prefix, default value and usage note."
+          :code $ quote $ defstruct DesignToken (:group 'String) (:name 'String) (:value 'String) (:note 'String)
+          :examples $ []
+          :schema $ :: 'StructDef
+        'amber-200 $ %{} 'CodeEntry (:doc "|Default: hsl(42 80% 76%)")
+          :code $ quote $ def amber-200 "|var(--rui-amber-200)"
+          :examples $ []
+          :schema $ :: 'String
+        'amber-50 $ %{} 'CodeEntry (:doc "|Default: hsl(45 95% 94%)")
+          :code $ quote $ def amber-50 "|var(--rui-amber-50)"
+          :examples $ []
+          :schema $ :: 'String
+        'amber-500 $ %{} 'CodeEntry (:doc "|Default: hsl(38 92% 50%)")
+          :code $ quote $ def amber-500 "|var(--rui-amber-500)"
+          :examples $ []
+          :schema $ :: 'String
+        'amber-700 $ %{} 'CodeEntry (:doc "|Default: hsl(32 85% 28%)")
+          :code $ quote $ def amber-700 "|var(--rui-amber-700)"
+          :examples $ []
+          :schema $ :: 'String
+        'blue-100 $ %{} 'CodeEntry (:doc "|Default: hsl(220 85% 93%)")
+          :code $ quote $ def blue-100 "|var(--rui-blue-100)"
+          :examples $ []
+          :schema $ :: 'String
+        'blue-200 $ %{} 'CodeEntry (:doc "|Default: hsl(220 80% 85%)")
+          :code $ quote $ def blue-200 "|var(--rui-blue-200)"
+          :examples $ []
+          :schema $ :: 'String
+        'blue-300 $ %{} 'CodeEntry (:doc "|Default: hsl(220 80% 74%)")
+          :code $ quote $ def blue-300 "|var(--rui-blue-300)"
+          :examples $ []
+          :schema $ :: 'String
+        'blue-50 $ %{} 'CodeEntry (:doc "|Default: hsl(220 90% 97%)")
+          :code $ quote $ def blue-50 "|var(--rui-blue-50)"
+          :examples $ []
+          :schema $ :: 'String
+        'blue-500 $ %{} 'CodeEntry (:doc "|Default: hsl(220 78% 54%)")
+          :code $ quote $ def blue-500 "|var(--rui-blue-500)"
+          :examples $ []
+          :schema $ :: 'String
+        'blue-600 $ %{} 'CodeEntry (:doc "|Default: hsl(220 72% 48%)")
+          :code $ quote $ def blue-600 "|var(--rui-blue-600)"
+          :examples $ []
+          :schema $ :: 'String
+        'blue-700 $ %{} 'CodeEntry (:doc "|Default: hsl(220 70% 40%)")
+          :code $ quote $ def blue-700 "|var(--rui-blue-700)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-bg $ %{} 'CodeEntry (:doc "|Page background. Default: var(--rui-gray-50)")
+          :code $ quote $ def color-bg "|var(--rui-color-bg)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-border $ %{} 'CodeEntry
+          :doc "|Dividers and card borders. Default: var(--rui-gray-200)"
+          :code $ quote $ def color-border "|var(--rui-color-border)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-border-strong $ %{} 'CodeEntry (:doc "|Control borders. Default: var(--rui-gray-300)")
+          :code $ quote $ def color-border-strong "|var(--rui-color-border-strong)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-danger $ %{} 'CodeEntry (:doc "|Solid danger fill. Default: var(--rui-red-500)")
+          :code $ quote $ def color-danger "|var(--rui-color-danger)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-danger-border $ %{} 'CodeEntry (:doc "|Soft danger border. Default: var(--rui-red-200)")
+          :code $ quote $ def color-danger-border "|var(--rui-color-danger-border)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-danger-soft $ %{} 'CodeEntry
+          :doc "|Soft danger background. Default: var(--rui-red-50)"
+          :code $ quote $ def color-danger-soft "|var(--rui-color-danger-soft)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-danger-text $ %{} 'CodeEntry
+          :doc "|Danger text on soft background. Default: var(--rui-red-700)"
+          :code $ quote $ def color-danger-text "|var(--rui-color-danger-text)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-focus $ %{} 'CodeEntry
+          :doc "|Focus ring color. Default: hsl(220 78% 56% / 0.28)"
+          :code $ quote $ def color-focus "|var(--rui-color-focus)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-info $ %{} 'CodeEntry (:doc "|Solid info fill. Default: var(--rui-blue-500)")
+          :code $ quote $ def color-info "|var(--rui-color-info)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-info-border $ %{} 'CodeEntry (:doc "|Soft info border. Default: var(--rui-blue-200)")
+          :code $ quote $ def color-info-border "|var(--rui-color-info-border)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-info-soft $ %{} 'CodeEntry
+          :doc "|Soft info background. Default: var(--rui-blue-50)"
+          :code $ quote $ def color-info-soft "|var(--rui-color-info-soft)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-info-text $ %{} 'CodeEntry
+          :doc "|Info text on soft background. Default: var(--rui-blue-700)"
+          :code $ quote $ def color-info-text "|var(--rui-color-info-text)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-overlay $ %{} 'CodeEntry
+          :doc "|Backdrop behind dialogs. Default: hsl(220 25% 14% / 0.45)"
+          :code $ quote $ def color-overlay "|var(--rui-color-overlay)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-primary $ %{} 'CodeEntry
+          :doc "|Primary actions, selection, links. Default: var(--rui-blue-500)"
+          :code $ quote $ def color-primary "|var(--rui-color-primary)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-primary-active $ %{} 'CodeEntry
+          :doc "|Pressed primary fills, link text. Default: var(--rui-blue-700)"
+          :code $ quote $ def color-primary-active "|var(--rui-color-primary-active)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-primary-border $ %{} 'CodeEntry
+          :doc "|Borders of soft primary surfaces. Default: var(--rui-blue-200)"
+          :code $ quote $ def color-primary-border "|var(--rui-color-primary-border)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-primary-hover $ %{} 'CodeEntry
+          :doc "|Hover on primary fills. Default: var(--rui-blue-600)"
+          :code $ quote $ def color-primary-hover "|var(--rui-color-primary-hover)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-primary-soft $ %{} 'CodeEntry
+          :doc "|Selected rows, soft fills. Default: var(--rui-blue-50)"
+          :code $ quote $ def color-primary-soft "|var(--rui-color-primary-soft)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-success $ %{} 'CodeEntry
+          :doc "|Solid success fill. Default: var(--rui-green-500)"
+          :code $ quote $ def color-success "|var(--rui-color-success)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-success-border $ %{} 'CodeEntry
+          :doc "|Soft success border. Default: var(--rui-green-200)"
+          :code $ quote $ def color-success-border "|var(--rui-color-success-border)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-success-soft $ %{} 'CodeEntry
+          :doc "|Soft success background. Default: var(--rui-green-50)"
+          :code $ quote $ def color-success-soft "|var(--rui-color-success-soft)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-success-text $ %{} 'CodeEntry
+          :doc "|Success text on soft background. Default: var(--rui-green-700)"
+          :code $ quote $ def color-success-text "|var(--rui-color-success-text)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-surface $ %{} 'CodeEntry
+          :doc "|Controls, cards, popovers. Default: var(--rui-gray-0)"
+          :code $ quote $ def color-surface "|var(--rui-color-surface)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-surface-muted $ %{} 'CodeEntry
+          :doc "|Code blocks, skeletons, tracks. Default: var(--rui-gray-100)"
+          :code $ quote $ def color-surface-muted "|var(--rui-color-surface-muted)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-surface-subtle $ %{} 'CodeEntry
+          :doc "|Hover fills and table stripes. Default: var(--rui-gray-50)"
+          :code $ quote $ def color-surface-subtle "|var(--rui-color-surface-subtle)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-text $ %{} 'CodeEntry
+          :doc "|Body text and headings. Default: var(--rui-gray-900)"
+          :code $ quote $ def color-text "|var(--rui-color-text)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-text-disabled $ %{} 'CodeEntry (:doc "|Disabled controls. Default: var(--rui-gray-400)")
+          :code $ quote $ def color-text-disabled "|var(--rui-color-text-disabled)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-text-inverse $ %{} 'CodeEntry (:doc "|Text on solid fills. Default: var(--rui-gray-0)")
+          :code $ quote $ def color-text-inverse "|var(--rui-color-text-inverse)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-text-muted $ %{} 'CodeEntry
+          :doc "|Hints, placeholders, separators. Default: var(--rui-gray-500)"
+          :code $ quote $ def color-text-muted "|var(--rui-color-text-muted)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-text-secondary $ %{} 'CodeEntry
+          :doc "|Descriptions and labels. Default: var(--rui-gray-600)"
+          :code $ quote $ def color-text-secondary "|var(--rui-color-text-secondary)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-warning $ %{} 'CodeEntry
+          :doc "|Solid warning fill. Default: var(--rui-amber-500)"
+          :code $ quote $ def color-warning "|var(--rui-color-warning)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-warning-border $ %{} 'CodeEntry
+          :doc "|Soft warning border. Default: var(--rui-amber-200)"
+          :code $ quote $ def color-warning-border "|var(--rui-color-warning-border)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-warning-soft $ %{} 'CodeEntry
+          :doc "|Soft warning background. Default: var(--rui-amber-50)"
+          :code $ quote $ def color-warning-soft "|var(--rui-color-warning-soft)"
+          :examples $ []
+          :schema $ :: 'String
+        'color-warning-text $ %{} 'CodeEntry
+          :doc "|Warning text on soft background. Default: var(--rui-amber-700)"
+          :code $ quote $ def color-warning-text "|var(--rui-color-warning-text)"
+          :examples $ []
+          :schema $ :: 'String
+        'control-lg $ %{} 'CodeEntry (:doc "|Height of lg controls. Default: 40px")
+          :code $ quote $ def control-lg "|var(--rui-control-lg)"
+          :examples $ []
+          :schema $ :: 'String
+        'control-lg-padding $ %{} 'CodeEntry
+          :doc "|Horizontal padding of lg controls. Default: 16px"
+          :code $ quote $ def control-lg-padding "|var(--rui-control-lg-padding)"
+          :examples $ []
+          :schema $ :: 'String
+        'control-md $ %{} 'CodeEntry (:doc "|Height of md controls. Default: 32px")
+          :code $ quote $ def control-md "|var(--rui-control-md)"
+          :examples $ []
+          :schema $ :: 'String
+        'control-md-padding $ %{} 'CodeEntry
+          :doc "|Horizontal padding of md controls. Default: 12px"
+          :code $ quote $ def control-md-padding "|var(--rui-control-md-padding)"
+          :examples $ []
+          :schema $ :: 'String
+        'control-sm $ %{} 'CodeEntry (:doc "|Height of sm controls. Default: 24px")
+          :code $ quote $ def control-sm "|var(--rui-control-sm)"
+          :examples $ []
+          :schema $ :: 'String
+        'control-sm-padding $ %{} 'CodeEntry (:doc "|Horizontal padding of sm controls. Default: 8px")
+          :code $ quote $ def control-sm-padding "|var(--rui-control-sm-padding)"
+          :examples $ []
+          :schema $ :: 'String
+        'css-variables $ %{} 'CodeEntry
+          :doc "|Turn tokens into a map of --rui-* custom properties."
+          :code $ quote $ defn css-variables (tokens)
+            foldl tokens ({})
+              fn (acc token)
+                assoc acc (str |--rui- token.:name) token.:value
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ [] $ :: 'List 'respo-ui.tokens/DesignToken
+            :return $ :: 'Map 'String 'String
+        'design-tokens $ %{} 'CodeEntry
+          :doc "|Every token with its default value. The theme style and the design system page are both generated from this list."
+          :code $ quote $ def design-tokens
+            []
+              DesignToken :group |palette :name |gray-0 :value "|hsl(220 0% 100%)" :note |
+              DesignToken :group |palette :name |gray-50 :value "|hsl(220 20% 98%)" :note |
+              DesignToken :group |palette :name |gray-100 :value "|hsl(220 18% 96%)" :note |
+              DesignToken :group |palette :name |gray-200 :value "|hsl(220 16% 92%)" :note |
+              DesignToken :group |palette :name |gray-300 :value "|hsl(220 14% 84%)" :note |
+              DesignToken :group |palette :name |gray-400 :value "|hsl(220 12% 70%)" :note |
+              DesignToken :group |palette :name |gray-500 :value "|hsl(220 10% 46%)" :note |
+              DesignToken :group |palette :name |gray-600 :value "|hsl(220 12% 42%)" :note |
+              DesignToken :group |palette :name |gray-700 :value "|hsl(220 16% 30%)" :note |
+              DesignToken :group |palette :name |gray-800 :value "|hsl(220 20% 20%)" :note |
+              DesignToken :group |palette :name |gray-900 :value "|hsl(220 25% 14%)" :note |
+              DesignToken :group |palette :name |blue-50 :value "|hsl(220 90% 97%)" :note |
+              DesignToken :group |palette :name |blue-100 :value "|hsl(220 85% 93%)" :note |
+              DesignToken :group |palette :name |blue-200 :value "|hsl(220 80% 85%)" :note |
+              DesignToken :group |palette :name |blue-300 :value "|hsl(220 80% 74%)" :note |
+              DesignToken :group |palette :name |blue-500 :value "|hsl(220 78% 54%)" :note |
+              DesignToken :group |palette :name |blue-600 :value "|hsl(220 72% 48%)" :note |
+              DesignToken :group |palette :name |blue-700 :value "|hsl(220 70% 40%)" :note |
+              DesignToken :group |palette :name |green-50 :value "|hsl(145 55% 96%)" :note |
+              DesignToken :group |palette :name |green-200 :value "|hsl(145 40% 80%)" :note |
+              DesignToken :group |palette :name |green-500 :value "|hsl(145 55% 38%)" :note |
+              DesignToken :group |palette :name |green-700 :value "|hsl(145 60% 26%)" :note |
+              DesignToken :group |palette :name |amber-50 :value "|hsl(45 95% 94%)" :note |
+              DesignToken :group |palette :name |amber-200 :value "|hsl(42 80% 76%)" :note |
+              DesignToken :group |palette :name |amber-500 :value "|hsl(38 92% 50%)" :note |
+              DesignToken :group |palette :name |amber-700 :value "|hsl(32 85% 28%)" :note |
+              DesignToken :group |palette :name |red-50 :value "|hsl(4 85% 96%)" :note |
+              DesignToken :group |palette :name |red-200 :value "|hsl(4 70% 86%)" :note |
+              DesignToken :group |palette :name |red-500 :value "|hsl(4 72% 52%)" :note |
+              DesignToken :group |palette :name |red-700 :value "|hsl(4 68% 40%)" :note |
+              DesignToken :group |color :name |color-text :value "|var(--rui-gray-900)" :note "|Body text and headings"
+              DesignToken :group |color :name |color-text-secondary :value "|var(--rui-gray-600)" :note "|Descriptions and labels"
+              DesignToken :group |color :name |color-text-muted :value "|var(--rui-gray-500)" :note "|Hints, placeholders, separators"
+              DesignToken :group |color :name |color-text-disabled :value "|var(--rui-gray-400)" :note "|Disabled controls"
+              DesignToken :group |color :name |color-text-inverse :value "|var(--rui-gray-0)" :note "|Text on solid fills"
+              DesignToken :group |color :name |color-bg :value "|var(--rui-gray-50)" :note "|Page background"
+              DesignToken :group |color :name |color-surface :value "|var(--rui-gray-0)" :note "|Controls, cards, popovers"
+              DesignToken :group |color :name |color-surface-subtle :value "|var(--rui-gray-50)" :note "|Hover fills and table stripes"
+              DesignToken :group |color :name |color-surface-muted :value "|var(--rui-gray-100)" :note "|Code blocks, skeletons, tracks"
+              DesignToken :group |color :name |color-border :value "|var(--rui-gray-200)" :note "|Dividers and card borders"
+              DesignToken :group |color :name |color-border-strong :value "|var(--rui-gray-300)" :note "|Control borders"
+              DesignToken :group |color :name |color-primary :value "|var(--rui-blue-500)" :note "|Primary actions, selection, links"
+              DesignToken :group |color :name |color-primary-hover :value "|var(--rui-blue-600)" :note "|Hover on primary fills"
+              DesignToken :group |color :name |color-primary-active :value "|var(--rui-blue-700)" :note "|Pressed primary fills, link text"
+              DesignToken :group |color :name |color-primary-soft :value "|var(--rui-blue-50)" :note "|Selected rows, soft fills"
+              DesignToken :group |color :name |color-primary-border :value "|var(--rui-blue-200)" :note "|Borders of soft primary surfaces"
+              DesignToken :group |color :name |color-info :value "|var(--rui-blue-500)" :note "|Solid info fill"
+              DesignToken :group |color :name |color-info-soft :value "|var(--rui-blue-50)" :note "|Soft info background"
+              DesignToken :group |color :name |color-info-border :value "|var(--rui-blue-200)" :note "|Soft info border"
+              DesignToken :group |color :name |color-info-text :value "|var(--rui-blue-700)" :note "|Info text on soft background"
+              DesignToken :group |color :name |color-success :value "|var(--rui-green-500)" :note "|Solid success fill"
+              DesignToken :group |color :name |color-success-soft :value "|var(--rui-green-50)" :note "|Soft success background"
+              DesignToken :group |color :name |color-success-border :value "|var(--rui-green-200)" :note "|Soft success border"
+              DesignToken :group |color :name |color-success-text :value "|var(--rui-green-700)" :note "|Success text on soft background"
+              DesignToken :group |color :name |color-warning :value "|var(--rui-amber-500)" :note "|Solid warning fill"
+              DesignToken :group |color :name |color-warning-soft :value "|var(--rui-amber-50)" :note "|Soft warning background"
+              DesignToken :group |color :name |color-warning-border :value "|var(--rui-amber-200)" :note "|Soft warning border"
+              DesignToken :group |color :name |color-warning-text :value "|var(--rui-amber-700)" :note "|Warning text on soft background"
+              DesignToken :group |color :name |color-danger :value "|var(--rui-red-500)" :note "|Solid danger fill"
+              DesignToken :group |color :name |color-danger-soft :value "|var(--rui-red-50)" :note "|Soft danger background"
+              DesignToken :group |color :name |color-danger-border :value "|var(--rui-red-200)" :note "|Soft danger border"
+              DesignToken :group |color :name |color-danger-text :value "|var(--rui-red-700)" :note "|Danger text on soft background"
+              DesignToken :group |color :name |color-focus :value "|hsl(220 78% 56% / 0.28)" :note "|Focus ring color"
+              DesignToken :group |color :name |color-overlay :value "|hsl(220 25% 14% / 0.45)" :note "|Backdrop behind dialogs"
+              DesignToken :group |font :name |font-sans :value "|Hind, Verdana, 'Hiragino Sans GB', 'WenQuanYi Micro Hei', 'Microsoft Yahei', sans-serif" :note "|Interface text"
+              DesignToken :group |font :name |font-mono :value "|'Source Code Pro', Menlo, 'Ubuntu Mono', Consolas, monospace" :note "|Code, keys, numbers in tables"
+              DesignToken :group |font :name |font-display :value "|'Josefin Sans', 'Helvetica Neue', Arial, sans-serif" :note "|Brand and hero titles only"
+              DesignToken :group |text :name |text-xs :value |12px :note "|Badges, captions"
+              DesignToken :group |text :name |text-sm :value |13px :note "|Secondary text, small controls"
+              DesignToken :group |text :name |text-md :value |14px :note "|Body and controls"
+              DesignToken :group |text :name |text-lg :value |16px :note "|Card titles, large controls"
+              DesignToken :group |text :name |text-xl :value |20px :note "|Section titles"
+              DesignToken :group |text :name |text-2xl :value |24px :note "|Page titles"
+              DesignToken :group |text :name |text-3xl :value |32px :note "|Hero titles"
+              DesignToken :group |text :name |leading-tight :value |1.25 :note "|Headings, controls"
+              DesignToken :group |text :name |leading-normal :value |1.5 :note "|Body text"
+              DesignToken :group |text :name |leading-relaxed :value |1.75 :note "|Long-form docs"
+              DesignToken :group |text :name |weight-regular :value |400 :note |
+              DesignToken :group |text :name |weight-medium :value |500 :note |
+              DesignToken :group |text :name |weight-semibold :value |600 :note |
+              DesignToken :group |space :name |space-0-5 :value |2px :note |
+              DesignToken :group |space :name |space-1 :value |4px :note |
+              DesignToken :group |space :name |space-1-5 :value |6px :note |
+              DesignToken :group |space :name |space-2 :value |8px :note |
+              DesignToken :group |space :name |space-3 :value |12px :note |
+              DesignToken :group |space :name |space-4 :value |16px :note |
+              DesignToken :group |space :name |space-5 :value |20px :note |
+              DesignToken :group |space :name |space-6 :value |24px :note |
+              DesignToken :group |space :name |space-8 :value |32px :note |
+              DesignToken :group |space :name |space-10 :value |40px :note |
+              DesignToken :group |space :name |space-12 :value |48px :note |
+              DesignToken :group |space :name |space-16 :value |64px :note |
+              DesignToken :group |radius :name |radius-sm :value |4px :note "|Tags, kbd, checkboxes"
+              DesignToken :group |radius :name |radius-md :value |6px :note "|Buttons, inputs, selects"
+              DesignToken :group |radius :name |radius-lg :value |10px :note "|Cards, alerts, popovers"
+              DesignToken :group |radius :name |radius-full :value |999px :note "|Pills, switches, avatars"
+              DesignToken :group |control :name |control-sm :value |24px :note "|Height of sm controls"
+              DesignToken :group |control :name |control-sm-padding :value |8px :note "|Horizontal padding of sm controls"
+              DesignToken :group |control :name |control-md :value |32px :note "|Height of md controls"
+              DesignToken :group |control :name |control-md-padding :value |12px :note "|Horizontal padding of md controls"
+              DesignToken :group |control :name |control-lg :value |40px :note "|Height of lg controls"
+              DesignToken :group |control :name |control-lg-padding :value |16px :note "|Horizontal padding of lg controls"
+              DesignToken :group |shadow :name |shadow-xs :value "|0 1px 2px hsl(220 30% 20% / 0.06)" :note "|Controls and resting cards"
+              DesignToken :group |shadow :name |shadow-sm :value "|0 1px 3px hsl(220 30% 20% / 0.08), 0 1px 2px hsl(220 30% 20% / 0.04)" :note "|Hovered cards"
+              DesignToken :group |shadow :name |shadow-md :value "|0 6px 16px hsl(220 30% 20% / 0.12)" :note "|Tooltips, dropdowns"
+              DesignToken :group |shadow :name |shadow-lg :value "|0 16px 40px hsl(220 30% 20% / 0.18)" :note "|Dialogs and drawers"
+              DesignToken :group |shadow :name |focus-ring :value "|0 0 0 3px var(--rui-color-focus)" :note "|Applied on :focus-visible"
+              DesignToken :group |motion :name |duration-fast :value |120ms :note "|Hover and press feedback"
+              DesignToken :group |motion :name |duration-normal :value |200ms :note "|Expand, fade, slide"
+              DesignToken :group |motion :name |duration-slow :value |320ms :note "|Large surfaces"
+              DesignToken :group |motion :name |ease :value "|cubic-bezier(0.2, 0, 0, 1)" :note "|Standard easing"
+              DesignToken :group |layer :name |z-dropdown :value |1000 :note |
+              DesignToken :group |layer :name |z-sticky :value |1100 :note |
+              DesignToken :group |layer :name |z-overlay :value |1200 :note |
+              DesignToken :group |layer :name |z-modal :value |1300 :note |
+              DesignToken :group |layer :name |z-tooltip :value |1400 :note |
+          :examples $ []
+          :schema $ :: 'List 'respo-ui.tokens/DesignToken
+        'duration-fast $ %{} 'CodeEntry (:doc "|Hover and press feedback. Default: 120ms")
+          :code $ quote $ def duration-fast "|var(--rui-duration-fast)"
+          :examples $ []
+          :schema $ :: 'String
+        'duration-normal $ %{} 'CodeEntry (:doc "|Expand, fade, slide. Default: 200ms")
+          :code $ quote $ def duration-normal "|var(--rui-duration-normal)"
+          :examples $ []
+          :schema $ :: 'String
+        'duration-slow $ %{} 'CodeEntry (:doc "|Large surfaces. Default: 320ms")
+          :code $ quote $ def duration-slow "|var(--rui-duration-slow)"
+          :examples $ []
+          :schema $ :: 'String
+        'ease $ %{} 'CodeEntry
+          :doc "|Standard easing. Default: cubic-bezier(0.2, 0, 0, 1)"
+          :code $ quote $ def ease "|var(--rui-ease)"
+          :examples $ []
+          :schema $ :: 'String
+        'focus-ring $ %{} 'CodeEntry
+          :doc "|Applied on :focus-visible. Default: 0 0 0 3px var(--rui-color-focus)"
+          :code $ quote $ def focus-ring "|var(--rui-focus-ring)"
+          :examples $ []
+          :schema $ :: 'String
+        'font-display $ %{} 'CodeEntry
+          :doc "|Brand and hero titles only. Default: 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif"
+          :code $ quote $ def font-display "|var(--rui-font-display)"
+          :examples $ []
+          :schema $ :: 'String
+        'font-mono $ %{} 'CodeEntry
+          :doc "|Code, keys, numbers in tables. Default: 'Source Code Pro', Menlo, 'Ubuntu Mono', Consolas, monospace"
+          :code $ quote $ def font-mono "|var(--rui-font-mono)"
+          :examples $ []
+          :schema $ :: 'String
+        'font-sans $ %{} 'CodeEntry
+          :doc "|Interface text. Default: Hind, Verdana, 'Hiragino Sans GB', 'WenQuanYi Micro Hei', 'Microsoft Yahei', sans-serif"
+          :code $ quote $ def font-sans "|var(--rui-font-sans)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-0 $ %{} 'CodeEntry (:doc "|Default: hsl(220 0% 100%)")
+          :code $ quote $ def gray-0 "|var(--rui-gray-0)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-100 $ %{} 'CodeEntry (:doc "|Default: hsl(220 18% 96%)")
+          :code $ quote $ def gray-100 "|var(--rui-gray-100)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-200 $ %{} 'CodeEntry (:doc "|Default: hsl(220 16% 92%)")
+          :code $ quote $ def gray-200 "|var(--rui-gray-200)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-300 $ %{} 'CodeEntry (:doc "|Default: hsl(220 14% 84%)")
+          :code $ quote $ def gray-300 "|var(--rui-gray-300)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-400 $ %{} 'CodeEntry (:doc "|Default: hsl(220 12% 70%)")
+          :code $ quote $ def gray-400 "|var(--rui-gray-400)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-50 $ %{} 'CodeEntry (:doc "|Default: hsl(220 20% 98%)")
+          :code $ quote $ def gray-50 "|var(--rui-gray-50)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-500 $ %{} 'CodeEntry (:doc "|Default: hsl(220 10% 46%)")
+          :code $ quote $ def gray-500 "|var(--rui-gray-500)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-600 $ %{} 'CodeEntry (:doc "|Default: hsl(220 12% 42%)")
+          :code $ quote $ def gray-600 "|var(--rui-gray-600)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-700 $ %{} 'CodeEntry (:doc "|Default: hsl(220 16% 30%)")
+          :code $ quote $ def gray-700 "|var(--rui-gray-700)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-800 $ %{} 'CodeEntry (:doc "|Default: hsl(220 20% 20%)")
+          :code $ quote $ def gray-800 "|var(--rui-gray-800)"
+          :examples $ []
+          :schema $ :: 'String
+        'gray-900 $ %{} 'CodeEntry (:doc "|Default: hsl(220 25% 14%)")
+          :code $ quote $ def gray-900 "|var(--rui-gray-900)"
+          :examples $ []
+          :schema $ :: 'String
+        'green-200 $ %{} 'CodeEntry (:doc "|Default: hsl(145 40% 80%)")
+          :code $ quote $ def green-200 "|var(--rui-green-200)"
+          :examples $ []
+          :schema $ :: 'String
+        'green-50 $ %{} 'CodeEntry (:doc "|Default: hsl(145 55% 96%)")
+          :code $ quote $ def green-50 "|var(--rui-green-50)"
+          :examples $ []
+          :schema $ :: 'String
+        'green-500 $ %{} 'CodeEntry (:doc "|Default: hsl(145 55% 38%)")
+          :code $ quote $ def green-500 "|var(--rui-green-500)"
+          :examples $ []
+          :schema $ :: 'String
+        'green-700 $ %{} 'CodeEntry (:doc "|Default: hsl(145 60% 26%)")
+          :code $ quote $ def green-700 "|var(--rui-green-700)"
+          :examples $ []
+          :schema $ :: 'String
+        'leading-normal $ %{} 'CodeEntry (:doc "|Body text. Default: 1.5")
+          :code $ quote $ def leading-normal "|var(--rui-leading-normal)"
+          :examples $ []
+          :schema $ :: 'String
+        'leading-relaxed $ %{} 'CodeEntry (:doc "|Long-form docs. Default: 1.75")
+          :code $ quote $ def leading-relaxed "|var(--rui-leading-relaxed)"
+          :examples $ []
+          :schema $ :: 'String
+        'leading-tight $ %{} 'CodeEntry (:doc "|Headings, controls. Default: 1.25")
+          :code $ quote $ def leading-tight "|var(--rui-leading-tight)"
+          :examples $ []
+          :schema $ :: 'String
+        'radius-full $ %{} 'CodeEntry (:doc "|Pills, switches, avatars. Default: 999px")
+          :code $ quote $ def radius-full "|var(--rui-radius-full)"
+          :examples $ []
+          :schema $ :: 'String
+        'radius-lg $ %{} 'CodeEntry (:doc "|Cards, alerts, popovers. Default: 10px")
+          :code $ quote $ def radius-lg "|var(--rui-radius-lg)"
+          :examples $ []
+          :schema $ :: 'String
+        'radius-md $ %{} 'CodeEntry (:doc "|Buttons, inputs, selects. Default: 6px")
+          :code $ quote $ def radius-md "|var(--rui-radius-md)"
+          :examples $ []
+          :schema $ :: 'String
+        'radius-sm $ %{} 'CodeEntry (:doc "|Tags, kbd, checkboxes. Default: 4px")
+          :code $ quote $ def radius-sm "|var(--rui-radius-sm)"
+          :examples $ []
+          :schema $ :: 'String
+        'red-200 $ %{} 'CodeEntry (:doc "|Default: hsl(4 70% 86%)")
+          :code $ quote $ def red-200 "|var(--rui-red-200)"
+          :examples $ []
+          :schema $ :: 'String
+        'red-50 $ %{} 'CodeEntry (:doc "|Default: hsl(4 85% 96%)")
+          :code $ quote $ def red-50 "|var(--rui-red-50)"
+          :examples $ []
+          :schema $ :: 'String
+        'red-500 $ %{} 'CodeEntry (:doc "|Default: hsl(4 72% 52%)")
+          :code $ quote $ def red-500 "|var(--rui-red-500)"
+          :examples $ []
+          :schema $ :: 'String
+        'red-700 $ %{} 'CodeEntry (:doc "|Default: hsl(4 68% 40%)")
+          :code $ quote $ def red-700 "|var(--rui-red-700)"
+          :examples $ []
+          :schema $ :: 'String
+        'shadow-lg $ %{} 'CodeEntry
+          :doc "|Dialogs and drawers. Default: 0 16px 40px hsl(220 30% 20% / 0.18)"
+          :code $ quote $ def shadow-lg "|var(--rui-shadow-lg)"
+          :examples $ []
+          :schema $ :: 'String
+        'shadow-md $ %{} 'CodeEntry
+          :doc "|Tooltips, dropdowns. Default: 0 6px 16px hsl(220 30% 20% / 0.12)"
+          :code $ quote $ def shadow-md "|var(--rui-shadow-md)"
+          :examples $ []
+          :schema $ :: 'String
+        'shadow-sm $ %{} 'CodeEntry
+          :doc "|Hovered cards. Default: 0 1px 3px hsl(220 30% 20% / 0.08), 0 1px 2px hsl(220 30% 20% / 0.04)"
+          :code $ quote $ def shadow-sm "|var(--rui-shadow-sm)"
+          :examples $ []
+          :schema $ :: 'String
+        'shadow-xs $ %{} 'CodeEntry
+          :doc "|Controls and resting cards. Default: 0 1px 2px hsl(220 30% 20% / 0.06)"
+          :code $ quote $ def shadow-xs "|var(--rui-shadow-xs)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-0-5 $ %{} 'CodeEntry (:doc "|Default: 2px")
+          :code $ quote $ def space-0-5 "|var(--rui-space-0-5)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-1 $ %{} 'CodeEntry (:doc "|Default: 4px")
+          :code $ quote $ def space-1 "|var(--rui-space-1)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-1-5 $ %{} 'CodeEntry (:doc "|Default: 6px")
+          :code $ quote $ def space-1-5 "|var(--rui-space-1-5)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-10 $ %{} 'CodeEntry (:doc "|Default: 40px")
+          :code $ quote $ def space-10 "|var(--rui-space-10)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-12 $ %{} 'CodeEntry (:doc "|Default: 48px")
+          :code $ quote $ def space-12 "|var(--rui-space-12)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-16 $ %{} 'CodeEntry (:doc "|Default: 64px")
+          :code $ quote $ def space-16 "|var(--rui-space-16)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-2 $ %{} 'CodeEntry (:doc "|Default: 8px")
+          :code $ quote $ def space-2 "|var(--rui-space-2)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-3 $ %{} 'CodeEntry (:doc "|Default: 12px")
+          :code $ quote $ def space-3 "|var(--rui-space-3)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-4 $ %{} 'CodeEntry (:doc "|Default: 16px")
+          :code $ quote $ def space-4 "|var(--rui-space-4)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-5 $ %{} 'CodeEntry (:doc "|Default: 20px")
+          :code $ quote $ def space-5 "|var(--rui-space-5)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-6 $ %{} 'CodeEntry (:doc "|Default: 24px")
+          :code $ quote $ def space-6 "|var(--rui-space-6)"
+          :examples $ []
+          :schema $ :: 'String
+        'space-8 $ %{} 'CodeEntry (:doc "|Default: 32px")
+          :code $ quote $ def space-8 "|var(--rui-space-8)"
+          :examples $ []
+          :schema $ :: 'String
+        'text-2xl $ %{} 'CodeEntry (:doc "|Page titles. Default: 24px")
+          :code $ quote $ def text-2xl "|var(--rui-text-2xl)"
+          :examples $ []
+          :schema $ :: 'String
+        'text-3xl $ %{} 'CodeEntry (:doc "|Hero titles. Default: 32px")
+          :code $ quote $ def text-3xl "|var(--rui-text-3xl)"
+          :examples $ []
+          :schema $ :: 'String
+        'text-lg $ %{} 'CodeEntry (:doc "|Card titles, large controls. Default: 16px")
+          :code $ quote $ def text-lg "|var(--rui-text-lg)"
+          :examples $ []
+          :schema $ :: 'String
+        'text-md $ %{} 'CodeEntry (:doc "|Body and controls. Default: 14px")
+          :code $ quote $ def text-md "|var(--rui-text-md)"
+          :examples $ []
+          :schema $ :: 'String
+        'text-sm $ %{} 'CodeEntry (:doc "|Secondary text, small controls. Default: 13px")
+          :code $ quote $ def text-sm "|var(--rui-text-sm)"
+          :examples $ []
+          :schema $ :: 'String
+        'text-xl $ %{} 'CodeEntry (:doc "|Section titles. Default: 20px")
+          :code $ quote $ def text-xl "|var(--rui-text-xl)"
+          :examples $ []
+          :schema $ :: 'String
+        'text-xs $ %{} 'CodeEntry (:doc "|Badges, captions. Default: 12px")
+          :code $ quote $ def text-xs "|var(--rui-text-xs)"
+          :examples $ []
+          :schema $ :: 'String
+        'theme $ %{} 'CodeEntry
+          :doc "|Declares every --rui-* token on :root. Loaded with this namespace; override the variables in your own CSS to theme components."
+          :code $ quote $ defstyle theme
+            {} $ |:root $ css-variables design-tokens
+          :examples $ []
+          :schema $ :: 'String
+        'weight-medium $ %{} 'CodeEntry (:doc "|Default: 500")
+          :code $ quote $ def weight-medium "|var(--rui-weight-medium)"
+          :examples $ []
+          :schema $ :: 'String
+        'weight-regular $ %{} 'CodeEntry (:doc "|Default: 400")
+          :code $ quote $ def weight-regular "|var(--rui-weight-regular)"
+          :examples $ []
+          :schema $ :: 'String
+        'weight-semibold $ %{} 'CodeEntry (:doc "|Default: 600")
+          :code $ quote $ def weight-semibold "|var(--rui-weight-semibold)"
+          :examples $ []
+          :schema $ :: 'String
+        'z-dropdown $ %{} 'CodeEntry (:doc "|Default: 1000")
+          :code $ quote $ def z-dropdown "|var(--rui-z-dropdown)"
+          :examples $ []
+          :schema $ :: 'String
+        'z-modal $ %{} 'CodeEntry (:doc "|Default: 1300")
+          :code $ quote $ def z-modal "|var(--rui-z-modal)"
+          :examples $ []
+          :schema $ :: 'String
+        'z-overlay $ %{} 'CodeEntry (:doc "|Default: 1200")
+          :code $ quote $ def z-overlay "|var(--rui-z-overlay)"
+          :examples $ []
+          :schema $ :: 'String
+        'z-sticky $ %{} 'CodeEntry (:doc "|Default: 1100")
+          :code $ quote $ def z-sticky "|var(--rui-z-sticky)"
+          :examples $ []
+          :schema $ :: 'String
+        'z-tooltip $ %{} 'CodeEntry (:doc "|Default: 1400")
+          :code $ quote $ def z-tooltip "|var(--rui-z-tooltip)"
+          :examples $ []
+          :schema $ :: 'String
+      :ns $ %{} 'NsEntry
+        :doc "|Design tokens as CSS custom properties. Components read tokens through these defs so a theme can override --rui-* variables."
+        :code $ quote $ ns respo-ui.tokens
+          :require $ respo.css :refer $ defstyle
     'respo-ui.util $ %{} 'FileEntry
       :defs $ {}
         'santinize-html-text $ %{} 'CodeEntry (:doc |)

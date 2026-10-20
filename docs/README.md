@@ -6,6 +6,7 @@ Respo UI provides reusable styles and small, composable components for Calcit ap
 
 - [Introduction](./introduction.md) — installation and first use
 - [Components](./components.md) — component signatures, options, and examples
+- [Design system](./design-system.md) — tokens, theming, and component conventions
 - [Styles](./styles.md) — map styles, generated CSS classes, and performance
 - [Examples](./examples.md) — forms, feedback, loading states, and cards
 - [API reference](./api-reference.md) — namespace-level inventory
