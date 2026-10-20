@@ -88,11 +88,13 @@ try {
   calls.push([pages]);
   // Build typed callbacks in Calcit, then invoke the actual DOM-host handlers.
   // The event table intentionally exposes opaque host-callable functions.
-  for (const [name, type] of [["checkbox", "Bool"], ["switch", "Bool"], ["select", "String"], ["radio-group", "String"]]) {
+  for (const [name, type] of [["checkbox", "Bool"], ["switch", "Bool"], ["select", "String"], ["radio-group", "String"], ["input", "String"], ["textarea", "String"]]) {
     const helper = `replay-${name}-event`;
     const items = "([] (respo-ui.schema/SelectOption :value |a :label |A) (respo-ui.schema/SelectOption :value |b :label |B))";
-    const component = { select: `comp-select |a ${items}`, "radio-group": `comp-radio-group |a ${items}` }[name] ?? `comp-${name} false`;
-    const options = { select: "respo-ui.schema/SelectOptions", "radio-group": "respo-ui.schema/RadioGroupOptions" }[name]
+    const component = { select: `comp-select |a ${items}`, "radio-group": `comp-radio-group |a ${items}`,
+      input: "comp-input |a", textarea: "comp-textarea |a" }[name] ?? `comp-${name} false`;
+    const options = { select: "respo-ui.schema/SelectOptions", "radio-group": "respo-ui.schema/RadioGroupOptions",
+      input: "respo-ui.schema/InputOptions", textarea: "respo-ui.schema/InputOptions" }[name]
       ?? "respo-ui.schema/SwitchOptions";
     operations.push(["edit", "def", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code", `quote $ defn ${helper} ()
   ${component} $ Option :some $ ${options} :on-change
@@ -163,6 +165,14 @@ try {
     const dispatched = [];
     assert.equal(select(c.parse_cirru_edn(input), value => { dispatched.push(value); }), undefined);
     assert.deepEqual(dispatched, [expected], `select: ${input}`);
+  }
+  for (const name of ["input", "textarea"]) {
+    const handler = eventHandler(name, name, "input");
+    for (const [input, expected] of [["{}", ""], ["{} (:value |)", ""], ["{} (:value |中文😀)", "中文😀"], ["{} (:value 0)", "0"]]) {
+      const dispatched = [];
+      assert.equal(handler(c.parse_cirru_edn(input), value => { dispatched.push(value); }), undefined);
+      assert.deepEqual(dispatched, [expected], `${name}: ${input}`);
+    }
   }
   const failure = new Error("select dispatch failure");
   assert.throws(() => select(c.parse_cirru_edn("{} (:value |a)"), () => { throw failure; }), error => error === failure);
