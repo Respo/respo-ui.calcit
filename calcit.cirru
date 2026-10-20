@@ -47,7 +47,8 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag 'Content $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
             :generics $ [] 'Content
-        'comp-attributes $ %{} 'CodeEntry (:doc |)
+        'comp-attributes $ %{} 'CodeEntry
+          :doc "|Render a responsive label/value grid from AttributesOptions :items. Each item may carry :label, :value (text or a Respo node), and :span; options also set the title, item size, and CSS overrides."
           :code $ quote $ defcomp comp-attributes (options)
             let
                 items $ :items options
@@ -296,10 +297,12 @@
               span $ {}
                 :class-name $ str-spaced style-catoptric $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-          :examples $ []
+          :examples $ [] $ quote
+            comp-catoptric-text |Respo $ Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
-        'comp-checkbox $ %{} 'CodeEntry (:doc |)
+        'comp-checkbox $ %{} 'CodeEntry
+          :doc "|Render a controlled native checkbox. Shares SwitchOptions with comp-switch: :label, :disabled, :on-change (receives the next Bool and d!), :class-name, and :style."
           :code $ quote $ defcomp comp-checkbox (checked options) (assert-type checked 'Bool)
             create-element :label
               {}
@@ -332,11 +335,13 @@
               if
                 non-nil? $ respo-ui.schema/read-field options :label
                 <> $ str $ respo-ui.schema/read-field options :label
-          :examples $ []
+          :examples $ [] $ quote
+            comp-checkbox true $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Remember me")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Bool $ :: 'calcit.core/Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
-        'comp-cirru-snippet $ %{} 'CodeEntry (:doc |)
+        'comp-cirru-snippet $ %{} 'CodeEntry
+          :doc "|Render Cirru code with syntax highlighting. Options: :class-name and :style."
           :code $ quote $ defcomp comp-cirru-snippet (text options)
             div
               {}
@@ -350,13 +355,15 @@
           :examples $ [] $ quote (comp-cirru-snippet "|defn f (x) x")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
-        'comp-close $ %{} 'CodeEntry (:doc |)
+        'comp-close $ %{} 'CodeEntry
+          :doc "|Render a clickable close (✕) mark. ButtonOptions :on-click handles the click; :class-name and :style adjust presentation."
           :code $ quote $ defcomp comp-close (options)
             span $ {} (:inner-text "|✕")
               :style $ respo-ui.schema/read-field options :style
               :class-name $ str-spaced style-close $ respo-ui.schema/read-field options :class-name
               :on-click $ respo-ui.schema/read-field options :on-click
-          :examples $ []
+          :examples $ [] $ quote
+            comp-close $ Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/ButtonOptions
         'comp-collapse $ %{} 'CodeEntry
@@ -394,7 +401,8 @@
               assert= false $ .includes? closed |open=
               assert= true $ .includes? closed |>Node<
             :tags $ #{} :js-only
-        'comp-copy $ %{} 'CodeEntry (:doc |)
+        'comp-copy $ %{} 'CodeEntry
+          :doc "|Render a copy icon. Clicking copies code to the clipboard, unless a handler is passed, which then replaces the default copy."
           :code $ quote $ defcomp comp-copy (code f)
             div
               {}
@@ -404,7 +412,8 @@
                   (:none) (copy-handler code)
               div $ {} (:class-name style-copy-outline)
                 :style $ {} (:top -5) (:right -2)
-          :examples $ []
+          :examples $ [] $ quote
+            comp-copy "|caps --ci" $ Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo.schema/EventHandler
         'comp-divider $ %{} 'CodeEntry
@@ -572,12 +581,13 @@
               assert= false $ .includes? html "|disabled=\"true\""
               assert= true $ .includes? first-html "|disabled=\"true\""
             :tags $ #{} :js-only
-        'comp-placeholder $ %{} 'CodeEntry (:doc |)
+        'comp-placeholder $ %{} 'CodeEntry
+          :doc "|Render a muted placeholder text block for empty areas."
           :code $ quote $ defcomp comp-placeholder (text)
             div
               {} $ :class-name css-placeholder
               <> text
-          :examples $ []
+          :examples $ [] $ quote (comp-placeholder "|Nothing here yet")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String
         'comp-progress $ %{} 'CodeEntry
@@ -653,7 +663,7 @@
               assert= false $ .includes? plain |name=
             :tags $ #{} :js-only
         'comp-select $ %{} 'CodeEntry
-          :doc "|Render a controlled native select from keyed option maps. Each item uses :value, :label, and optional :disabled; :on-change receives the next value and d!."
+          :doc "|Render a controlled native select from SelectOption items, each with :value, :label, and optional :disabled. Options: :disabled, :on-change (receives the next value and d!), :class-name, and :style."
           :code $ quote $ defcomp comp-select (value items options)
             create-list-element :select
               {} (:value value)
@@ -718,7 +728,8 @@
             comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :some "|Loading title") :width (Option :some |60%)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/SkeletonOptions
-        'comp-snippet $ %{} 'CodeEntry (:doc |)
+        'comp-snippet $ %{} 'CodeEntry
+          :doc "|Render plain preformatted code. Options: :class-name and :style."
           :code $ quote $ defcomp comp-snippet (code options)
             div
               {} $ :class-name $ str-spaced css/row css-snippet (respo-ui.schema/read-field options :class-name)
@@ -728,7 +739,8 @@
               span
                 {} $ :class-name style-copy-wrapper
                 comp-copy code
-          :examples $ []
+          :examples $ [] $ quote
+            comp-snippet "|yarn install" $ Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
         'comp-spinner $ %{} 'CodeEntry
@@ -839,7 +851,8 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Bool $ :: 'calcit.core/Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
-        'comp-tabs $ %{} 'CodeEntry (:doc |)
+        'comp-tabs $ %{} 'CodeEntry
+          :doc "|Render horizontal or vertical tabs from TabRoute items. TabsOptions sets :selected, :vertical?, :width, and styles; on-route receives the clicked TabRoute."
           :code $ quote $ defcomp comp-tabs (options tabs on-route)
             let
                 selected options.:selected
@@ -895,7 +908,8 @@
                   :: 'Fn $ {} (:return 'Unit)
                     :args $ [] 'Op
             :generics $ [] 'Value 'Op
-        'comp-tag $ %{} 'CodeEntry (:doc |)
+        'comp-tag $ %{} 'CodeEntry
+          :doc "|Render a small semantic tag. Kinds are :info, :success, :warning, and :error; any other tag uses the neutral style. ButtonOptions :on-click, :class-name, and :style apply."
           :code $ quote $ defcomp comp-tag (kind content options)
             div
               {}
@@ -906,7 +920,8 @@
                 :on-click $ either (respo-ui.schema/read-field options :on-click)
                   fn $ e d!
               <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-          :examples $ []
+          :examples $ [] $ quote
+            comp-tag :success |Stable $ Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag 'Content $ :: 'calcit.core/Option 'respo-ui.schema/ButtonOptions
             :generics $ [] 'Content
@@ -931,7 +946,7 @@
                 mark $ format-time-mark time
               span $ {} (:class-name css/font-fancy) (:title time) (:inner-text mark)
                 :on-click $ fn (e d!) (js/console.log :time time) &unit
-          :examples $ []
+          :examples $ [] $ quote (comp-time |2026-10-20T08:00:00Z)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String
             :features $ #{} :js-ffi
@@ -1233,7 +1248,7 @@
           :schema $ :: 'String
         'style-badge $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width |20px) (:height |20px) (:padding "|0 6px") (:border-radius |10px) (:font-size 12) (:font-weight 500) (:line-height 1) (:white-space :nowrap)
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width |20px) (:height |20px) (:padding "|0 6px") (:border-radius |10px) (:font-size 12) (:font-weight 500) (:line-height |1) (:white-space :nowrap)
               :color $ hsl 0 0 30
               :background-color $ hsl 0 0 92
           :examples $ []
@@ -2467,7 +2482,7 @@
         %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-doc-block (text)
             div $ {} (:inner-text text)
-              :style $ {} (:white-space :pre-wrap) (:line-height 1.6) (:color |#555)
+              :style $ {} (:white-space :pre-wrap) (:line-height |1.6) (:color |#555)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String
@@ -2538,30 +2553,90 @@
       :defs $ {}
         'comp-home $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-home ()
-            div ({})
+            div
+              {} $ :class-name $ str-spaced css/stack css/gap16 style-home-page
               div
-                {} $ :style style-home
-                <> "|Styles for Respo"
-              =< 0 32
-              div ({})
-                comp-doc-block "|Respo UI is some minimal style collections for creating small pieces of apps. It includes variables for Flexbox layouts, basic button and input styles, fonts like \"Josefin Sans\" and \"Hind\".\n\nYou may read code on [GitHub](http://github.com/Respo/respo-ui). [Fonts files](https://github.com/tiye/favored-fonts) are hosted separately on my server."
+                {} $ :class-name $ str-spaced css/stack css/gap8
+                div $ {} (:class-name style-home) (:inner-text "|Respo UI")
+                div $ {} (:class-name style-home-lead)
+                  :inner-text "|Typed components and static CSS classes for Respo apps written in Calcit. Controls stay controlled, options are named structs, and styles are generated once by defstyle."
+                div
+                  {} $ :class-name $ str-spaced css/row-middle css/gap8
+                  a $ {} (:href |#/components.html) (:class-name css/link) (:inner-text "|Browse components")
+                  a $ {} (:href |#/layouts.html) (:class-name css/link) (:inner-text "|Layout classes")
+                  a $ {} (:href |https://github.com/Respo/respo-ui.calcit) (:class-name css/link) (:inner-text |GitHub)
+              div
+                {} $ :class-name $ str-spaced css/responsive-grid css/gap16
+                render-category "|Form controls" "|button, input, textarea, select, checkbox, switch, radio group, field"
+                render-category |Navigation "|tabs, breadcrumb, pagination, steps"
+                render-category "|Disclosure and hints" "|collapse, tooltip, kbd"
+                render-category |Feedback "|alert, progress, spinner, skeleton, empty state, badge"
+                render-category "|Data display" "|card, avatar, tag, attributes, divider, time"
+                render-category "|Code and utilities" "|snippet, Cirru snippet, copy, close, placeholder"
+              div
+                {} $ :class-name $ str-spaced css/stack css/gap8
+                div $ {} (:class-name style-home-heading) (:inner-text "|Quick start")
+                div $ {} (:class-name style-home-text)
+                  :inner-text "|Add the module to deps.cirru, run caps, then import components and their option structs:"
+                comp-cirru-snippet "|{} (:calcit-version |0.30.1-alpha.4)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |0.7.41" $ Option :none
+                comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
+                div $ {} (:class-name style-home-text)
+                  :inner-text "|Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
-        'style-home $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def style-home
-            {} (:font-size 32) (:font-family "|Josefin Sans")
-              :color $ hsl 200 100 76
-              :font-weight 100
+        'render-category $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-category (title names)
+            div
+              {} $ :class-name $ str-spaced css/stack css/gap8 style-home-card
+              div $ {} (:class-name style-home-heading) (:inner-text title)
+              div $ {} (:class-name style-home-text) (:inner-text names)
           :examples $ []
-          :schema $ :: 'Map 'Tag 'Dynamic
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'String 'String
+        'style-home $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home
+            {} $ |& $ {} (:font-size 40) (:font-family "|Josefin Sans") (:font-weight 100) (:line-height |1.2)
+              :color $ hsl 200 100 66
+          :examples $ []
+          :schema $ :: 'String
+        'style-home-card $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home-card
+            {} $ |& $ {} (:padding |16px) (:border-radius |8px) (:background-color :white)
+              :border $ str "|1px solid " $ hsl 0 0 90
+          :examples $ []
+          :schema $ :: 'String
+        'style-home-heading $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home-heading
+            {} $ |& $ {} (:font-size 15) (:font-weight 600)
+              :color $ hsl 0 0 20
+          :examples $ []
+          :schema $ :: 'String
+        'style-home-lead $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home-lead
+            {} $ |& $ {} (:max-width |640px) (:font-size 16) (:line-height |1.6)
+              :color $ hsl 0 0 30
+          :examples $ []
+          :schema $ :: 'String
+        'style-home-page $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home-page
+            {} $ |& $ {} (:max-width |960px) (:padding "|8px 0 48px")
+          :examples $ []
+          :schema $ :: 'String
+        'style-home-text $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home-text
+            {} $ |& $ {} (:font-size 14) (:line-height |1.6)
+              :color $ hsl 0 0 40
+          :examples $ []
+          :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.home
           :require
-            respo.core :refer $ defcomp div a img <>
-            respo.comp.space :refer $ =<
+            respo.core :refer $ defcomp div a <>
+            respo.css :refer $ defstyle
             respo.util.format :refer $ hsl
-            respo-ui.comp.docs :refer $ comp-doc-block
+            respo-ui.comp :refer $ comp-cirru-snippet
+            respo-ui.css :as css
     'respo-ui.comp.layouts-page $ %{} 'FileEntry
       :defs $ {}
         'comp-layouts-page $ %{} 'CodeEntry (:doc |)

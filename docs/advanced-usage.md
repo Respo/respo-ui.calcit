@@ -64,15 +64,15 @@ Respo schemas for DOM props and component return values.
 
 ## Dynamic content
 
-Text-like slots in `comp-button`, `comp-card`, and `comp-alert` accept either a literal or a Respo node. Build complex content before passing it when that improves readability:
+Text-like slots in `comp-button`, `comp-card`, `comp-alert`, `comp-collapse`, and `comp-tooltip` accept either a literal or a Respo node. Build complex content before passing it when that improves readability:
 
 ```cirru
 let
     actions $ div
       {} $ :class-name $ str-spaced css/row css/gap8
-      comp-button "|Cancel"
-      comp-button "|Confirm" $ {} (:kind :primary)
-  comp-card content $ {} (:title title) (:footer actions)
+      comp-button "|Cancel" $ Option :none
+      comp-button "|Confirm" $ Option :some $ ButtonOptions :kind (Option :some :primary)
+  comp-card content $ Option :some $ CardOptions :title (Option :some title) :footer (Option :some actions)
 ```
 
 ## Accessibility
@@ -83,6 +83,10 @@ let
 - `comp-switch` and `comp-select` keep native form controls underneath their presentation.
 - `comp-divider` uses `role="separator"`.
 - `comp-progress` uses `role="progressbar"`; announce detailed progress in adjacent text when users need the exact value.
+- `comp-radio-group` renders native radios inside `role="radiogroup"`; give them a shared `:name` so arrow keys move between options.
+- `comp-field` shows `:error` with `role="alert"`; pass `:for` with the control's id to link the label.
+- `comp-breadcrumb`, `comp-pagination`, and `comp-steps` mark the current item with `aria-current`.
+- `comp-collapse` is a native `details`/`summary`, and `comp-tooltip` appears on focus as well as hover.
 
 ## Verification
 
