@@ -503,11 +503,12 @@
               :disabled $ or (respo-ui.schema/read-field options :disabled) false
               :class-name $ str-spaced css/input $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
-              :on-input $ respo-ui.schema/read-field options :on-input
+              :on-input $ input-handler options
           :examples $ [] $ quote
             comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Search)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
-            :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/InputOptions
+            :args $ [] 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/InputOptions 'Op)
+            :generics $ [] 'Op
         'comp-kbd $ %{} 'CodeEntry
           :doc "|Render a keyboard shortcut from key names, joined with +. Options: :class-name and :style."
           :code $ quote $ defcomp comp-kbd (key-names options)
@@ -917,11 +918,12 @@
               :disabled $ or (respo-ui.schema/read-field options :disabled) false
               :class-name $ str-spaced css/textarea $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
-              :on-input $ respo-ui.schema/read-field options :on-input
+              :on-input $ input-handler options
           :examples $ [] $ quote
             comp-textarea |notes $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Notes)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
-            :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/InputOptions
+            :args $ [] 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/InputOptions 'Op)
+            :generics $ [] 'Op
         'comp-time $ %{} 'CodeEntry
           :doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future..."
           :code $ quote $ defcomp comp-time (time)
@@ -1061,6 +1063,31 @@
           :schema $ :: 'Fn $ {} (:return 'String)
             :args $ [] 'String
             :features $ #{} :js-ffi
+        'input-handler $ %{} 'CodeEntry
+          :doc "|Event handler for comp-input and comp-textarea: :on-change gets the text value, otherwise the raw :on-input handler is used."
+          :code $ quote $ defn input-handler (options)
+            match options
+              (:some o)
+                match o.:on-change
+                  (:some on-change)
+                    fn (e d!)
+                      hint-fn $ {}
+                        :args $ [] (:: 'Map 'Tag 'Dynamic)
+                          :: 'Fn $ {}
+                            :args $ [] 'Op
+                            :return 'Unit
+                        :return 'Unit
+                      on-change
+                        match (get e :value)
+                          (:some event-value) (str event-value)
+                          (:none) |
+                        , d!
+                  (:none) (respo-ui.schema/read-field options :on-input)
+              (:none) nil
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'Dynamic)
+            :args $ [] $ :: 'calcit.core/Option (:: 'respo-ui.schema/InputOptions 'Op)
+            :generics $ [] 'Op
         'literal? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn literal? (v)
             or (string? v) (tag? v) (number? v) (bool? v)
@@ -3787,12 +3814,21 @@
           :examples $ [] $ quote
             FieldOptions :error $ Option :some "|Required field"
           :schema $ :: 'Enum
-        'InputOptions $ %{} 'CodeEntry (:doc |)
+        'InputOptions $ %{} 'CodeEntry
+          :doc "|Typed options for comp-input and comp-textarea. :on-change receives the current text and d!; :on-input still receives the raw event map."
           :code $ quote $ defstruct InputOptions
+            [] $ quote Op
             :type $ :: 'Option 'String
             :placeholder $ :: 'Option 'String
             :disabled $ :: 'Option 'Bool
             :on-input $ :: 'Option 'respo.schema/EventHandler
+            :on-change $ :: 'Option $ :: 'Fn
+              {}
+                :args $ [] 'String $ :: 'Fn
+                  {}
+                    :args $ [] $ quote Op
+                    :return 'Unit
+                :return 'Unit
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ []
