@@ -61,7 +61,7 @@
                     :style $ ui/merge-styles
                       {} (:display :grid)
                         :grid-template-columns $ str "|repeat(auto-fit, minmax(" item-width "|px,1fr))"
-                        :gap 8
+                        :gap tokens/space-2
                       if (option:some? options.:style) (option:unwrap options.:style) ({})
                   -> items $ map-indexed $ fn (idx info)
                     [] idx $ let
@@ -1019,40 +1019,28 @@
             :features $ #{} :js-ffi
         'css-item-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-item-label
-            {} $ |$0 $ {} (:font-weight |300) (:font-family ui/font-fancy) (:font-size 15) (:line-height |14px)
-              :color $ hsl 0 0 60
+            {} $ |$0 $ {} (:font-size tokens/text-xs) (:font-weight tokens/weight-medium) (:line-height tokens/leading-normal) (:color tokens/color-text-muted)
           :examples $ []
           :schema $ :: 'String
         'css-placeholder $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-placeholder
             {} $ |$0 $ ui/merge-styles ui/center
-              {} (:padding 16) (:font-family ui/font-fancy)
-                :color $ hsl 0 0 80
-                :font-size 12
-                :font-style :italic
+              {} (:padding tokens/space-4) (:font-size tokens/text-sm) (:font-style :italic) (:color tokens/color-text-muted)
           :examples $ []
           :schema $ :: 'String
         'css-snippet $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-snippet
             {}
-              |& $ {} (:font-family ui/font-code) (:white-space :pre) (:font-size 12) (:line-height |20px)
-                :color $ hsl 0 0 40
-                :padding "|4px 32px 4px 6px"
-                :border $ str "|1px solid " $ hsl 0 0 90
-                :border-radius |4px
-                :margin 0
-                :position :relative
+              |& $ {} (:position :relative) (:margin 0) (:padding "|8px 36px 8px 12px") (:border-radius tokens/radius-md) (:font-family tokens/font-mono) (:font-size tokens/text-xs) (:line-height tokens/leading-normal) (:white-space :pre) (:overflow-x :auto) (:color tokens/color-text) (:background-color tokens/color-surface-subtle)
+                :border $ str "|1px solid " tokens/color-border
               "|& > pre" $ {} $ :margin 0
           :examples $ []
           :schema $ :: 'String
         'css-tab $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-tab
             {}
-              |$0 $ {} (:padding "|0 8px") (:font-family ui/font-normal) (:font-weight |300) (:cursor :pointer) (:font-size 14)
-                :color $ hsl 0 0 70
-                :line-height |24px
-                :border-radius |2px
-              |$0:hover $ {} $ :background-color (hsl 0 0 98)
+              |$0 $ {} (:padding "|0 12px") (:border-radius tokens/radius-sm) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:line-height tokens/control-md) (:color tokens/color-text-secondary) (:cursor :pointer) (:user-select :none) (:transition tokens/transition-colors)
+              |$0:hover $ {} (:color tokens/color-text) (:background-color tokens/color-surface-subtle)
           :examples $ []
           :schema $ :: 'String
         'effect-dataset-text $ %{} 'CodeEntry
@@ -1073,8 +1061,8 @@
               or (= action :mount) (= action :update)
               let
                   root $ unsafe-coerce el 'js-ffi.browser/DomElementHost
-                  target $ browser/element-query-selector root |.style-selected-tab
-                  cursor $ browser/element-query-selector root |.style-tab-highlight
+                  target $ browser/element-query-selector root $ str |. style-selected-tab
+                  cursor $ browser/element-query-selector root $ str |. style-tab-highlight
                 if
                   and (option:some? target) (option:some? cursor)
                   let
@@ -1211,56 +1199,38 @@
             :generics $ [] 'Op
         'style-alert $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert
-            {} $ |& $ {} (:padding "|10px 12px") (:border "|1px solid transparent") (:border-radius |6px) (:line-height |1.5)
+            {} $ |& $ {} (:padding "|10px 12px") (:border "|1px solid transparent") (:border-radius tokens/radius-lg) (:font-size tokens/text-md) (:line-height tokens/leading-normal)
           :examples $ []
           :schema $ :: 'String
         'style-alert-error $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert-error
-            {} $ |& $ {}
-              :color $ hsl 4 68 38
-              :background-color $ hsl 4 80 96
-              :border-color $ hsl 4 65 86
+            {} $ |& $ {} (:color tokens/color-danger-text) (:background-color tokens/color-danger-soft) (:border-color tokens/color-danger-border)
           :examples $ []
           :schema $ :: 'String
         'style-alert-info $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert-info
-            {} $ |& $ {}
-              :color $ hsl 210 70 34
-              :background-color $ hsl 210 80 96
-              :border-color $ hsl 210 60 86
+            {} $ |& $ {} (:color tokens/color-info-text) (:background-color tokens/color-info-soft) (:border-color tokens/color-info-border)
           :examples $ []
           :schema $ :: 'String
         'style-alert-success $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert-success
-            {} $ |& $ {}
-              :color $ hsl 135 55 28
-              :background-color $ hsl 135 55 95
-              :border-color $ hsl 135 45 84
+            {} $ |& $ {} (:color tokens/color-success-text) (:background-color tokens/color-success-soft) (:border-color tokens/color-success-border)
           :examples $ []
           :schema $ :: 'String
         'style-alert-warning $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert-warning
-            {} $ |& $ {}
-              :color $ hsl 38 80 28
-              :background-color $ hsl 45 90 94
-              :border-color $ hsl 42 75 80
+            {} $ |& $ {} (:color tokens/color-warning-text) (:background-color tokens/color-warning-soft) (:border-color tokens/color-warning-border)
           :examples $ []
           :schema $ :: 'String
         'style-attributes-title $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-attributes-title
-            {} $ |$0 $ {} (:font-size 18) (:margin-bottom 6)
+            {} $ |$0 $ {} (:margin-bottom tokens/space-2) (:font-size tokens/text-lg) (:font-weight tokens/weight-semibold) (:line-height tokens/leading-tight)
           :examples $ []
           :schema $ :: 'String
         'style-avatar $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-avatar
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:width |32px) (:height |32px) (:overflow :hidden) (:border-radius |50%)
-              :background-color $ hsl 220 75 92
-              :color $ hsl 220 65 42
-              :font-family ui/font-normal
-              :font-size |12px
-              :font-weight |600
-              :text-transform :uppercase
-              :flex-shrink |0
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:flex-shrink |0) (:width tokens/control-md) (:height tokens/control-md) (:overflow :hidden) (:border-radius tokens/radius-full) (:font-family tokens/font-sans) (:font-size tokens/text-xs) (:font-weight tokens/weight-semibold) (:text-transform :uppercase) (:color tokens/color-primary-active) (:background-color tokens/color-primary-soft)
+              :box-shadow $ str "|inset 0 0 0 1px " tokens/color-primary-border
           :examples $ []
           :schema $ :: 'String
         'style-avatar-image $ %{} 'CodeEntry (:doc |)
@@ -1270,116 +1240,98 @@
           :schema $ :: 'String
         'style-avatar-large $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-avatar-large
-            {} $ |& $ {} (:width |48px) (:height |48px) (:font-size |16px)
+            {} $ |& $ {} (:width tokens/control-lg) (:height tokens/control-lg) (:font-size tokens/text-md)
           :examples $ []
           :schema $ :: 'String
         'style-avatar-small $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-avatar-small
-            {} $ |& $ {} (:width |24px) (:height |24px) (:font-size |10px)
+            {} $ |& $ {} (:width tokens/control-sm) (:height tokens/control-sm) (:font-size |10px)
           :examples $ []
           :schema $ :: 'String
         'style-badge $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width |20px) (:height |20px) (:padding "|0 6px") (:border-radius |10px) (:font-size 12) (:font-weight |500) (:line-height |1) (:white-space :nowrap)
-              :color $ hsl 0 0 30
-              :background-color $ hsl 0 0 92
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width tokens/space-5) (:height tokens/space-5) (:padding "|0 6px") (:border-radius tokens/radius-full) (:font-size tokens/text-xs) (:font-weight tokens/weight-medium) (:line-height |1) (:white-space :nowrap) (:color tokens/color-text-secondary) (:background-color tokens/color-surface-muted)
           :examples $ []
           :schema $ :: 'String
         'style-badge-dot $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge-dot
-            {} $ |& $ {} (:min-width |8px) (:width |8px) (:height |8px) (:padding 0) (:border-radius |50%)
+            {} $ |& $ {} (:min-width tokens/space-2) (:width tokens/space-2) (:height tokens/space-2) (:padding 0) (:border-radius tokens/radius-full)
           :examples $ []
           :schema $ :: 'String
         'style-badge-error $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge-error
-            {} $ |& $ {} (:color :white)
-              :background-color $ hsl 0 75 52
+            {} $ |& $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-danger)
           :examples $ []
           :schema $ :: 'String
         'style-badge-info $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge-info
-            {} $ |& $ {} (:color :white)
-              :background-color $ hsl 210 80 50
+            {} $ |& $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-info)
           :examples $ []
           :schema $ :: 'String
         'style-badge-success $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge-success
-            {} $ |& $ {} (:color :white)
-              :background-color $ hsl 140 60 40
+            {} $ |& $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-success)
           :examples $ []
           :schema $ :: 'String
         'style-badge-warning $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge-warning
-            {} $ |& $ {}
-              :color $ hsl 30 90 20
-              :background-color $ hsl 40 95 60
+            {} $ |& $ {} (:color tokens/color-warning-text) (:background-color tokens/color-warning)
           :examples $ []
           :schema $ :: 'String
         'style-breadcrumb $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-breadcrumb
-            {} $ |& $ {} (:font-size 14) (:line-height |20px)
+            {} $ |& $ {} (:font-size tokens/text-md) (:line-height tokens/leading-normal)
           :examples $ []
           :schema $ :: 'String
         'style-breadcrumb-current $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-breadcrumb-current
-            {} $ |& $ {} (:font-weight |500)
-              :color $ hsl 0 0 15
+            {} $ |& $ {} (:font-weight tokens/weight-medium) (:color tokens/color-text)
           :examples $ []
           :schema $ :: 'String
         'style-breadcrumb-item $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-breadcrumb-item
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |6px)
-              :color $ hsl 0 0 45
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap tokens/space-1-5) (:color tokens/color-text-secondary)
           :examples $ []
           :schema $ :: 'String
         'style-breadcrumb-link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-breadcrumb-link
             {}
-              |& $ {} (:color :inherit) (:text-decoration :none)
-              |&:hover $ {} (:text-decoration :underline)
-                :color $ hsl 200 80 40
+              |& $ {} (:color :inherit) (:text-decoration :none) (:border-radius tokens/radius-sm) (:transition tokens/transition-colors)
+              |&:hover $ {} (:color tokens/color-primary) (:text-decoration :underline)
+              |&:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring)
           :examples $ []
           :schema $ :: 'String
         'style-breadcrumb-list $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-breadcrumb-list
-            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap |6px) (:margin 0) (:padding 0) (:list-style :none)
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap tokens/space-1-5) (:margin 0) (:padding 0) (:list-style :none)
           :examples $ []
           :schema $ :: 'String
         'style-breadcrumb-separator $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-breadcrumb-separator
-            {} $ |& $ {}
-              :color $ hsl 0 0 70
+            {} $ |& $ {} (:color tokens/color-text-muted)
           :examples $ []
           :schema $ :: 'String
         'style-card $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-card
-            {} $ |& $ {}
-              :border $ str "|1px solid " $ hsl 0 0 90
-              :border-radius |8px
-              :background-color :white
-              :overflow :hidden
-              :box-shadow $ str "|0 2px 10px " $ hsl 0 0 0 0.06
+            {} $ |& $ {} (:overflow :hidden) (:border-radius tokens/radius-lg) (:background-color tokens/color-surface) (:box-shadow tokens/shadow-xs)
+              :border $ str "|1px solid " tokens/color-border
           :examples $ []
           :schema $ :: 'String
         'style-card-body $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-card-body
-            {} $ |& $ {} (:padding |16px)
+            {} $ |& $ {} (:padding tokens/space-4) (:font-size tokens/text-md) (:line-height tokens/leading-normal)
           :examples $ []
           :schema $ :: 'String
         'style-card-footer $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-card-footer
-            {} $ |& $ {} (:padding "|10px 16px")
-              :border-top $ str "|1px solid " $ hsl 0 0 92
-              :background-color $ hsl 0 0 98
+            {} $ |& $ {} (:padding "|10px 16px") (:background-color tokens/color-surface-subtle)
+              :border-top $ str "|1px solid " tokens/color-border
           :examples $ []
           :schema $ :: 'String
         'style-card-title $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-card-title
-            {} $ |& $ {} (:padding "|12px 16px")
-              :border-bottom $ str "|1px solid " $ hsl 0 0 92
-              :font-family ui/font-fancy
-              :font-size |16px
-              :font-weight |600
+            {} $ |& $ {} (:padding "|12px 16px") (:font-size tokens/text-lg) (:font-weight tokens/weight-semibold) (:line-height tokens/leading-tight) (:color tokens/color-text)
+              :border-bottom $ str "|1px solid " tokens/color-border
           :examples $ []
           :schema $ :: 'String
         'style-catoptric $ %{} 'CodeEntry (:doc |)
@@ -1390,211 +1342,174 @@
         'style-close $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-close
             {}
-              |& $ {} (:font-size 16) (:line-height |16px) (:height |16px) (:font-weight |100)
-                :color $ hsl 0 90 70
-                :opacity 0.5
-                :cursor :pointer
-                :transition-duration |200ms
-                :user-select :none
-              |&:hover $ {} $ :opacity 1
-              |&:active $ {} (:transform "|scale(1.1)") (:transition-duration |0ms)
+              |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:width tokens/control-sm) (:height tokens/control-sm) (:border-radius tokens/radius-sm) (:font-size tokens/text-md) (:line-height |1) (:color tokens/color-text-muted) (:cursor :pointer) (:user-select :none) (:transition tokens/transition-colors)
+              |&:hover $ {} (:color tokens/color-text) (:background-color tokens/color-surface-muted)
+              |&:active $ {} (:color tokens/color-danger-text) (:background-color tokens/color-danger-soft)
+              |&:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring)
           :examples $ []
           :schema $ :: 'String
         'style-collapse $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-collapse
-            {} $ |& $ {} (:border-radius |8px) (:background-color :white)
-              :border $ str "|1px solid " $ hsl 0 0 90
+            {} $ |& $ {} (:overflow :hidden) (:border-radius tokens/radius-lg) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border
           :examples $ []
           :schema $ :: 'String
         'style-collapse-body $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-collapse-body
-            {} $ |& $ {} (:padding "|0 14px 12px") (:font-size 14) (:line-height |22px)
-              :color $ hsl 0 0 35
+            {} $ |& $ {} (:padding "|0 16px 12px") (:font-size tokens/text-md) (:line-height tokens/leading-normal) (:color tokens/color-text-secondary)
           :examples $ []
           :schema $ :: 'String
         'style-collapse-summary $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-collapse-summary
             {}
-              |& $ {} (:padding "|10px 14px") (:font-size 14) (:font-weight |500) (:cursor :pointer) (:list-style-position :inside)
-              |&:hover $ {} $ :background-color (hsl 0 0 97)
-              |&:focus-visible $ {} (:outline-offset |-2px)
-                :outline $ str "|2px solid " $ hsl 200 80 50
+              |& $ {} (:padding "|10px 16px") (:font-size tokens/text-md) (:font-weight tokens/weight-medium) (:line-height tokens/leading-normal) (:cursor :pointer) (:list-style-position :inside) (:transition tokens/transition-colors)
+              |&:hover $ {} $ :background-color tokens/color-surface-subtle
+              |&:focus-visible $ {} (:outline :none)
+                :box-shadow $ str "|inset " tokens/focus-ring
           :examples $ []
           :schema $ :: 'String
         'style-control-disabled $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-control-disabled
-            {} $ |& $ {} (:opacity 0.5) (:cursor :not-allowed)
+            {} $ |& $ {} (:opacity |0.5) (:cursor :not-allowed)
           :examples $ []
           :schema $ :: 'String
         'style-copy-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-copy-container
             {}
-              |& $ {} (:display :inline-block) (:margin "|0 8px 0 4px")
-              |&:hover $ {} (:transition-duration |200ms) (:transform "|scale(1.06)")
+              |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:width tokens/control-sm) (:height tokens/control-sm) (:border-radius tokens/radius-sm) (:cursor :pointer) (:transition tokens/transition-colors)
+              |&:hover $ {} $ :background-color tokens/color-surface-muted
           :examples $ []
           :schema $ :: 'String
         'style-copy-outline $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-copy-outline
             {}
-              |& $ {} (:position :relative) (:width 12) (:height 12) (:border-radius |2px)
-                :border $ str "|1.5px solid " $ hsl 0 0 80
-                :cursor :pointer
-                :outline "|1px solid white"
-              |&:active $ {}
-                :border-color $ hsl 0 0 50
-                :transition-duration |0ms
+              |& $ {} (:position :relative) (:width tokens/space-3) (:height tokens/space-3) (:border-radius |2px) (:cursor :pointer)
+                :border $ str "|1.5px solid " tokens/color-text-muted
+                :outline $ str "|1px solid " tokens/color-surface
+              |&:active $ {} $ :border-color tokens/color-text
           :examples $ []
           :schema $ :: 'String
         'style-copy-wrapper $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-copy-wrapper
-            {} $ |& $ {} (:position :absolute) (:top 10) (:right 2)
+            {} $ |& $ {} (:position :absolute) (:top tokens/space-1) (:right tokens/space-1)
           :examples $ []
           :schema $ :: 'String
         'style-divider $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-divider
-            {} $ |& $ {} (:width |100%) (:height |1px) (:margin "|12px 0")
-              :background-color $ hsl 0 0 90
+            {} $ |& $ {} (:width |100%) (:height |1px) (:margin "|12px 0") (:background-color tokens/color-border)
           :examples $ []
           :schema $ :: 'String
         'style-divider-vertical $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-divider-vertical
-            {} $ |& $ {} (:display :inline-block) (:width |1px) (:height |1em) (:margin "|0 12px")
-              :background-color $ hsl 0 0 90
-              :vertical-align :middle
+            {} $ |& $ {} (:display :inline-block) (:width |1px) (:height |1em) (:margin "|0 12px") (:vertical-align :middle) (:background-color tokens/color-border)
           :examples $ []
           :schema $ :: 'String
         'style-empty $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-empty
-            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:align-items :center) (:justify-content :center) (:min-height |160px) (:padding |24px)
-              :border $ str "|1px dashed " $ hsl 220 15 82
-              :border-radius |8px
-              :text-align :center
-              :background-color $ hsl 220 20 99
+            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:align-items :center) (:justify-content :center) (:min-height |160px) (:padding tokens/space-6) (:border-radius tokens/radius-lg) (:text-align :center) (:background-color tokens/color-surface-subtle)
+              :border $ str "|1px dashed " tokens/color-border-strong
           :examples $ []
           :schema $ :: 'String
         'style-empty-description $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-empty-description
-            {} $ |& $ {} (:margin-top |4px) (:margin-bottom |12px)
-              :color $ hsl 220 10 52
+            {} $ |& $ {} (:margin-top tokens/space-1) (:margin-bottom tokens/space-3) (:font-size tokens/text-sm) (:line-height tokens/leading-normal) (:color tokens/color-text-secondary)
           :examples $ []
           :schema $ :: 'String
         'style-empty-icon $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-empty-icon
-            {} $ |& $ {} (:font-size |28px) (:line-height |1)
-              :color $ hsl 220 20 68
-              :margin-bottom |10px
+            {} $ |& $ {} (:margin-bottom tokens/space-3) (:font-size tokens/text-3xl) (:line-height |1) (:color tokens/color-text-disabled)
           :examples $ []
           :schema $ :: 'String
         'style-empty-title $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-empty-title
-            {} $ |& $ {} (:font-size |16px) (:font-weight |600)
-              :color $ hsl 220 20 25
+            {} $ |& $ {} (:font-size tokens/text-lg) (:font-weight tokens/weight-semibold) (:line-height tokens/leading-tight) (:color tokens/color-text)
           :examples $ []
           :schema $ :: 'String
         'style-field $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-field
-            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:gap |6px)
+            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:gap tokens/space-1-5)
           :examples $ []
           :schema $ :: 'String
         'style-field-description $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-field-description
-            {} $ |& $ {} (:font-size 12) (:line-height |18px)
-              :color $ hsl 0 0 50
+            {} $ |& $ {} (:font-size tokens/text-xs) (:line-height tokens/leading-normal) (:color tokens/color-text-muted)
           :examples $ []
           :schema $ :: 'String
         'style-field-error $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-field-error
-            {} $ |& $ {} (:font-size 12) (:line-height |18px)
-              :color $ hsl 0 70 44
+            {} $ |& $ {} (:font-size tokens/text-xs) (:line-height tokens/leading-normal) (:color tokens/color-danger-text)
           :examples $ []
           :schema $ :: 'String
         'style-field-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-field-label
-            {} $ |& $ {} (:font-size 14) (:font-weight |500) (:line-height |20px)
-              :color $ hsl 0 0 20
+            {} $ |& $ {} (:font-size tokens/text-sm) (:font-weight tokens/weight-medium) (:line-height tokens/leading-normal) (:color tokens/color-text)
           :examples $ []
           :schema $ :: 'String
         'style-field-required $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-field-required
-            {} $ |& $ {} (:margin-left |4px)
-              :color $ hsl 0 70 50
+            {} $ |& $ {} (:margin-left tokens/space-1) (:color tokens/color-danger-text)
           :examples $ []
           :schema $ :: 'String
         'style-item $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-item
             {}
-              |$0 $ {} (:min-height 72)
-                :background-color $ hsl 0 0 99
-                :padding |8px
-                :transition-duration |240ms
-                :border-radius |4px
-              |$0:hover $ {}
-                :background-color $ hsl 0 0 100
-                :box-shadow $ str "|0 0 4px 1px " $ hsl 0 0 0 0.08
+              |$0 $ {} (:min-height |72px) (:padding tokens/space-2) (:border-radius tokens/radius-md) (:background-color tokens/color-surface-subtle) (:transition tokens/transition-colors)
+              |$0:hover $ {} (:background-color tokens/color-surface) (:box-shadow tokens/shadow-sm)
           :examples $ []
           :schema $ :: 'String
         'style-kbd $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-kbd
-            {} $ |& $ {} (:display :inline-block) (:min-width |20px) (:padding "|1px 6px") (:border-radius |4px) (:font-family "|ui-monospace, SFMono-Regular, Menlo, monospace") (:font-size 12) (:line-height |18px) (:text-align :center) (:background-color :white)
-              :color $ hsl 0 0 25
-              :border $ str "|1px solid " $ hsl 0 0 82
-              :box-shadow $ str "|inset 0 -1px 0 " $ hsl 0 0 82
+            {} $ |& $ {} (:display :inline-block) (:min-width tokens/space-5) (:padding "|1px 6px") (:border-radius tokens/radius-sm) (:font-family tokens/font-mono) (:font-size tokens/text-xs) (:line-height tokens/leading-normal) (:text-align :center) (:color tokens/color-text) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border-strong
+              :box-shadow $ str "|inset 0 -1px 0 " tokens/color-border-strong
           :examples $ []
           :schema $ :: 'String
         'style-kbd-group $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-kbd-group
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |4px)
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap tokens/space-1)
           :examples $ []
           :schema $ :: 'String
         'style-kbd-plus $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-kbd-plus
-            {} $ |& $ {} (:margin-right |4px) (:font-size 12)
-              :color $ hsl 0 0 55
+            {} $ |& $ {} (:margin-right tokens/space-1) (:font-size tokens/text-xs) (:color tokens/color-text-muted)
           :examples $ []
           :schema $ :: 'String
         'style-pagination $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-pagination
-            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap |4px)
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap tokens/space-1)
           :examples $ []
           :schema $ :: 'String
         'style-pagination-current $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-pagination-current
             {}
-              |&& $ {} (:color :white) (:cursor :default)
-                :background-color $ hsl 200 80 50
-                :border-color $ hsl 200 80 50
-              "|&&:hover:not(:disabled)" $ {} $ :color :white
+              |&& $ {} (:cursor :default) (:color tokens/color-text-inverse) (:background-color tokens/color-primary) (:border-color tokens/color-primary)
+              "|&&:hover:not(:disabled)" $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-primary-hover)
           :examples $ []
           :schema $ :: 'String
         'style-pagination-gap $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-pagination-gap
-            {} $ |& $ {} (:min-width |24px) (:text-align :center)
-              :color $ hsl 0 0 60
+            {} $ |& $ {} (:min-width tokens/control-sm) (:text-align :center) (:color tokens/color-text-muted)
           :examples $ []
           :schema $ :: 'String
         'style-pagination-item $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-pagination-item
             {}
-              |& $ {} (:min-width |32px) (:height |32px) (:padding "|0 8px") (:border-radius |6px) (:font-size 14) (:cursor :pointer) (:background-color :white)
-                :border $ str "|1px solid " $ hsl 0 0 86
-                :color $ hsl 0 0 25
-              "|&:hover:not(:disabled)" $ {}
-                :border-color $ hsl 200 80 50
-                :color $ hsl 200 80 40
-              |&:disabled $ {} (:cursor :not-allowed) (:opacity 0.4)
+              |& $ {} (:box-sizing :border-box) (:min-width tokens/control-md) (:height tokens/control-md) (:padding "|0 8px") (:border-radius tokens/radius-md) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:color tokens/color-text) (:background-color tokens/color-surface) (:cursor :pointer) (:transition tokens/transition-colors)
+                :border $ str "|1px solid " tokens/color-border-strong
+              "|&:hover:not(:disabled)" $ {} (:color tokens/color-primary) (:border-color tokens/color-primary)
+              |&:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring)
+              |&:disabled $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:background-color tokens/color-surface-muted) (:border-color tokens/color-border)
           :examples $ []
           :schema $ :: 'String
         'style-progress $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-progress
-            {} $ |& $ {} (:width |100%) (:height |8px) (:overflow :hidden) (:border-radius |999px)
-              :background-color $ hsl 220 20 92
+            {} $ |& $ {} (:width |100%) (:height tokens/space-2) (:overflow :hidden) (:border-radius tokens/radius-full) (:background-color tokens/color-surface-muted)
           :examples $ []
           :schema $ :: 'String
         'style-progress-value $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-progress-value
-            {} $ |& $ {} (:height |100%) (:border-radius |inherit)
-              :background-color $ hsl 220 80 62
-              :transition "|width 180ms ease"
+            {} $ |& $ {} (:height |100%) (:border-radius |inherit) (:background-color tokens/color-primary)
+              :transition $ str "|width " tokens/duration-normal "| " tokens/ease
           :examples $ []
           :schema $ :: 'String
         'style-radio-group $ %{} 'CodeEntry (:doc |)
@@ -1604,30 +1519,30 @@
           :schema $ :: 'String
         'style-radio-group-vertical $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-radio-group-vertical
-            {} $ |& $ {} (:flex-direction :column) (:align-items :flex-start) (:gap |8px)
+            {} $ |& $ {} (:flex-direction :column) (:align-items :flex-start) (:gap tokens/space-2)
           :examples $ []
           :schema $ :: 'String
         'style-radio-input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-radio-input
-            {} $ |& $ {} (:margin 0) (:width |16px) (:height |16px) (:cursor :inherit)
-              :accent-color $ hsl 200 80 50
+            {}
+              |& $ {} (:margin 0) (:width tokens/space-4) (:height tokens/space-4) (:cursor :inherit) (:accent-color tokens/color-primary)
+              |&:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring) (:border-radius tokens/radius-full)
           :examples $ []
           :schema $ :: 'String
         'style-radio-item $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-radio-item
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |6px) (:cursor :pointer) (:line-height |20px)
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap tokens/space-2) (:font-size tokens/text-md) (:line-height tokens/leading-normal) (:cursor :pointer)
           :examples $ []
           :schema $ :: 'String
         'style-selected-tab $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-selected-tab
-            {} $ |& $ {}
+            {} $ |&& $ {} (:color tokens/color-primary) (:font-weight tokens/weight-medium)
           :examples $ []
           :schema $ :: 'String
         'style-skeleton $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-skeleton
             {}
-              |& $ {} (:display :block)
-                :background-color $ hsl 220 18 90
+              |& $ {} (:display :block) (:background-color tokens/color-surface-muted)
                 :animation "|respo-ui-skeleton 1.2s ease-in-out infinite alternate"
               "|@keyframes respo-ui-skeleton" $ {}
                 |from $ {} $ :opacity 0.45
@@ -1636,68 +1551,57 @@
           :schema $ :: 'String
         'style-skeleton-circle $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-skeleton-circle
-            {} $ |& $ {} (:width |32px) (:height |32px) (:border-radius |50%)
+            {} $ |& $ {} (:width tokens/control-md) (:height tokens/control-md) (:border-radius tokens/radius-full)
           :examples $ []
           :schema $ :: 'String
         'style-skeleton-text $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-skeleton-text
-            {} $ |& $ {} (:width |100%) (:height |12px) (:border-radius |4px)
+            {} $ |& $ {} (:width |100%) (:height tokens/space-3) (:border-radius tokens/radius-sm)
           :examples $ []
           :schema $ :: 'String
         'style-spinner $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-spinner
             {}
-              |& $ {} (:display :inline-block) (:width |16px) (:height |16px)
-                :border $ str "|2px solid " $ hsl 220 30 88
-                :border-top-color $ hsl 220 80 60
-                :border-radius |50%
-                :vertical-align :middle
-                :animation "|respo-ui-spin 700ms linear infinite"
+              |& $ {} (:display :inline-block) (:box-sizing :border-box) (:width tokens/space-4) (:height tokens/space-4) (:border-radius tokens/radius-full) (:vertical-align :middle) (:border-width |2px) (:border-style :solid) (:animation "|respo-ui-spin 700ms linear infinite")
+                :border-color $ str tokens/color-primary "| " tokens/color-primary-border "| " tokens/color-primary-border "| " tokens/color-primary-border
               "|@keyframes respo-ui-spin" $ {} $ |to
                 {} $ :transform "|rotate(360deg)"
           :examples $ []
           :schema $ :: 'String
         'style-step $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step
-            {} $ |& $ {} (:display :flex) (:align-items :flex-start) (:gap |8px)
-              :color $ hsl 0 0 35
+            {} $ |& $ {} (:display :flex) (:align-items :flex-start) (:gap tokens/space-2) (:color tokens/color-text-secondary)
           :examples $ []
           :schema $ :: 'String
         'style-step-current $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-current
-            {} $ |& $ {} (:font-weight |500)
-              :color $ hsl 0 0 15
+            {} $ |& $ {} (:font-weight tokens/weight-medium) (:color tokens/color-text)
           :examples $ []
           :schema $ :: 'String
         'style-step-description $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-description
-            {} $ |& $ {} (:font-size 12) (:line-height |18px) (:font-weight |400)
-              :color $ hsl 0 0 55
+            {} $ |& $ {} (:font-size tokens/text-xs) (:line-height tokens/leading-normal) (:font-weight tokens/weight-regular) (:color tokens/color-text-muted)
           :examples $ []
           :schema $ :: 'String
         'style-step-marker $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-marker
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:flex-shrink |0) (:box-sizing :border-box) (:width |24px) (:height |24px) (:border-radius |50%) (:font-size 12)
-              :border $ str "|1px solid " $ hsl 0 0 80
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:flex-shrink |0) (:box-sizing :border-box) (:width tokens/control-sm) (:height tokens/control-sm) (:border-radius tokens/radius-full) (:font-size tokens/text-xs) (:color tokens/color-text-secondary) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-border-strong
           :examples $ []
           :schema $ :: 'String
         'style-step-marker-current $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-marker-current
-            {} $ |& $ {} (:color :white)
-              :background-color $ hsl 200 80 50
-              :border-color $ hsl 200 80 50
+            {} $ |& $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-primary) (:border-color tokens/color-primary)
           :examples $ []
           :schema $ :: 'String
         'style-step-marker-done $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-marker-done
-            {} $ |& $ {}
-              :color $ hsl 200 80 40
-              :border-color $ hsl 200 80 50
+            {} $ |& $ {} (:color tokens/color-primary-active) (:background-color tokens/color-primary-soft) (:border-color tokens/color-primary)
           :examples $ []
           :schema $ :: 'String
         'style-step-title $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-title
-            {} $ |& $ {} (:font-size 14) (:line-height |24px)
+            {} $ |& $ {} (:font-size tokens/text-md) (:line-height tokens/control-sm)
           :examples $ []
           :schema $ :: 'String
         'style-steps $ %{} 'CodeEntry (:doc |)
@@ -1707,56 +1611,46 @@
           :schema $ :: 'String
         'style-steps-vertical $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-steps-vertical
-            {} $ |& $ {} (:flex-direction :column) (:gap |16px)
+            {} $ |& $ {} (:flex-direction :column) (:gap tokens/space-4)
           :examples $ []
           :schema $ :: 'String
         'style-switch-input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-input
-            {} $ |& $ {} (:position :absolute) (:width |1px) (:height |1px) (:opacity 0) (:pointer-events :none)
+            {} $ |& $ {} (:position :absolute) (:top 0) (:left 0) (:width |1px) (:height |1px) (:margin 0) (:opacity 0) (:pointer-events :none)
           :examples $ []
           :schema $ :: 'String
         'style-switch-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-label
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |8px) (:cursor :pointer) (:user-select :none)
+            {}
+              |& $ {} (:position :relative) (:display :inline-flex) (:align-items :center) (:gap tokens/space-2) (:font-size tokens/text-md) (:cursor :pointer) (:user-select :none)
+              "|& > input:focus-visible + span" $ {} $ :box-shadow tokens/focus-ring
           :examples $ []
           :schema $ :: 'String
         'style-switch-track $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-track
             {}
-              |& $ {} (:position :relative) (:display :inline-block) (:width |36px) (:height |20px) (:border-radius |999px)
-                :background-color $ hsl 220 12 82
-                :transition "|background-color 160ms ease"
-              |&::after $ {} (:content ||) (:position :absolute) (:top |2px) (:left |2px) (:width |16px) (:height |16px) (:border-radius |50%) (:background-color :white)
-                :box-shadow $ str "|0 1px 4px " $ hsl 0 0 0 0.2
-                :transition "|transform 160ms ease"
+              |& $ {} (:position :relative) (:display :inline-block) (:flex-shrink 0) (:width |36px) (:height tokens/space-5) (:border-radius tokens/radius-full) (:background-color tokens/color-border-strong)
+                :transition $ str "|background-color " tokens/duration-fast "| " tokens/ease
+              |&::after $ {} (:content "|\"\"") (:position :absolute) (:top |2px) (:left |2px) (:width tokens/space-4) (:height tokens/space-4) (:border-radius tokens/radius-full) (:background-color tokens/color-surface) (:box-shadow tokens/shadow-sm)
+                :transition $ str "|transform " tokens/duration-fast "| " tokens/ease
           :examples $ []
           :schema $ :: 'String
         'style-switch-track-checked $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-track-checked
             {}
-              |& $ {} $ :background-color (hsl 220 80 62)
+              |& $ {} $ :background-color tokens/color-primary
               |&::after $ {} $ :transform "|translateX(16px)"
           :examples $ []
           :schema $ :: 'String
         'style-tab-highlight $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tab-highlight
-            {}
-              |& $ {} (:min-width 0) (:left 0) (:height 1)
-                :background-color $ hsl 200 60 80
-                :bottom 0
-                :position :absolute
-                :transition-duration |200ms
-                :border-radius |2px
-              (str |. style-tabs "|:hover &")
-                {} $ :height 3
+            {} $ |& $ {} (:position :absolute) (:bottom 0) (:left 0) (:min-width 0) (:height |2px) (:border-radius |2px) (:background-color tokens/color-primary)
+              :transition $ str "|left " tokens/duration-normal "| " tokens/ease "|, width " tokens/duration-normal "| " tokens/ease "|, top " tokens/duration-normal "| " tokens/ease "|, height " tokens/duration-normal "| " tokens/ease
           :examples $ []
           :schema $ :: 'String
         'style-tab-vertical-highlight $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tab-vertical-highlight
-            {}
-              |div& $ {} (:width 2) (:left 0)
-              (str |. style-tabs "|:hover div&")
-                {} $ :width 4
+            {} $ |div& $ {} (:width |2px) (:left 0)
           :examples $ []
           :schema $ :: 'String
         'style-tabs $ %{} 'CodeEntry (:doc |)
@@ -1766,53 +1660,28 @@
           :schema $ :: 'String
         'style-tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tag
-            {}
-              |& $ {} (:display :inline-block)
-                :background-color $ hsl 0 0 96
-                :border $ str "|1px solid " $ hsl 0 0 92
-                :border-radius |4px
-                :height |20px
-                :line-height |20px
-                :font-size 12
-                :padding "|0px 8px"
-                :color $ hsl 0 0 64
-                :cursor :default
-              |&:hover $ {} $ :background-color (hsl 0 0 94)
-              |&:active $ {} $ :transform "|translate(1px,1px)"
+            {} $ |& $ {} (:display :inline-block) (:box-sizing :border-box) (:height tokens/space-5) (:padding "|0 8px") (:border-radius tokens/radius-sm) (:font-size tokens/text-xs) (:line-height |18px) (:color tokens/color-text-secondary) (:background-color tokens/color-surface-muted) (:cursor :default)
+              :border $ str "|1px solid " tokens/color-border
           :examples $ []
           :schema $ :: 'String
         'style-tag-error $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tag-error
-            {}
-              |div& $ {} (:color :white) (:border :none)
-                :background-color $ hsl 0 90 76
-              |div&:hover $ {} $ :background-color (hsl 0 90 72)
+            {} $ |&& $ {} (:color tokens/color-danger-text) (:background-color tokens/color-danger-soft) (:border-color tokens/color-danger-border)
           :examples $ []
           :schema $ :: 'String
         'style-tag-info $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tag-info
-            {}
-              |div& $ {} (:color :white) (:border :none)
-                :background-color $ hsl 240 99 86
-              |div&:hover $ {} $ :background-color (hsl 240 99 84)
+            {} $ |&& $ {} (:color tokens/color-info-text) (:background-color tokens/color-info-soft) (:border-color tokens/color-info-border)
           :examples $ []
           :schema $ :: 'String
         'style-tag-success $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tag-success
-            {}
-              |div& $ {} (:color :white) (:border :none)
-                :color $ hsl 120 99 40
-                :background-color $ hsl 120 99 92
-              |div&:hover $ {} $ :background-color (hsl 120 99 88)
+            {} $ |&& $ {} (:color tokens/color-success-text) (:background-color tokens/color-success-soft) (:border-color tokens/color-success-border)
           :examples $ []
           :schema $ :: 'String
         'style-tag-warning $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tag-warning
-            {}
-              |div& $ {} (:color :white) (:border :none)
-                :color $ hsl 60 90 30
-                :background-color $ hsl 60 98 58
-              |div&:hover $ {} $ :background-color (hsl 60 98 49)
+            {} $ |&& $ {} (:color tokens/color-warning-text) (:background-color tokens/color-warning-soft) (:border-color tokens/color-warning-border)
           :examples $ []
           :schema $ :: 'String
         'style-tooltip $ %{} 'CodeEntry (:doc |)
@@ -1829,8 +1698,8 @@
           :schema $ :: 'String
         'style-tooltip-tip $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tooltip-tip
-            {} $ |& $ {} (:position :absolute) (:bottom "|calc(100% + 6px)") (:left |50%) (:transform "|translateX(-50%)") (:z-index |10) (:padding "|4px 8px") (:border-radius |4px) (:font-size 12) (:line-height |18px) (:white-space :nowrap) (:color :white) (:pointer-events :none) (:opacity 0) (:visibility :hidden) (:transition "|opacity 120ms ease")
-              :background-color $ hsl 0 0 15
+            {} $ |& $ {} (:position :absolute) (:bottom "|calc(100% + 6px)") (:left |50%) (:transform "|translateX(-50%)") (:z-index tokens/z-tooltip) (:padding "|4px 8px") (:border-radius tokens/radius-sm) (:font-size tokens/text-xs) (:line-height tokens/leading-normal) (:white-space :nowrap) (:color tokens/color-text-inverse) (:background-color tokens/color-text) (:box-shadow tokens/shadow-md) (:pointer-events :none) (:opacity 0) (:visibility :hidden)
+              :transition $ str "|opacity " tokens/duration-fast "| " tokens/ease
           :examples $ []
           :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
@@ -1840,6 +1709,7 @@
             respo.comp.space :refer $ =<
             respo-ui.core :as ui
             respo.util.format :refer $ hsl
+            respo-ui.tokens :as tokens
             |cirru-color :refer $ generateHtml
             respo.css :refer $ defstyle
             respo-ui.css :as css
@@ -2481,7 +2351,7 @@
           :code $ quote $ def color-groups
             []
               TokenGroup :title |Text :names $ [] |color-text |color-text-secondary |color-text-muted |color-text-disabled |color-text-inverse
-              TokenGroup :title "|Surface and border" :names $ [] |color-bg |color-surface |color-surface-subtle |color-surface-muted |color-border |color-border-strong
+              TokenGroup :title "|Surface and border" :names $ [] |color-bg |color-surface |color-surface-subtle |color-surface-muted |color-border |color-border-strong |color-border-hover
               TokenGroup :title |Primary :names $ [] |color-primary |color-primary-hover |color-primary-active |color-primary-soft |color-primary-border |color-focus
               TokenGroup :title |Info :names $ [] |color-info |color-info-soft |color-info-border |color-info-text
               TokenGroup :title |Success :names $ [] |color-success |color-success-soft |color-success-border |color-success-text
@@ -2730,7 +2600,7 @@
         'rules $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def rules
             []
-              DesignNote :title |Sizes :body "|Controls take :size :sm, :md or :lg: heights control-sm/md/lg, horizontal padding control-*-padding, font text-sm, text-md or text-lg. Default is :md. Controls use radius-md; tags, badges and kbd use radius-sm."
+              DesignNote :title |Sizes :body "|Controls are control-md high with control-md-padding and text-md, so inputs, selects and buttons line up. control-sm (with text-sm) suits dense toolbars and table rows; control-lg (with text-lg) suits prominent actions. Controls use radius-md; tags, badges and kbd use radius-sm."
               DesignNote :title |States :body "|Every interactive element styles hover, active, :focus-visible and disabled. Focus adds focus-ring and never removes the outline without it. Disabled uses color-text-disabled on color-surface-muted, cursor not-allowed and no hover."
               DesignNote :title |Intent :body "|:kind picks the intent: :info, :success, :warning or :error, mapped to the info, success, warning and danger tokens. Solid fills use color-*; soft surfaces use color-*-soft, color-*-border and color-*-text."
               DesignNote :title |Validation :body "|An invalid field gets a color-danger border, aria-invalid and a message in color-danger-text below it. Required marks use color-danger-text."
@@ -2738,7 +2608,7 @@
               DesignNote :title |Text :body "|Body and controls: text-md, leading-normal. Labels: text-sm, weight-medium. Captions: text-xs, color-text-muted. Titles use weight-semibold, not the display font."
               DesignNote :title |Motion :body "|Animate color, background, opacity and transform with duration-fast and ease. Expanding content uses duration-normal. Wrap anything larger in prefers-reduced-motion."
               DesignNote :title |Accessibility :body "|Text contrast is at least 4.5:1. Icon-only controls carry aria-label. Targets are at least 24px. State is exposed with aria attributes, not only color."
-              DesignNote :title |Naming :body "|Options structs are named <Component>Options in respo-ui.schema. Style defs are style-<component>-<part>. Components read tokens/<name> and never contain raw hsl values or pixel literals outside the scale."
+              DesignNote :title |Naming :body "|Options structs are named <Component>Options in respo-ui.schema. Style defs are style-<component>-<part>. Components read colors, font sizes, radii, control heights, shadows and durations from tokens/<name> and contain no raw hsl values. Paddings and gaps stay on the 4px grid."
           :examples $ []
           :schema $ :: 'List 'respo-ui.comp.design-page/DesignNote
         'style-cell-sample $ %{} 'CodeEntry (:doc |)
@@ -4065,36 +3935,26 @@
       :defs $ {}
         'button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def button
-            {} (:min-width |80px) (:line-height |24px) (:border-radius |4px) (:font-size 14) (:text-align |center)
-              :border $ str "|1px solid " $ hsl 220 100 76
-              :color $ hsl 220 100 76
-              :cursor |pointer
-              :display |inline-block
-              :padding "|0 8px"
-              :outline :none
-              :vertical-align :top
-              :background-color :white
-              :user-select :none
-              :transition-duration |300ms
+            {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:gap tokens/space-1-5) (:box-sizing :border-box) (:min-width tokens/space-16) (:height tokens/control-md) (:padding-block 0) (:border-radius tokens/radius-md) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:font-weight tokens/weight-medium) (:line-height tokens/leading-tight) (:text-align :center) (:white-space :nowrap) (:vertical-align :middle) (:cursor :pointer) (:user-select :none) (:outline :none) (:padding-inline tokens/control-md-padding)
+              :border $ str "|1px solid " tokens/color-border-strong
+              :color tokens/color-text
+              :background-color tokens/color-surface
+              :transition tokens/transition-colors
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'button-danger $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def button-danger
-            merge-styles button $ {} (:color :white)
-              :background-color $ hsl 6 100 60
-              :border-color $ hsl 6 100 60
+            merge-styles button $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-danger) (:border-color tokens/color-danger)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'button-primary $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def button-primary
-            merge-styles button $ {} (:color :white)
-              :background-color $ hsl 220 80 60
-              :border-color $ hsl 220 80 60
+            merge-styles button $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-primary) (:border-color tokens/color-primary)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'card $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def card
-            {} $ :padding |16px
+            {} $ :padding tokens/space-4
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'center $ %{} 'CodeEntry (:doc |)
@@ -4104,17 +3964,12 @@
           :schema $ :: 'Map 'Tag 'Dynamic
         'checkbox $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def checkbox
-            {}
-              :accent-color $ hsl 220 80 60
-              :width |16px
-              :height |16px
-              :cursor :pointer
-              :vertical-align :middle
+            {} (:accent-color tokens/color-primary) (:width tokens/space-4) (:height tokens/space-4) (:margin 0) (:cursor :pointer) (:vertical-align :middle)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'checkbox-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def checkbox-label
-            {} (:display :flex) (:align-items :center) (:gap |8px) (:line-height |1) (:cursor :pointer) (:user-select :none)
+            {} (:display :inline-flex) (:align-items :center) (:gap tokens/space-2) (:line-height tokens/leading-tight) (:cursor :pointer) (:user-select :none)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'column $ %{} 'CodeEntry (:doc |)
@@ -4170,8 +4025,7 @@
           :schema $ :: 'Map 'Tag 'Dynamic
         'global $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def global
-            {} (:line-height |2) (:font-size |14px) (:font-family default-fonts)
-              :color $ hsl 0 0 20
+            {} (:line-height tokens/leading-normal) (:font-size tokens/text-md) (:font-family tokens/font-sans) (:color tokens/color-text)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'hsl $ %{} 'CodeEntry (:doc |)
@@ -4185,22 +4039,16 @@
             :args $ [] 'Number 'Number 'Number $ :: 'calcit.core/Option 'Number
         'input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def input
-            merge-styles global $ {} (:border |none) (:outline |none)
-              :border $ str "|1px solid " $ hsl 0 0 80
-              :border-radius |4px
-              :font-size |14px
-              :padding "|4px 8px"
-              :min-width |120px
-              :line-height |16px
-              :height 28
-              :font-family default-fonts
-              :vertical-align :top
+            {} (:box-sizing :border-box) (:height tokens/control-md) (:min-width |120px) (:padding-inline tokens/control-md-padding) (:border-radius tokens/radius-md) (:outline :none) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:line-height tokens/leading-tight) (:vertical-align :middle)
+              :border $ str "|1px solid " tokens/color-border-strong
+              :color tokens/color-text
+              :background-color tokens/color-surface
+              :transition tokens/transition-colors
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def link
-            {} (:text-decoration :underline) (:height 24) (:line-height |24px) (:margin 4) (:display :inline-block) (:cursor :pointer) (:user-select :none)
-              :color $ hsl 200 100 76
+            {} (:display :inline-block) (:height tokens/control-sm) (:line-height tokens/control-sm) (:margin tokens/space-1) (:color tokens/color-primary) (:text-decoration :underline) (:text-underline-offset |2px) (:cursor :pointer) (:user-select :none) (:transition tokens/transition-colors)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'merge-styles $ %{} 'CodeEntry (:doc |)
@@ -4241,104 +4089,87 @@
           :schema $ :: 'Map 'Tag 'Dynamic
         'select $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def select
-            {} (:height 28) (:outline |none) (:font-size 14) (:min-width 120)
-              :border $ str "|1px solid " $ hsl 0 0 80
-              :padding "|0 4px"
-              :border-radius |4px
-              :font-family default-fonts
-              :vertical-align :top
-              :cursor :pointer
+            {} (:box-sizing :border-box) (:height tokens/control-md) (:min-width |120px) (:padding-inline tokens/control-md-padding) (:border-radius tokens/radius-md) (:outline :none) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:vertical-align :middle) (:cursor :pointer)
+              :border $ str "|1px solid " tokens/color-border-strong
+              :color tokens/color-text
+              :background-color tokens/color-surface
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag
-            {}
-              :background-color $ hsl 200 80 60
-              :line-height |21px
-              :font-size 14
-              :padding "|0px 8px"
-              :border-radius 4
-              :color :white
+            {} (:display :inline-block) (:padding "|0 8px") (:border-radius tokens/radius-sm) (:font-size tokens/text-sm) (:line-height tokens/space-5) (:color tokens/color-text-inverse) (:background-color tokens/color-primary)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'tag-outline $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag-outline
-            merge-styles tag $ {} (:background-color :white)
-              :border $ str "|1px solid " $ hsl 200 70 80
-              :color $ hsl 200 30 40
+            merge-styles tag $ {} (:color tokens/color-primary-active) (:background-color tokens/color-surface)
+              :border $ str "|1px solid " tokens/color-primary-border
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'tag-stroke $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag-stroke
-            merge-styles tag $ {}
-              :background-color $ hsl 200 70 90
-              :color $ hsl 200 20 40
+            merge-styles tag $ {} (:color tokens/color-primary-active) (:background-color tokens/color-primary-soft)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'text-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def text-label
-            {} (:line-height |32px) (:font-size 14)
-              :color $ hsl 0 0 20
-              :display :inline-block
-              :vertical-align :top
+            {} (:display :inline-block) (:line-height tokens/control-md) (:font-size tokens/text-md) (:color tokens/color-text) (:vertical-align :middle)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def textarea
-            {} (:outline :none) (:border :none) (:font-size 14) (:font-family default-fonts)
-              :border $ str "|1px solid " $ hsl 0 0 80
-              :border-radius |4px
-              :padding 8
-              :min-width 240
-              :vertical-align :top
+            {} (:box-sizing :border-box) (:min-width |240px) (:padding "|8px 12px") (:border-radius tokens/radius-md) (:outline :none) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:line-height tokens/leading-normal) (:vertical-align :top)
+              :border $ str "|1px solid " tokens/color-border-strong
+              :color tokens/color-text
+              :background-color tokens/color-surface
+              :transition tokens/transition-colors
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
-        :code $ quote $ ns respo-ui.core (:require)
+        :code $ quote $ ns respo-ui.core
+          :require $ respo-ui.tokens :as tokens
     'respo-ui.css $ %{} 'FileEntry
       :defs $ {}
         'button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle button
             {} (|$0 ui/button)
-              |$0:hover $ {} $ :background-color (hsl 0 0 98)
-              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
+              |$0:hover $ {} (:color tokens/color-primary) (:border-color tokens/color-primary) (:background-color tokens/color-surface)
+              |$0:active $ {} (:color tokens/color-primary-active) (:border-color tokens/color-primary-active) (:background-color tokens/color-primary-soft)
+              |$0:focus-visible $ {} (:border-color tokens/color-primary) (:box-shadow tokens/focus-ring)
+              "|$0:disabled, $0:disabled:hover, $0:disabled:active" $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:border-color tokens/color-border) (:background-color tokens/color-surface-muted) (:box-shadow :none)
           :examples $ []
           :schema $ :: 'String
         'button-danger $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle button-danger
             {} (|$0 ui/button-danger)
-              |$0:hover $ {}
-                :background-color $ hsl 6 100 64
-                :border-color $ hsl 6 100 64
-              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
-                :background-color $ hsl 6 100 68
-                :border-color $ hsl 6 100 68
+              |$0:hover $ {} (:background-color tokens/color-danger-text) (:border-color tokens/color-danger-text)
+              |$0:active $ {} (:background-color tokens/color-danger-text) (:border-color tokens/color-danger-text)
+              |$0:focus-visible $ {} $ :box-shadow tokens/focus-ring
+              "|$0:disabled, $0:disabled:hover, $0:disabled:active" $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:border-color tokens/color-border) (:background-color tokens/color-surface-muted) (:box-shadow :none)
           :examples $ []
           :schema $ :: 'String
         'button-danger-outline $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle button-danger-outline
             {}
-              |$0 $ ui/merge-styles ui/button $ {}
-                :border-color $ hsl 6 100 60
-                :color $ hsl 6 100 60
-              |$0:hover $ {} $ :background-color (hsl 0 0 98)
-              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
+              |$0 $ ui/merge-styles ui/button $ {} (:color tokens/color-danger-text) (:border-color tokens/color-danger)
+              |$0:hover $ {} $ :background-color tokens/color-danger-soft
+              |$0:active $ {} (:background-color tokens/color-danger-soft) (:border-color tokens/color-danger-text)
+              |$0:focus-visible $ {} $ :box-shadow tokens/focus-ring
+              "|$0:disabled, $0:disabled:hover, $0:disabled:active" $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:border-color tokens/color-border) (:background-color tokens/color-surface-muted) (:box-shadow :none)
           :examples $ []
           :schema $ :: 'String
         'button-primary $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle button-primary
             {} (|$0 ui/button-primary)
-              |$0:hover $ {}
-                :background-color $ hsl 220 80 64
-                :border-color $ hsl 220 80 64
-              |$0:active $ {} (:transform "|scale(1.02)") (:transition-duration |0ms)
-                :background-color $ hsl 220 80 68
-                :border-color $ hsl 220 80 68
+              |$0:hover $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-primary-hover) (:border-color tokens/color-primary-hover)
+              |$0:active $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-primary-active) (:border-color tokens/color-primary-active)
+              |$0:focus-visible $ {} $ :box-shadow tokens/focus-ring
+              "|$0:disabled, $0:disabled:hover, $0:disabled:active" $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:border-color tokens/color-border) (:background-color tokens/color-surface-muted) (:box-shadow :none)
           :examples $ []
           :schema $ :: 'String
         'card $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle card
-            {} $ |& $ {} (:padding |16px)
+            {} $ |& $ {} (:padding tokens/space-4)
           :examples $ []
           :schema $ :: 'String
         'center $ %{} 'CodeEntry (:doc |)
@@ -4349,8 +4180,8 @@
         'checkbox $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle checkbox
             {} (|$0 ui/checkbox)
-              |$0:focus $ {} (:outline :none)
-                :box-shadow $ str "|0 0 0 2px " $ hsl 220 80 80 (Option :some 0.3)
+              |$0:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring) (:border-radius tokens/radius-sm)
+              |$0:disabled $ {} $ :cursor :not-allowed
           :examples $ []
           :schema $ :: 'String
         'checkbox-label $ %{} 'CodeEntry (:doc |)
@@ -4408,35 +4239,35 @@
           :schema $ :: 'String
         'font-code $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-code
-            {} $ |$0 $ {}
-              :font-family "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace"
+            {} $ |$0 $ {} (:font-family tokens/font-mono)
           :examples $ []
           :schema $ :: 'String
         'font-code! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-code!
             {} $ |$0 $ {}
-              :font-family "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace !important"
+              :font-family $ str tokens/font-mono "| !important"
           :examples $ []
           :schema $ :: 'String
         'font-fancy $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-fancy
-            {} $ |$0 $ {} (:font-family "|Josefin Sans, Helvetica neue, Arial, sans-serif")
+            {} $ |$0 $ {} (:font-family tokens/font-display)
           :examples $ []
           :schema $ :: 'String
         'font-fancy! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-fancy!
             {} $ |& $ {}
-              :font-family "|Josefin Sans, Helvetica neue, Arial, sans-serif !important"
+              :font-family $ str tokens/font-display "| !important"
           :examples $ []
           :schema $ :: 'String
         'font-normal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-normal
-            {} $ |& $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
+            {} $ |& $ {} (:font-family tokens/font-sans)
           :examples $ []
           :schema $ :: 'String
         'font-normal! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle font-normal!
-            {} $ |& $ {} (:font-family "|Hind, Helvatica, Arial, sans-serif")
+            {} $ |& $ {}
+              :font-family $ str tokens/font-sans "| !important"
           :examples $ []
           :schema $ :: 'String
         'fullscreen $ %{} 'CodeEntry (:doc |)
@@ -4446,18 +4277,17 @@
           :schema $ :: 'String
         'gap16 $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle gap16
-            {} $ |& $ {} (:gap 16)
+            {} $ |& $ {} (:gap tokens/space-4)
           :examples $ []
           :schema $ :: 'String
         'gap8 $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle gap8
-            {} $ |& $ {} (:gap 8)
+            {} $ |& $ {} (:gap tokens/space-2)
           :examples $ []
           :schema $ :: 'String
         'global $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle global
-            {} $ |$0 $ {} (:line-height |2) (:font-size |14px) (:font-family ui/default-fonts)
-              :color $ hsl 0 0 20
+            {} $ |$0 ui/global
           :examples $ []
           :schema $ :: 'String
         'hsl $ %{} 'CodeEntry (:doc |)
@@ -4472,29 +4302,27 @@
         'input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle input
             {} (|$0 ui/input)
-              |$0:focus $ {}
-                :border $ str "|1px solid " $ hsl 200 50 75
-                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (Option :some 0.2)
+              |$0::placeholder $ {} $ :color tokens/color-text-muted
+              "|$0:hover:not(:disabled):not(:focus)" $ {} $ :border-color tokens/color-border-hover
+              |$0:focus $ {} (:border-color tokens/color-primary) (:box-shadow tokens/focus-ring)
+              |$0:disabled $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:background-color tokens/color-surface-muted)
           :examples $ []
           :schema $ :: 'String
         'link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle link
             {} (|$0 ui/link)
-              |$0:hover $ {} $ :color (hsl 200 100 56)
-              |$0:active $ {}
-                :color $ hsl 200 100 40
-                :transform "|scale(1.04)"
+              |$0:hover $ {} $ :color tokens/color-primary-hover
+              |$0:active $ {} $ :color tokens/color-primary-active
+              |$0:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring) (:border-radius tokens/radius-sm)
           :examples $ []
           :schema $ :: 'String
         'link-slight $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle link-slight
             {}
-              |$0 $ {} (:text-decoration :none) (:height 24) (:line-height |24px) (:margin 4) (:display :inline-block) (:cursor :pointer) (:user-select :none)
-                :color $ hsl 200 100 76
-              |$0:hover $ {} $ :color (hsl 200 100 56)
-              |$0:active $ {}
-                :color $ hsl 200 100 40
-                :transform "|scale(1.04)"
+              |$0 $ ui/merge-styles ui/link $ {} (:text-decoration :none)
+              |$0:hover $ {} (:color tokens/color-primary-hover) (:text-decoration :underline)
+              |$0:active $ {} $ :color tokens/color-primary-active
+              |$0:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring) (:border-radius tokens/radius-sm)
           :examples $ []
           :schema $ :: 'String
         'preset $ %{} 'CodeEntry (:doc |)
@@ -4502,10 +4330,9 @@
             {}
               |body $ {} (:margin 0) (:overscroll-behavior-x :none) (:overscroll-behavior-y :none)
               "|body *" $ {} $ :box-sizing :border-box
-              |::-webkit-scrollbar $ {} (:width 4) (:height 4)
-              |::-webkit-scrollbar-track $ {} $ :background-color (hsl 0 0 100)
-              |::-webkit-scrollbar-thumb $ {} $ :background-color
-                hsl 180 40 76 $ Option :some 0.8
+              |::-webkit-scrollbar $ {} (:width tokens/space-1) (:height tokens/space-1)
+              |::-webkit-scrollbar-track $ {} $ :background-color tokens/color-surface
+              |::-webkit-scrollbar-thumb $ {} (:background-color tokens/color-border-strong) (:border-radius tokens/radius-full)
               |::-webkit-scrollbar-corner $ {} $ :background-color :transparent
               |::-webkit-resizer $ {} $ :background-color :transparent
           :examples $ []
@@ -4557,17 +4384,12 @@
         'select $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle select
             {}
-              |$0 $ merge ui/select $ {} (:appearance :none) (:background-color :white) (:background-repeat :no-repeat) (:background-position "|right 8px center") (:padding "|0 28px 0 8px") (:transition "|border-color 120ms")
-                :color $ hsl 220 15 20
+              |$0 $ merge ui/select $ {} (:appearance :none) (:background-repeat :no-repeat) (:background-position "|right 10px center") (:transition tokens/transition-colors)
+                :padding-right $ str "|calc(" tokens/control-md-padding "| + 16px)"
                 :background-image "|url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%238a93a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")"
-              "|$0:hover:not(:disabled)" $ {} $ :border
-                str "|1px solid " $ hsl 220 15 65
-              |$0:focus $ {}
-                :border $ str "|1px solid " $ hsl 200 50 75
-                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (Option :some 0.2)
-              |$0:disabled $ {} (:cursor :not-allowed)
-                :color $ hsl 220 10 62
-                :background-color $ hsl 220 15 97
+              "|$0:hover:not(:disabled):not(:focus)" $ {} $ :border-color tokens/color-border-hover
+              |$0:focus $ {} (:border-color tokens/color-primary) (:box-shadow tokens/focus-ring)
+              |$0:disabled $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:background-color tokens/color-surface-muted)
           :examples $ []
           :schema $ :: 'String
         'split-layout $ %{} 'CodeEntry
@@ -4605,9 +4427,10 @@
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle textarea
             {} (|$0 ui/textarea)
-              |$0:focus $ {}
-                :border $ str "|1px solid " $ hsl 200 50 75
-                :box-shadow $ str "|0 0 4px " $ hsl 200 70 50 (Option :some 0.2)
+              |$0::placeholder $ {} $ :color tokens/color-text-muted
+              "|$0:hover:not(:disabled):not(:focus)" $ {} $ :border-color tokens/color-border-hover
+              |$0:focus $ {} (:border-color tokens/color-primary) (:box-shadow tokens/focus-ring)
+              |$0:disabled $ {} (:cursor :not-allowed) (:color tokens/color-text-disabled) (:background-color tokens/color-surface-muted)
           :examples $ []
           :schema $ :: 'String
         'with-sidebar $ %{} 'CodeEntry
@@ -4621,7 +4444,7 @@
           :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.css
-          :require (respo-ui.core :as ui)
+          :require (respo-ui.core :as ui) (respo-ui.tokens :as tokens)
             respo.css :refer $ defstyle
             respo.util.format :refer $ hsl
     'respo-ui.main $ %{} 'FileEntry
@@ -5270,6 +5093,11 @@
           :code $ quote $ def color-border "|var(--rui-color-border)"
           :examples $ []
           :schema $ :: 'String
+        'color-border-hover $ %{} 'CodeEntry
+          :doc "|Hovered control borders. Default: var(--rui-gray-400)"
+          :code $ quote $ def color-border-hover "|var(--rui-color-border-hover)"
+          :examples $ []
+          :schema $ :: 'String
         'color-border-strong $ %{} 'CodeEntry (:doc "|Control borders. Default: var(--rui-gray-300)")
           :code $ quote $ def color-border-strong "|var(--rui-color-border-strong)"
           :examples $ []
@@ -5504,6 +5332,7 @@
               DesignToken :group |color :name |color-surface-muted :value "|var(--rui-gray-100)" :note "|Code blocks, skeletons, tracks"
               DesignToken :group |color :name |color-border :value "|var(--rui-gray-200)" :note "|Dividers and card borders"
               DesignToken :group |color :name |color-border-strong :value "|var(--rui-gray-300)" :note "|Control borders"
+              DesignToken :group |color :name |color-border-hover :value "|var(--rui-gray-400)" :note "|Hovered control borders"
               DesignToken :group |color :name |color-primary :value "|var(--rui-blue-500)" :note "|Primary actions, selection, links"
               DesignToken :group |color :name |color-primary-hover :value "|var(--rui-blue-600)" :note "|Hover on primary fills"
               DesignToken :group |color :name |color-primary-active :value "|var(--rui-blue-700)" :note "|Pressed primary fills, link text"
@@ -5822,6 +5651,12 @@
           :doc "|Declares every --rui-* token on :root. Loaded with this namespace; override the variables in your own CSS to theme components."
           :code $ quote $ defstyle theme
             {} $ |:root $ css-variables design-tokens
+          :examples $ []
+          :schema $ :: 'String
+        'transition-colors $ %{} 'CodeEntry
+          :doc "|Transition shorthand for hover and press feedback on color, background, border and shadow."
+          :code $ quote $ def transition-colors
+            str "|color " duration-fast "| " ease "|, background-color " duration-fast "| " ease "|, border-color " duration-fast "| " ease "|, box-shadow " duration-fast "| " ease
           :examples $ []
           :schema $ :: 'String
         'weight-medium $ %{} 'CodeEntry (:doc "|Default: 500")
