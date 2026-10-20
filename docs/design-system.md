@@ -55,9 +55,10 @@ at a palette step, so changing one ramp re-colors every role that uses it:
 
 ## Component conventions
 
-- **Sizes.** Controls take `:size` `:sm`, `:md` (default) or `:lg`. They use
-  heights `control-*`, padding `control-*-padding` and fonts `text-sm`,
-  `text-md` or `text-lg`. Controls use `radius-md`; tags, badges and kbd use
+- **Sizes.** Controls are `control-md` high with `control-md-padding` and
+  `text-md`, so inputs, selects and buttons line up. `control-sm` (with
+  `text-sm`) suits dense toolbars and table rows; `control-lg` (with `text-lg`)
+  suits prominent actions. Controls use `radius-md`; tags, badges and kbd use
   `radius-sm`.
 - **States.** Every interactive element styles hover, active, `:focus-visible`
   and disabled. Focus adds `focus-ring` and never removes the outline without
@@ -80,12 +81,13 @@ at a palette step, so changing one ramp re-colors every role that uses it:
   `aria-label`. Targets are at least 24px. State is exposed through aria
   attributes, not only through color.
 - **Naming.** Options structs are `<Component>Options` in `respo-ui.schema`.
-  Style defs are `style-<component>-<part>`. Components read `tokens/<name>`
-  and contain no raw `hsl` values or pixel literals outside the scales.
+  Style defs are `style-<component>-<part>`. Components read colors, font
+  sizes, radii, control heights, shadows and durations from `tokens/<name>` and
+  contain no raw `hsl` values. Paddings and gaps stay on the 4px grid.
 
 ## Status
 
-The tokens and the page ship first. Existing components still carry their own
-values and are being moved onto the tokens. The replay test
+`respo-ui.core`, `respo-ui.css` and every `respo-ui.comp` component read
+their colors, sizes and motion from the tokens. The replay test
 (`npm run test:js`) fails when generated code reads a `--rui-*` variable that
 `design-tokens` does not declare.
