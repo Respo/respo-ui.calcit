@@ -57,6 +57,9 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
   `respo-ui.schema`) and wrap siblings in one `div` only when the layout needs it.
   Also add the component id to `componentIds` in `scripts/test-ui-js.mjs`, which
   is hand-written; the replay test then checks that the new block renders.
+- The site shell lives in `respo-ui.comp.sidebar` (`comp-topbar`, `comp-sidenav`, and
+  `component-groups`, which also feeds the index chips and the home category cards).
+  The version shown there comes from `respo-ui.config/version`; bump it with `deps.cirru`.
 
 ## Styles
 

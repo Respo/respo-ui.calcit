@@ -1853,14 +1853,10 @@
       :defs $ {}
         'comp-component-index $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-component-index ()
-            div
+            list->
               {} $ :class-name style-index
-              render-index-group |form "|Form controls" $ [] |button |input |textarea |select |checkbox |switch |radio-group |field
-              render-index-group |navigation |Navigation $ [] |tabs |breadcrumb |pagination |steps
-              render-index-group |disclosure "|Disclosure and hints" $ [] |collapse |tooltip |kbd
-              render-index-group |feedback |Feedback $ [] |alert |progress |spinner |skeleton |empty |badge
-              render-index-group |data "|Data display" $ [] |card |avatar |tag |attributes |divider |time
-              render-index-group |utilities "|Code and utilities" $ [] |cirru-snippet |snippet |copy |close |placeholder |catoptric-text
+              map component-groups $ fn (group)
+                [] group.:id $ render-index-group group
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -2125,23 +2121,6 @@
               respo-ui.schema/SelectOption :value |rust :label |Rust :disabled $ Option :some true
           :examples $ []
           :schema $ :: 'List 'respo-ui.schema/SelectOption
-        'on-jump $ %{} 'CodeEntry
-          :doc "|Return a click handler that scrolls the first element matching the selector into view; used by the index chips because the hash is owned by the router."
-          :code $ quote $ defn on-jump (selector)
-            fn (e d!)
-              hint-fn $ {}
-                :args $ [] (:: 'Map 'Tag 'Dynamic)
-                  :: 'Fn $ {}
-                    :args $ [] 'Dynamic
-                    :return 'Unit
-                :return 'Unit
-              match (query-selector selector)
-                (:some el) (element-scroll-into-view! el)
-                (:none) &unit
-          :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
-            :args $ [] 'String
-            :features $ #{} :js-ffi
         'render-category-head $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-category-head (id title lead)
             div
@@ -2194,20 +2173,20 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String
         'render-index-group $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn render-index-group (cat-id title ids)
+          :code $ quote $ defn render-index-group (group)
             div
               {} $ :class-name style-index-group
               button
                 {} (:type |button) (:class-name style-index-title)
-                  :on-click $ on-jump $ str |#category- cat-id
-                <> title
+                  :on-click $ on-jump $ str |#category- group.:id
+                <> group.:title
               list->
                 {} $ :class-name $ str-spaced css/row style-index-chips
-                map ids $ fn (id)
+                map group.:items $ fn (id)
                   [] id $ render-chip id
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
-            :args $ [] 'String 'String $ :: 'List 'String
+            :args $ [] 'respo-ui.comp.sidebar/ComponentGroup
         'style-category-head $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-category-head
             {} $ |& $ {} (:margin-bottom |16px) (:scroll-margin-top |16px)
@@ -2355,8 +2334,8 @@
             respo.css :refer $ defstyle
             respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-checkbox comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider comp-radio-group comp-field comp-badge comp-breadcrumb comp-pagination comp-steps comp-collapse comp-kbd comp-tooltip
             js-ffi.shared :as shared
-            js-ffi.browser :refer $ query-selector element-scroll-into-view!
             respo-ui.schema :refer $ ButtonOptions InputOptions SelectOption SelectOptions SwitchOptions RadioGroupOptions FieldOptions BadgeOptions CardOptions CollapseOptions TooltipOptions AvatarOptions SkeletonOptions SpinnerOptions EmptyOptions DividerOptions TabsOptions TabRoute BreadcrumbItem StepItem StepsOptions AttributesOptions PresentationOptions
+            respo-ui.comp.sidebar :refer $ on-jump component-groups
     'respo-ui.comp.container $ %{} 'FileEntry
       :defs $ {}
         'comp-container $ %{} 'CodeEntry (:doc |)
@@ -2375,22 +2354,24 @@
                   _ :index
               div
                 {}
-                  :class-name $ str-spaced css/preset css/global css/fullscreen css/row
-                  :style $ {} $ :padding-top 16
-                comp-sidebar route-name
+                  :class-name $ str-spaced css/preset css/global css/fullscreen css/column
+                  :style $ {} $ :overflow :hidden
+                comp-topbar route-name
                 div
-                  {} $ :class-name $ str-spaced css/expand css-content
-                  match router
-                    (:index) (comp-home)
-                    (:index) (comp-home)
-                    (:widgets) (comp-widgets-page)
-                    (:layouts) (comp-layouts-page)
-                    (:fonts) (comp-fonts-page)
-                    (:components) (comp-components-page)
-                    (:utils) (comp-utils-page)
-                    (:not-found pp)
-                      <> $ to-lispy-string router
-                    _ $ do (eprintln |unknown-router router) (comp-home)
+                  {} $ :class-name style-shell-body
+                  when (not= route-name :index) (comp-sidenav route-name)
+                  div
+                    {} $ :class-name $ if (= route-name :index) css-content-home css-content
+                    match router
+                      (:index) (comp-home)
+                      (:widgets) (comp-widgets-page)
+                      (:layouts) (comp-layouts-page)
+                      (:fonts) (comp-fonts-page)
+                      (:components) (comp-components-page)
+                      (:utils) (comp-utils-page)
+                      (:not-found pp)
+                        <> $ to-lispy-string router
+                      _ $ do (eprintln |unknown-router router) (comp-home)
                 if dev? $ comp-inspect |Store store $ {} (:bottom 0)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
@@ -2441,7 +2422,12 @@
             :args $ []
         'css-content $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-content
-            {} $ |$0 $ {} (:padding 8)
+            {} $ |$0 $ {} (:flex |1) (:min-width |0) (:overflow-y :auto) (:box-sizing :border-box) (:padding "|8px 32px 48px")
+          :examples $ []
+          :schema $ :: 'String
+        'css-content-home $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle css-content-home
+            {} $ |$0 $ {} (:flex |1) (:min-width |0) (:overflow-y :auto)
           :examples $ []
           :schema $ :: 'String
         'random-count $ %{} 'CodeEntry (:doc |)
@@ -2451,6 +2437,11 @@
           :schema $ :: 'Fn $ {} (:return 'Number)
             :args $ []
             :features $ #{} :js-ffi
+        'style-shell-body $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-shell-body
+            {} $ |& $ {} (:display :flex) (:flex |1) (:min-height |0)
+          :examples $ []
+          :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.container
           :require
@@ -2459,7 +2450,7 @@
             respo.comp.space :refer $ =<
             respo.comp.inspect :refer $ comp-inspect
             respo-ui.core :as ui
-            respo-ui.comp.sidebar :refer $ comp-sidebar
+            respo-ui.comp.sidebar :refer $ comp-topbar comp-sidenav
             respo-ui.comp.home :refer $ comp-home
             respo-ui.comp.widgets-page :refer $ comp-widgets-page
             respo-ui.comp.layouts-page :refer $ comp-layouts-page
@@ -2546,90 +2537,326 @@
       :defs $ {}
         'comp-home $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-home ()
-            div
-              {} $ :class-name $ str-spaced css/stack css/gap16 style-home-page
+            div ({})
               div
-                {} $ :class-name $ str-spaced css/stack css/gap8
-                div $ {} (:class-name style-home) (:inner-text "|Respo UI")
-                div $ {} (:class-name style-home-lead)
-                  :inner-text "|Typed components and static CSS classes for Respo apps written in Calcit. Controls stay controlled, options are named structs, and styles are generated once by defstyle."
+                {} $ :class-name style-hero
                 div
-                  {} $ :class-name $ str-spaced css/row-middle css/gap8
-                  a $ {} (:href |#/components.html) (:class-name css/link) (:inner-text "|Browse components")
-                  a $ {} (:href |#/layouts.html) (:class-name css/link) (:inner-text "|Layout classes")
-                  a $ {} (:href |https://github.com/Respo/respo-ui.calcit) (:class-name css/link) (:inner-text |GitHub)
+                  {} $ :class-name style-hero-inner
+                  div
+                    {} $ :class-name style-hero-badge
+                    <> $ str |v config/version "| · Calcit + Respo"
+                  div
+                    {} $ :class-name style-hero-title
+                    <> "|Respo UI"
+                  div
+                    {} $ :class-name style-hero-tagline
+                    <> "|Typed UI components for Respo apps"
+                  div
+                    {} $ :class-name style-hero-lead
+                    <> "|Controlled controls, named option structs and static CSS classes, written in Calcit. Copy a snippet, pass your state in, and keep the rest of the app in your store."
+                  div
+                    {} $ :class-name style-hero-actions
+                    comp-button "|Browse components" $ Option :some $ ButtonOptions :kind (Option :some :primary) :on-click
+                      Option :some $ on-route |components.html
+                    comp-button "|Layout classes" $ Option :some $ ButtonOptions :on-click
+                      Option :some $ on-route |layouts.html
+                    a $ {} (:href |https://github.com/Respo/respo-ui.calcit) (:target |_blank) (:rel |noreferrer)
+                      :class-name $ str-spaced css/button style-hero-link
+                      :inner-text |GitHub
+                  div
+                    {} $ :class-name style-hero-install
+                    comp-cirru-snippet (str "|Respo/respo-ui.calcit |" config/version) (Option :none)
               div
-                {} $ :class-name $ str-spaced css/responsive-grid css/gap16
-                render-category "|Form controls" "|button, input, textarea, select, checkbox, switch, radio group, field"
-                render-category |Navigation "|tabs, breadcrumb, pagination, steps"
-                render-category "|Disclosure and hints" "|collapse, tooltip, kbd"
-                render-category |Feedback "|alert, progress, spinner, skeleton, empty state, badge"
-                render-category "|Data display" "|card, avatar, tag, attributes, divider, time"
-                render-category "|Code and utilities" "|snippet, Cirru snippet, copy, close, placeholder"
+                {} $ :class-name style-home-section
+                div
+                  {} $ :class-name style-feature-grid
+                  render-feature "|Typed option structs" "|Every component takes positional data and one Option of a named struct. Write only the fields you use; the checker catches typos."
+                  render-feature "|Controlled by design" "|Values go in, :on-change comes out with d!. No hidden component state, so the store stays the single source of truth."
+                  render-feature "|Static CSS" "|Styles are generated once by defstyle. Rendering only joins short class names, with no per-render style objects."
+                  render-feature "|Accessible defaults" "|Native details, radio and checkbox elements, roles and aria labels, and visible keyboard focus come built in."
               div
-                {} $ :class-name $ str-spaced css/stack css/gap8
-                div $ {} (:class-name style-home-heading) (:inner-text "|Quick start")
-                div $ {} (:class-name style-home-text)
-                  :inner-text "|Add the module to deps.cirru, run caps, then import components and their option structs:"
-                comp-cirru-snippet "|{} (:calcit-version |0.30.1-alpha.4)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |0.8.0" $ Option :none
-                comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
-                div $ {} (:class-name style-home-text)
-                  :inner-text "|Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+                {} $ :class-name style-home-section
+                div
+                  {} $ :class-name style-home-heading
+                  <> "|See it at a glance"
+                div
+                  {} $ :class-name style-home-sub
+                  <> "|Real components from the library, rendered live. Open the components page for each one with its code."
+                div
+                  {} $ :class-name style-gallery-sheet
+                  comp-home-gallery
+              div
+                {} $ :class-name style-home-section
+                div
+                  {} $ :class-name style-home-heading
+                  <> "|Everything in the box"
+                div
+                  {} $ :class-name style-home-sub
+                  <> "|33 components in six groups. Pick a group to jump into the components page."
+                list->
+                  {} $ :class-name style-cat-grid
+                  map component-groups $ fn (group)
+                    [] group.:id $ render-cat-card group
+              div
+                {} $ :class-name style-home-section
+                div
+                  {} $ :class-name style-home-heading
+                  <> "|Quick start"
+                div
+                  {} $ :class-name style-home-sub
+                  <> "|Add the module to deps.cirru, run caps, then import components and their option structs."
+                div
+                  {} $ :class-name $ str-spaced css/stack css/gap8
+                  comp-cirru-snippet
+                    str "|{} (:calcit-version |0.30.1-alpha.4)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    Option :none
+                  comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
+                  div
+                    {} $ :class-name style-home-sub
+                    <> "|Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+              div
+                {} $ :class-name style-footer
+                <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
-        'render-category $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn render-category (title names)
+        'comp-home-gallery $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defcomp comp-home-gallery ()
             div
-              {} $ :class-name $ str-spaced css/stack css/gap8 style-home-card
-              div $ {} (:class-name style-home-heading) (:inner-text title)
-              div $ {} (:class-name style-home-text) (:inner-text names)
+              {} $ :class-name style-gallery
+              comp-card
+                div
+                  {} $ :class-name $ str-spaced css/column css/gap8
+                  comp-input | $ Option :some $ InputOptions :placeholder (Option :some "|Search components")
+                  comp-select |calcit language-options $ Option :none
+                  comp-switch true $ Option :some $ SwitchOptions :label (Option :some "|Compact mode")
+                  div
+                    {} $ :class-name $ str-spaced css/row css/gap8
+                    comp-button |Cancel
+                    comp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)
+                Option :some $ CardOptions :title $ Option :some "|Form controls"
+              comp-card
+                div
+                  {} $ :class-name $ str-spaced css/column css/gap8
+                  comp-alert :success "|All checks passed"
+                  comp-alert :warning "|Usage is approaching the limit"
+                  comp-progress 72
+                  div
+                    {} $ :class-name $ str-spaced css/row-middle css/gap8
+                    comp-badge |12 $ Option :some $ BadgeOptions :kind (Option :some :info)
+                    comp-badge |New $ Option :some $ BadgeOptions :kind (Option :some :success)
+                    comp-tag :info |beta
+                    comp-tag :error |deprecated
+                Option :some $ CardOptions :title $ Option :some |Feedback
+              comp-card
+                div
+                  {} $ :class-name $ str-spaced css/column css/gap16
+                  comp-tabs
+                    TabsOptions :selected $ Option :some :book
+                    [] (TabRoute :tab :book |Book) (TabRoute :tab :card |Card) (TabRoute :tab :pl |Language)
+                    , ignore-tab-route
+                  comp-pagination 4 9 $ Option :none
+                  comp-steps 1
+                    [] (StepItem :title |Account) (StepItem :title |Profile) (StepItem :title |Review)
+                    Option :none
+                Option :some $ CardOptions :title $ Option :some |Navigation
+              comp-card
+                div
+                  {} $ :class-name $ str-spaced css/column css/gap16
+                  div
+                    {} $ :class-name $ str-spaced css/row-middle css/gap8
+                    comp-avatar |CY $ Option :some $ AvatarOptions :size (Option :some :small)
+                    comp-avatar |RS $ Option :none
+                    comp-avatar |UI $ Option :some $ AvatarOptions :size (Option :some :large)
+                  div
+                    {} $ :class-name $ str-spaced css/row-middle css/gap8
+                    <> "|Search with"
+                    comp-kbd ([] |Ctrl |K) (Option :none)
+                  comp-attributes $ AttributesOptions :items $ [] (:: :attr |Name |Respo) (:: :attr |Language |Calcit)
+                Option :some $ CardOptions :title $ Option :some "|Data display"
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ []
+        'render-cat-card $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-cat-card (group)
+            div
+              {} (:class-name style-cat-card)
+                :on-click $ on-route |components.html
+              div
+                {} $ :class-name style-cat-title
+                <> group.:title
+              div
+                {} $ :class-name style-cat-items
+                <> $ join-string group.:items "|  "
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'respo-ui.comp.sidebar/ComponentGroup
+        'render-feature $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-feature (title text)
+            div
+              {} $ :class-name style-feature-card
+              div
+                {} $ :class-name style-feature-title
+                <> title
+              div
+                {} $ :class-name style-feature-text
+                <> text
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String
-        'style-home $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstyle style-home
-            {} $ |& $ {} (:font-size 40) (:font-family "|Josefin Sans") (:font-weight |100) (:line-height |1.2)
-              :color $ hsl 200 100 66
+        'style-cat-card $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-cat-card
+            {}
+              |& $ {} (:padding "|16px 18px") (:border-radius |10px) (:cursor :pointer) (:background-color :white) (:transition "|border-color 120ms, box-shadow 120ms")
+                :border $ str "|1px solid " $ hsl 220 15 91
+              |&:hover $ {}
+                :border-color $ hsl 205 70 75
+                :box-shadow $ str "|0 2px 10px " $ hsl 205 60 50 0.12
           :examples $ []
           :schema $ :: 'String
-        'style-home-card $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstyle style-home-card
-            {} $ |& $ {} (:padding |16px) (:border-radius |8px) (:background-color :white)
-              :border $ str "|1px solid " $ hsl 0 0 90
+        'style-cat-grid $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-cat-grid
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(300px, 1fr))") (:gap |16px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-cat-items $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-cat-items
+            {} $ |& $ {} (:margin-top |8px) (:font-size |13px) (:line-height |1.8) (:font-family ui/font-code)
+              :color $ hsl 220 10 46
+          :examples $ []
+          :schema $ :: 'String
+        'style-cat-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-cat-title
+            {} $ |& $ {} (:font-size |15px) (:font-weight |600)
+              :color $ hsl 220 25 18
+          :examples $ []
+          :schema $ :: 'String
+        'style-feature-card $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-feature-card
+            {} $ |& $ {} (:padding "|18px 20px") (:border-radius |10px) (:background-color :white)
+              :border $ str "|1px solid " $ hsl 220 15 91
+              :border-top $ str "|3px solid " $ hsl 205 85 62
+          :examples $ []
+          :schema $ :: 'String
+        'style-feature-grid $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-feature-grid
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(230px, 1fr))") (:gap |16px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-feature-text $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-feature-text
+            {} $ |& $ {} (:margin-top |6px) (:font-size |14px) (:line-height |1.7)
+              :color $ hsl 220 10 40
+          :examples $ []
+          :schema $ :: 'String
+        'style-feature-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-feature-title
+            {} $ |& $ {} (:font-size |16px) (:font-weight |600) (:line-height |1.4)
+              :color $ hsl 220 25 18
+          :examples $ []
+          :schema $ :: 'String
+        'style-footer $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-footer
+            {} $ |& $ {} (:margin-top |64px) (:padding "|24px 24px 40px") (:text-align :center) (:font-size |13px)
+              :color $ hsl 220 10 50
+              :border-top $ str "|1px solid " $ hsl 220 15 93
+          :examples $ []
+          :schema $ :: 'String
+        'style-gallery $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-gallery
+            {} $ |& $ {} (:display :grid) (:grid-template-columns "|repeat(auto-fit, minmax(min(100%, 440px), 1fr))") (:gap |16px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-gallery-sheet $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-gallery-sheet
+            {} $ |& $ {} (:padding |20px) (:border-radius |12px) (:background-size "|16px 16px")
+              :border $ str "|1px solid " $ hsl 220 15 93
+              :background-color $ hsl 220 25 99
+              :background-image $ str "|radial-gradient(" (hsl 220 15 88) "|  1px, transparent 1px)"
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero
+            {} $ |& $ {} (:padding "|72px 24px 56px") (:text-align :center)
+              :background-image $ str "|radial-gradient(ellipse 80% 70% at 50% 0%, " (hsl 205 90 95) "|, transparent 70%)"
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-actions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-actions
+            {} $ |& $ {} (:display :flex) (:justify-content :center) (:flex-wrap :wrap) (:gap |12px) (:margin-top |28px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-badge $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-badge
+            {} $ |& $ {} (:display :inline-block) (:padding "|2px 12px") (:border-radius |12px) (:font-size |13px) (:line-height |22px)
+              :color $ hsl 205 70 38
+              :background-color $ hsl 205 90 95
+              :border $ str "|1px solid " $ hsl 205 80 88
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-inner $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-inner
+            {} $ |& $ {} (:max-width |760px) (:margin "|0 auto")
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-install $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-install
+            {} $ |& $ {} (:max-width |420px) (:margin "|28px auto 0") (:text-align :left)
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-lead $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-lead
+            {} $ |& $ {} (:max-width |600px) (:margin "|14px auto 0") (:font-size |16px) (:line-height |1.7)
+              :color $ hsl 220 10 40
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-link $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-link
+            {} $ |& $ {} (:text-decoration :none) (:display :inline-flex) (:align-items :center) (:box-sizing :border-box)
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-tagline $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-tagline
+            {} $ |& $ {} (:margin-top |12px) (:font-size |24px) (:font-weight |500) (:line-height |1.3)
+              :color $ hsl 220 25 18
+          :examples $ []
+          :schema $ :: 'String
+        'style-hero-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-hero-title
+            {} $ |& $ {} (:margin-top |20px) (:font-family ui/font-fancy) (:font-size |64px) (:font-weight |300) (:line-height |1.1) (:letter-spacing |-0.01em) (:color :transparent) (:background-clip |text) (:-webkit-background-clip |text)
+              :background-image $ str "|linear-gradient(120deg, " (hsl 205 90 48) "|, " (hsl 265 70 56) "|)"
           :examples $ []
           :schema $ :: 'String
         'style-home-heading $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-home-heading
-            {} $ |& $ {} (:font-size 15) (:font-weight |600)
-              :color $ hsl 0 0 20
+            {} $ |& $ {} (:font-family ui/font-fancy) (:font-size |30px) (:font-weight |500) (:line-height |1.3)
+              :color $ hsl 220 25 18
           :examples $ []
           :schema $ :: 'String
-        'style-home-lead $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstyle style-home-lead
-            {} $ |& $ {} (:max-width |640px) (:font-size 16) (:line-height |1.6)
-              :color $ hsl 0 0 30
+        'style-home-section $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home-section
+            {} $ |& $ {} (:max-width |1080px) (:margin "|0 auto") (:padding "|48px 24px 0") (:box-sizing :border-box)
           :examples $ []
           :schema $ :: 'String
-        'style-home-page $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstyle style-home-page
-            {} $ |& $ {} (:max-width |960px) (:padding "|8px 0 48px")
-          :examples $ []
-          :schema $ :: 'String
-        'style-home-text $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstyle style-home-text
-            {} $ |& $ {} (:font-size 14) (:line-height |1.6)
-              :color $ hsl 0 0 40
+        'style-home-sub $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-home-sub
+            {} $ |& $ {} (:margin "|6px 0 22px") (:font-size |15px) (:line-height |1.6)
+              :color $ hsl 220 10 42
           :examples $ []
           :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.home
           :require
-            respo.core :refer $ defcomp div a <>
+            respo.core :refer $ defcomp div a <> list->
             respo.css :refer $ defstyle
             respo.util.format :refer $ hsl
-            respo-ui.comp :refer $ comp-cirru-snippet
+            respo-ui.comp :refer $ comp-cirru-snippet comp-button comp-card comp-input comp-select comp-switch comp-alert comp-progress comp-badge comp-tag comp-tabs comp-pagination comp-steps comp-avatar comp-kbd comp-attributes
             respo-ui.css :as css
+            respo-ui.core :as ui
+            respo-ui.config :as config
+            respo-ui.schema :refer $ ButtonOptions InputOptions SwitchOptions CardOptions BadgeOptions TabsOptions TabRoute StepItem AvatarOptions AttributesOptions
+            respo-ui.comp.sidebar :refer $ on-route component-groups
+            respo-ui.comp.components :refer $ ignore-tab-route language-options
     'respo-ui.comp.layouts-page $ %{} 'FileEntry
       :defs $ {}
         'comp-layouts-page $ %{} 'CodeEntry (:doc |)
@@ -2878,6 +3105,11 @@
             respo-ui.comp.docs :refer $ comp-doc-block
     'respo-ui.comp.sidebar $ %{} 'FileEntry
       :defs $ {}
+        'ComponentGroup $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct ComponentGroup (:id 'String) (:title 'String)
+            :items $ :: 'List 'String
+          :examples $ []
+          :schema $ :: 'StructDef
         'comp-sidebar $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-sidebar (router-name)
             div
@@ -2895,6 +3127,114 @@
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag
+        'comp-sidenav $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defcomp comp-sidenav (route-name)
+            div
+              {} $ :class-name style-sidenav
+              div
+                {} $ :class-name style-nav-title
+                <> |Overview
+              render-nav-item |index.html |Introduction $ = route-name :index
+              div
+                {} $ :class-name style-nav-title
+                <> |Foundations
+              render-nav-item |layouts.html |Layouts $ = route-name :layouts
+              render-nav-item |fonts.html |Fonts $ = route-name :fonts
+              div
+                {} $ :class-name style-nav-title
+                <> |Components
+              render-nav-item |components.html "|All components" $ = route-name :components
+              when (= route-name :components)
+                list-> ({})
+                  map component-groups $ fn (group)
+                    [] group.:id $ render-nav-group group
+              div
+                {} $ :class-name style-nav-title
+                <> |More
+              render-nav-item |widgets.html |Widgets $ = route-name :widgets
+              render-nav-item |utils.html |Utils $ = route-name :utils
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Tag
+        'comp-topbar $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defcomp comp-topbar (route-name)
+            div
+              {} $ :class-name style-topbar
+              div
+                {} (:class-name style-brand)
+                  :on-click $ on-route |index.html
+                div $ {} $ :class-name style-brand-logo
+                div
+                  {} $ :class-name style-brand-name
+                  <> "|Respo UI"
+                div
+                  {} $ :class-name style-version
+                  <> config/version
+              div
+                {} $ :class-name style-topbar-nav
+                render-top-link |components.html |Components $ = route-name :components
+                render-top-link |layouts.html |Layouts $ = route-name :layouts
+                render-top-link |widgets.html |Widgets $ = route-name :widgets
+                render-top-link |fonts.html |Fonts $ = route-name :fonts
+                render-top-link |utils.html |Utils $ = route-name :utils
+              div $ {} $ :class-name css/expand
+              a $ {} (:href |https://github.com/Respo/respo-ui.calcit) (:target |_blank) (:rel |noreferrer) (:class-name css-nav-link) (:inner-text |GitHub)
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Tag
+        'component-groups $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def component-groups
+            []
+              ComponentGroup :id |form :title "|Form controls" :items $ [] |button |input |textarea |select |checkbox |switch |radio-group |field
+              ComponentGroup :id |navigation :title |Navigation :items $ [] |tabs |breadcrumb |pagination |steps
+              ComponentGroup :id |disclosure :title "|Disclosure and hints" :items $ [] |collapse |tooltip |kbd
+              ComponentGroup :id |feedback :title |Feedback :items $ [] |alert |progress |spinner |skeleton |empty |badge
+              ComponentGroup :id |data :title "|Data display" :items $ [] |card |avatar |tag |attributes |divider |time
+              ComponentGroup :id |utilities :title "|Code and utilities" :items $ [] |cirru-snippet |snippet |copy |close |placeholder |catoptric-text
+          :examples $ []
+          :schema $ :: 'List 'respo-ui.comp.sidebar/ComponentGroup
+        'css-nav-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle css-nav-item
+            {}
+              |$0 $ {} (:padding "|0 10px") (:line-height |30px) (:border-radius |6px) (:font-size |14px) (:cursor :pointer) (:transition "|background-color 120ms")
+                :color $ hsl 220 12 32
+              |$0:hover $ {} $ :background-color (hsl 220 20 96)
+          :examples $ []
+          :schema $ :: 'String
+        'css-nav-item-active $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle css-nav-item-active
+            {} $ |$0 $ {} (:padding "|0 10px") (:line-height |30px) (:border-radius |6px) (:font-size |14px) (:font-weight |600) (:cursor :pointer)
+              :color $ hsl 205 80 40
+              :background-color $ hsl 205 90 96
+          :examples $ []
+          :schema $ :: 'String
+        'css-nav-link $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle css-nav-link
+            {}
+              |$0 $ {} (:padding "|0 12px") (:line-height |32px) (:border-radius |6px) (:font-size |14px) (:cursor :pointer) (:text-decoration :none) (:transition "|background-color 120ms")
+                :color $ hsl 220 12 38
+              |$0:hover $ {}
+                :color $ hsl 220 25 16
+                :background-color $ hsl 220 20 96
+          :examples $ []
+          :schema $ :: 'String
+        'css-nav-link-active $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle css-nav-link-active
+            {} $ |$0 $ {} (:padding "|0 12px") (:line-height |32px) (:border-radius |6px) (:font-size |14px) (:font-weight |600) (:cursor :pointer) (:text-decoration :none)
+              :color $ hsl 205 80 40
+              :background-color $ hsl 205 90 96
+          :examples $ []
+          :schema $ :: 'String
+        'css-nav-sub $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle css-nav-sub
+            {}
+              |$0 $ {} (:padding "|0 10px 0 22px") (:line-height |26px) (:border-radius |6px) (:font-size |13px) (:cursor :pointer) (:font-family ui/font-code)
+                :color $ hsl 220 10 44
+              |$0:hover $ {}
+                :color $ hsl 205 80 40
+                :background-color $ hsl 220 20 97
+          :examples $ []
+          :schema $ :: 'String
         'css-sidebar-entry $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-sidebar-entry
             {}
@@ -2903,6 +3243,22 @@
               |$0:hover $ {} $ :background-color (hsl 0 0 97)
           :examples $ []
           :schema $ :: 'String
+        'on-jump $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn on-jump (selector)
+            fn (e d!)
+              hint-fn $ {}
+                :args $ [] (:: 'Map 'Tag 'Dynamic)
+                  :: 'Fn $ {}
+                    :args $ [] 'Dynamic
+                    :return 'Unit
+                :return 'Unit
+              match (query-selector selector)
+                (:some el) (element-scroll-into-view! el)
+                (:none) &unit
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
+            :args $ [] 'String
+            :features $ #{} :js-ffi
         'on-route $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-route (path-name)
             fn (e dispatch!)
@@ -2927,6 +3283,59 @@
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String 'Bool
+        'render-nav-group $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-nav-group (group)
+            div ({})
+              div
+                {} (:class-name style-nav-sub-title)
+                  :on-click $ on-jump $ str |#category- group.:id
+                <> group.:title
+              list-> ({})
+                map group.:items $ fn (item)
+                  [] item $ div
+                    {} (:class-name css-nav-sub)
+                      :on-click $ on-jump $ str |#demo- item
+                    <> item
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'respo-ui.comp.sidebar/ComponentGroup
+        'render-nav-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-nav-item (path title active?)
+            div
+              {}
+                :class-name $ if active? css-nav-item-active css-nav-item
+                :on-click $ on-route path
+              <> title
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'String 'String 'Bool
+        'render-top-link $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-top-link (path title active?)
+            div
+              {}
+                :class-name $ if active? css-nav-link-active css-nav-link
+                :on-click $ on-route path
+              <> title
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'String 'String 'Bool
+        'style-brand $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-brand
+            {} $ |& $ {} (:display :flex) (:align-items :center) (:gap |10px) (:cursor :pointer) (:flex-shrink 0)
+          :examples $ []
+          :schema $ :: 'String
+        'style-brand-logo $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-brand-logo
+            {} $ |& $ {} (:width |28px) (:height |28px) (:background-size :cover) (:border-radius |6px)
+              :background-image "|url(https://cos-sh.tiye.me/cos-up/bb4c2755050318e864b56f59145d726e-SubstractRespo.png)"
+          :examples $ []
+          :schema $ :: 'String
+        'style-brand-name $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-brand-name
+            {} $ |& $ {} (:font-family ui/font-fancy) (:font-size |22px) (:font-weight |300) (:line-height |1) (:white-space :nowrap)
+              :color $ hsl 220 25 16
+          :examples $ []
+          :schema $ :: 'String
         'style-logo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def style-logo
             {}
@@ -2938,14 +3347,53 @@
               :vertical-align :text-bottom
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
+        'style-nav-sub-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-nav-sub-title
+            {} $ |& $ {} (:margin "|10px 0 2px") (:padding "|0 10px 0 12px") (:font-size |13px) (:font-weight |600) (:cursor :pointer)
+              :color $ hsl 220 15 30
+          :examples $ []
+          :schema $ :: 'String
+        'style-nav-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-nav-title
+            {} $ |& $ {} (:margin "|18px 0 6px") (:padding "|0 10px") (:font-size |12px) (:font-weight |600) (:letter-spacing |0.04em) (:text-transform :uppercase)
+              :color $ hsl 220 10 52
+          :examples $ []
+          :schema $ :: 'String
+        'style-sidenav $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-sidenav
+            {} $ |& $ {} (:width |232px) (:flex-shrink 0) (:box-sizing :border-box) (:overflow-y :auto) (:padding "|20px 12px 48px 20px")
+              :border-right $ str "|1px solid " $ hsl 220 15 94
+          :examples $ []
+          :schema $ :: 'String
+        'style-topbar $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-topbar
+            {} $ |& $ {} (:display :flex) (:align-items :center) (:gap |20px) (:flex-shrink 0) (:height |56px) (:padding "|0 16px") (:box-sizing :border-box) (:background-color :white)
+              :border-bottom $ str "|1px solid " $ hsl 220 15 92
+          :examples $ []
+          :schema $ :: 'String
+        'style-topbar-nav $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-topbar-nav
+            {} $ |& $ {} (:display :flex) (:align-items :center) (:gap |4px) (:min-width 0) (:overflow-x :auto) (:white-space :nowrap)
+          :examples $ []
+          :schema $ :: 'String
+        'style-version $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-version
+            {} $ |& $ {} (:padding "|1px 8px") (:border-radius |10px) (:font-family ui/font-code) (:font-size |12px) (:line-height |18px)
+              :color $ hsl 220 15 42
+              :background-color $ hsl 220 20 95
+          :examples $ []
+          :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.sidebar
           :require
-            respo.core :refer $ defcomp div <>
+            respo.core :refer $ defcomp div <> a list->
             respo-ui.core :as ui
             respo.util.format :refer $ hsl
             respo.comp.space :refer $ =<
             respo.css :refer $ defstyle
+            respo-ui.css :as css
+            respo-ui.config :as config
+            js-ffi.browser :refer $ query-selector element-scroll-into-view!
     'respo-ui.comp.widgets-page $ %{} 'FileEntry
       :defs $ {}
         'comp-tags-styles $ %{} 'CodeEntry (:doc |)
@@ -3043,6 +3491,10 @@
             {} (:title "|Respo UI") (:icon |http://cdn.tiye.me/logo/respo.png) (:storage-key |respo-ui)
           :examples $ []
           :schema $ :: 'Map 'Tag 'String
+        'version $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def version |0.8.0
+          :examples $ []
+          :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.config
     'respo-ui.core $ %{} 'FileEntry
