@@ -41,7 +41,7 @@ for (let i = start; i < end; i++) {
     }
     examples.push(dedent(body));
   });
-  defs.set(head[1], { args, doc: doc.replaceAll('\\"', '"'), examples });
+  defs.set(head[1], { args, doc: doc.replaceAll("\\n", "\n").replaceAll('\\"', '"'), examples });
   i = j - 1;
 }
 
@@ -56,6 +56,8 @@ const sections = [
 const listed = new Set(sections.flatMap(([, names]) => names.map((n) => `comp-${n}`)));
 const unlisted = [...defs.keys()].filter((name) => !listed.has(name));
 if (unlisted.length) throw new Error(`Add to a section in scripts/gen-components-doc.mjs: ${unlisted.join(", ")}`);
+const undocumented = [...defs].filter(([, { doc, examples }]) => !doc || !examples.length).map(([name]) => name);
+if (undocumented.length) throw new Error(`Give these a :doc and an example: ${undocumented.join(", ")}`);
 
 const out = [`# Components
 
@@ -70,10 +72,13 @@ ns app.comp.demo $ :require
   respo-ui.schema :refer $ ButtonOptions FieldOptions InputOptions
 \`\`\`
 
-Every component returns \`respo.schema/Component\`. The last argument is an
-\`Option\` of a named options struct: pass \`Option :none\` for defaults, or
-\`Option :some\` with the struct constructor. The constructor fills every
-omitted \`Option\` field with \`Option :none\`, so only write the fields you use:
+Every component returns \`respo.schema/Component\`. Most take an \`Option\` of a
+named options struct as the last argument: pass \`Option :none\` for defaults,
+or \`Option :some\` with the struct constructor. \`comp-tabs\` and
+\`comp-attributes\` take the struct itself, and \`comp-time\` and
+\`comp-placeholder\` take no options; the headings below show each signature.
+The constructor fills every omitted \`Option\` field with \`Option :none\`, so
+only write the fields you use:
 
 \`\`\`cirru
 comp-button "|Save" $ Option :some $ ButtonOptions :kind (Option :some :primary)

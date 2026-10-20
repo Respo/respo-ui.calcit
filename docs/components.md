@@ -11,10 +11,13 @@ ns app.comp.demo $ :require
   respo-ui.schema :refer $ ButtonOptions FieldOptions InputOptions
 ```
 
-Every component returns `respo.schema/Component`. The last argument is an
-`Option` of a named options struct: pass `Option :none` for defaults, or
-`Option :some` with the struct constructor. The constructor fills every
-omitted `Option` field with `Option :none`, so only write the fields you use:
+Every component returns `respo.schema/Component`. Most take an `Option` of a
+named options struct as the last argument: pass `Option :none` for defaults,
+or `Option :some` with the struct constructor. `comp-tabs` and
+`comp-attributes` take the struct itself, and `comp-time` and
+`comp-placeholder` take no options; the headings below show each signature.
+The constructor fills every omitted `Option` field with `Option :none`, so
+only write the fields you use:
 
 ```cirru
 comp-button "|Save" $ Option :some $ ButtonOptions :kind (Option :some :primary)
@@ -101,6 +104,21 @@ comp-field |Email
 ### `comp-tabs (options tabs on-route)`
 
 Render horizontal or vertical tabs from TabRoute items. TabsOptions sets :selected, :vertical?, :width, and styles; on-route receives the clicked TabRoute.
+
+```cirru
+comp-tabs
+  respo-ui.schema/TabsOptions :selected $ Option :some :book
+  [] (respo-ui.schema/TabRoute :tab :book |Book) (respo-ui.schema/TabRoute :tab :card |Card)
+  fn (route d!)
+    hint-fn $ {} (:return 'Unit)
+      :args $ [] (:: 'respo-ui.schema/TabRoute 'Tag)
+        :: 'Fn $ {}
+          :args $ [] 'Dynamic
+          :return 'Unit
+    match route $
+      :tab value _title
+      d! $ :: :select-tab value
+```
 
 ### `comp-breadcrumb (items options)`
 
@@ -238,6 +256,10 @@ comp-tag :success |Stable $ Option :none
 
 Render a responsive label/value grid from AttributesOptions :items. Each item may carry :label, :value (text or a Respo node), and :span; options also set the title, item size, and CSS overrides.
 
+```cirru
+comp-attributes $ respo-ui.schema/AttributesOptions :title (Option :some |Project) :items $ [] (:: :attr |Name |Respo) (:: :attr-span |Description "|A virtual DOM library in Calcit" 2)
+```
+
 ### `comp-divider (options)`
 
 Render a horizontal divider, or a vertical divider with :vertical? true.
@@ -248,7 +270,7 @@ comp-divider $ Option :some $ respo-ui.schema/DividerOptions :vertical? (Option 
 
 ### `comp-time (time)`
 
-pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future...
+Render a time string, parsed with dayjs. Today's times show only the clock time; other days show the date and weekday.
 
 ```cirru
 comp-time |2026-10-20T08:00:00Z
@@ -269,7 +291,7 @@ comp-snippet "|yarn install" $ Option :none
 Render Cirru code with syntax highlighting. Options: :class-name and :style.
 
 ```cirru
-comp-cirru-snippet "|defn f (x) x"
+comp-cirru-snippet "|defn f (x) x" $ Option :none
 ```
 
 ### `comp-copy (code f)`

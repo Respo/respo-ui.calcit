@@ -84,9 +84,9 @@ let
 - `comp-divider` uses `role="separator"`.
 - `comp-progress` uses `role="progressbar"`; announce detailed progress in adjacent text when users need the exact value.
 - `comp-radio-group` renders native radios inside `role="radiogroup"`; give them a shared `:name` so arrow keys move between options.
-- `comp-field` shows `:error` with `role="alert"`; pass `:for` with the control's id to link the label.
+- `comp-field` shows `:error` with `role="alert"`; pass `:for` with the control's id to link the label. `InputOptions` and `SelectOptions` take that `:id`.
 - `comp-breadcrumb`, `comp-pagination`, and `comp-steps` mark the current item with `aria-current`.
-- `comp-collapse` is a native `details`/`summary`, and `comp-tooltip` appears on focus as well as hover.
+- `comp-collapse` is a native `details`/`summary`, and `comp-tooltip` appears on hover, and on focus when its content is focusable (a button or link). It is a visual hint only: put anything screen-reader users need in the content or an `aria-label`.
 
 ## Verification
 

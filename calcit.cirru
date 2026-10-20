@@ -108,7 +108,8 @@
                       , | $ respo.util.format/scalar-attribute-text (option:unwrap-or title |)
                   , ret
                 , ret
-          :examples $ []
+          :examples $ [] $ quote
+            comp-attributes $ respo-ui.schema/AttributesOptions :title (Option :some |Project) :items $ [] (:: :attr |Name |Respo) (:: :attr-span |Description "|A virtual DOM library in Calcit" 2)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'respo-ui.schema/AttributesOptions 'Item
             :generics $ [] 'Item
@@ -172,6 +173,7 @@
                       _ |
                     if dot? style-badge-dot
                     respo-ui.schema/read-field options :class-name
+                  :role $ if dot? |img
                   :aria-label $ if dot? content
                   :style $ respo-ui.schema/read-field options :style
                 if dot? nil $ <> content
@@ -190,6 +192,7 @@
               assert= true $ .includes? count-html |style-badge-success
               assert= true $ .includes? dot-html |style-badge-dot
               assert= true $ .includes? dot-html "|aria-label=\"3 unread\""
+              assert= true $ .includes? dot-html "|role=\"img\""
               assert= false $ .includes? dot-html "|>3 unread<"
               assert= true $ .includes? plain-html |>new<
             :tags $ #{} :js-only
@@ -352,7 +355,8 @@
               span
                 {} $ :class-name style-copy-wrapper
                 comp-copy text
-          :examples $ [] $ quote (comp-cirru-snippet "|defn f (x) x")
+          :examples $ [] $ quote
+            comp-cirru-snippet "|defn f (x) x" $ Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
         'comp-close $ %{} 'CodeEntry
@@ -506,6 +510,7 @@
           :doc "|Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-input (value options)
             input $ {}
+              :id $ respo-ui.schema/read-field options :id
               :type $ either (respo-ui.schema/read-field options :type) |text
               :value value
               :placeholder $ respo-ui.schema/read-field options :placeholder
@@ -547,7 +552,9 @@
           :doc "|Render page buttons for a 1-based page out of total pages, collapsing distant pages into gaps. Options: :siblings (pages beside the current one, default 1), :on-change (receives the next page and d!), :class-name, and :style."
           :code $ quote $ defcomp comp-pagination (page total options)
             let
-                siblings $ match options
+                total $ &max 0 total
+                page $ &max 1 $ &min page (&max 1 total)
+                siblings $ &max 0 $ match options
                   (:some o) (option:unwrap-or o.:siblings 1)
                   (:none) 1
               create-list-element :nav
@@ -569,18 +576,29 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Number 'Number $ :: 'calcit.core/Option (:: 'respo-ui.schema/PaginationOptions 'Op)
             :generics $ [] 'Op
-          :tests $ [] $ %{} 'TestEntry (:name |render-and-current)
-            :code $ quote $ let
-                html $ respo.render.html/make-string $ comp-pagination 5 10 (Option :none)
-                first-html $ respo.render.html/make-string $ comp-pagination 1 3 (Option :none)
-              assert= true $ .includes? html "|aria-label=\"Pagination\""
-              assert= true $ .includes? html "|aria-current=\"page\""
-              assert= true $ .includes? html |style-pagination-current
-              assert= true $ .includes? html "|…"
-              assert= true $ .includes? html "|aria-label=\"Page 10\""
-              assert= false $ .includes? html "|disabled=\"true\""
-              assert= true $ .includes? first-html "|disabled=\"true\""
-            :tags $ #{} :js-only
+          :tests $ []
+            %{} 'TestEntry (:name |render-and-current)
+              :code $ quote $ let
+                  html $ respo.render.html/make-string $ comp-pagination 5 10 (Option :none)
+                  first-html $ respo.render.html/make-string $ comp-pagination 1 3 (Option :none)
+                assert= true $ .includes? html "|aria-label=\"Pagination\""
+                assert= true $ .includes? html "|aria-current=\"page\""
+                assert= true $ .includes? html |style-pagination-current
+                assert= true $ .includes? html "|…"
+                assert= true $ .includes? html "|aria-label=\"Page 10\""
+                assert= false $ .includes? html "|disabled=\"true\""
+                assert= true $ .includes? first-html "|disabled=\"true\""
+              :tags $ #{} :js-only
+            %{} 'TestEntry (:name |clamps-out-of-range)
+              :code $ quote $ let
+                  past-end $ respo.render.html/make-string $ comp-pagination 50 20 (Option :none)
+                  no-pages $ respo.render.html/make-string $ comp-pagination 1 -3 (Option :none)
+                  narrow $ respo.render.html/make-string $ comp-pagination 4 9
+                    Option :some $ respo-ui.schema/PaginationOptions :siblings $ Option :some -1
+                assert= true $ .includes? past-end "|aria-current=\"page\""
+                assert= true $ .includes? no-pages "|aria-label=\"Pagination\""
+                assert= true $ .includes? narrow "|aria-current=\"page\""
+              :tags $ #{} :js-only
         'comp-placeholder $ %{} 'CodeEntry
           :doc "|Render a muted placeholder text block for empty areas."
           :code $ quote $ defcomp comp-placeholder (text)
@@ -667,6 +685,7 @@
           :code $ quote $ defcomp comp-select (value items options)
             create-list-element :select
               {} (:value value)
+                :id $ respo-ui.schema/read-field options :id
                 :disabled $ or (respo-ui.schema/read-field options :disabled) false
                 :class-name $ str-spaced css/select $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
@@ -899,7 +918,19 @@
                                     :return 'Unit
                                   d! op
                             <> display
-          :examples $ []
+          :examples $ [] $ quote
+            comp-tabs
+              respo-ui.schema/TabsOptions :selected $ Option :some :book
+              [] (respo-ui.schema/TabRoute :tab :book |Book) (respo-ui.schema/TabRoute :tab :card |Card)
+              fn (route d!)
+                hint-fn $ {} (:return 'Unit)
+                  :args $ [] (:: 'respo-ui.schema/TabRoute 'Tag)
+                    :: 'Fn $ {}
+                      :args $ [] 'Dynamic
+                      :return 'Unit
+                match route $
+                  :tab value _title
+                  d! $ :: :select-tab value
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] (:: 'respo-ui.schema/TabsOptions 'Value)
               :: 'List $ :: 'respo-ui.schema/TabRoute 'Value
@@ -929,6 +960,7 @@
           :doc "|Render a controlled textarea. Pass the current value and optional :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-textarea (value options)
             textarea $ {} (:value value)
+              :id $ respo-ui.schema/read-field options :id
               :placeholder $ respo-ui.schema/read-field options :placeholder
               :disabled $ or (respo-ui.schema/read-field options :disabled) false
               :class-name $ str-spaced css/textarea $ respo-ui.schema/read-field options :class-name
@@ -940,7 +972,7 @@
             :args $ [] 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/InputOptions 'Op)
             :generics $ [] 'Op
         'comp-time $ %{} 'CodeEntry
-          :doc "|pass a time in string(internally handled by dayjs)\n\nif is today, just show the time of today.\nif not today, only show date and week.\n\nneed to be extended in future..."
+          :doc "|Render a time string, parsed with dayjs. Today's times show only the clock time; other days show the date and weekday."
           :code $ quote $ defcomp comp-time (time)
             let
                 mark $ format-time-mark time
@@ -987,7 +1019,7 @@
             :features $ #{} :js-ffi
         'css-item-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-item-label
-            {} $ |$0 $ {} (:font-weight 300) (:font-family ui/font-fancy) (:font-size 15) (:line-height |14px)
+            {} $ |$0 $ {} (:font-weight |300) (:font-family ui/font-fancy) (:font-size 15) (:line-height |14px)
               :color $ hsl 0 0 60
           :examples $ []
           :schema $ :: 'String
@@ -1016,7 +1048,7 @@
         'css-tab $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle css-tab
             {}
-              |$0 $ {} (:padding "|0 8px") (:font-family ui/font-normal) (:font-weight 300) (:cursor :pointer) (:font-size 14)
+              |$0 $ {} (:padding "|0 8px") (:font-family ui/font-normal) (:font-weight |300) (:cursor :pointer) (:font-size 14)
                 :color $ hsl 0 0 70
                 :line-height |24px
                 :border-radius |2px
@@ -1248,7 +1280,7 @@
           :schema $ :: 'String
         'style-badge $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-badge
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width |20px) (:height |20px) (:padding "|0 6px") (:border-radius |10px) (:font-size 12) (:font-weight 500) (:line-height |1) (:white-space :nowrap)
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width |20px) (:height |20px) (:padding "|0 6px") (:border-radius |10px) (:font-size 12) (:font-weight |500) (:line-height |1) (:white-space :nowrap)
               :color $ hsl 0 0 30
               :background-color $ hsl 0 0 92
           :examples $ []
@@ -1290,7 +1322,7 @@
           :schema $ :: 'String
         'style-breadcrumb-current $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-breadcrumb-current
-            {} $ |& $ {} (:font-weight 500)
+            {} $ |& $ {} (:font-weight |500)
               :color $ hsl 0 0 15
           :examples $ []
           :schema $ :: 'String
@@ -1358,7 +1390,7 @@
         'style-close $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-close
             {}
-              |& $ {} (:font-size 16) (:line-height |16px) (:height |16px) (:font-weight 100)
+              |& $ {} (:font-size 16) (:line-height |16px) (:height |16px) (:font-weight |100)
                 :color $ hsl 0 90 70
                 :opacity 0.5
                 :cursor :pointer
@@ -1383,7 +1415,7 @@
         'style-collapse-summary $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-collapse-summary
             {}
-              |& $ {} (:padding "|10px 14px") (:font-size 14) (:font-weight 500) (:cursor :pointer) (:list-style-position :inside)
+              |& $ {} (:padding "|10px 14px") (:font-size 14) (:font-weight |500) (:cursor :pointer) (:list-style-position :inside)
               |&:hover $ {} $ :background-color (hsl 0 0 97)
               |&:focus-visible $ {} (:outline-offset |-2px)
                 :outline $ str "|2px solid " $ hsl 200 80 50
@@ -1478,7 +1510,7 @@
           :schema $ :: 'String
         'style-field-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-field-label
-            {} $ |& $ {} (:font-size 14) (:font-weight 500) (:line-height |20px)
+            {} $ |& $ {} (:font-size 14) (:font-weight |500) (:line-height |20px)
               :color $ hsl 0 0 20
           :examples $ []
           :schema $ :: 'String
@@ -1633,19 +1665,19 @@
           :schema $ :: 'String
         'style-step-current $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-current
-            {} $ |& $ {} (:font-weight 500)
+            {} $ |& $ {} (:font-weight |500)
               :color $ hsl 0 0 15
           :examples $ []
           :schema $ :: 'String
         'style-step-description $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-description
-            {} $ |& $ {} (:font-size 12) (:line-height |18px) (:font-weight 400)
+            {} $ |& $ {} (:font-size 12) (:line-height |18px) (:font-weight |400)
               :color $ hsl 0 0 55
           :examples $ []
           :schema $ :: 'String
         'style-step-marker $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-step-marker
-            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:flex-shrink 0) (:box-sizing :border-box) (:width |24px) (:height |24px) (:border-radius |50%) (:font-size 12)
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:flex-shrink |0) (:box-sizing :border-box) (:width |24px) (:height |24px) (:border-radius |50%) (:font-size 12)
               :border $ str "|1px solid " $ hsl 0 0 80
           :examples $ []
           :schema $ :: 'String
@@ -1797,7 +1829,7 @@
           :schema $ :: 'String
         'style-tooltip-tip $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-tooltip-tip
-            {} $ |& $ {} (:position :absolute) (:bottom "|calc(100% + 6px)") (:left |50%) (:transform "|translateX(-50%)") (:z-index 10) (:padding "|4px 8px") (:border-radius |4px) (:font-size 12) (:line-height |18px) (:white-space :nowrap) (:color :white) (:pointer-events :none) (:opacity 0) (:visibility :hidden) (:transition "|opacity 120ms ease")
+            {} $ |& $ {} (:position :absolute) (:bottom "|calc(100% + 6px)") (:left |50%) (:transform "|translateX(-50%)") (:z-index |10) (:padding "|4px 8px") (:border-radius |4px) (:font-size 12) (:line-height |18px) (:white-space :nowrap) (:color :white) (:pointer-events :none) (:opacity 0) (:visibility :hidden) (:transition "|opacity 120ms ease")
               :background-color $ hsl 0 0 15
           :examples $ []
           :schema $ :: 'String
@@ -1866,7 +1898,7 @@
               =< 0 8
               div
                 {} $ :class-name $ str-spaced css/row css/gap8
-                comp-cirru-snippet "|respo-ui.comp/comp-attributes\n\ncomp-attributes $ respo-ui.schema/AttributesOptions\n  :items $ [] $ :: :attr |Demo |content\n  :title $ Option :some |Attributes"
+                comp-cirru-snippet "|respo-ui.comp/comp-attributes\n\ncomp-attributes $ respo-ui.schema/AttributesOptions\n  :items $ [] $ :: :attr |Demo |content\n  :title $ Option :some |Attributes" $ Option :none
                 div
                   {} $ :class-name css/flex
                   comp-attributes $ respo-ui.schema/AttributesOptions :items
@@ -1914,7 +1946,7 @@
                   {} $ :class-name $ str-spaced css/flex css/column
                   comp-snippet "|@import url(cirru-color/assets/cirru.css);"
                   =< 0 8
-                  comp-cirru-snippet "|defn f (a b)\n  + a b"
+                  comp-cirru-snippet "|defn f (a b)\n  + a b" $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -1930,7 +1962,7 @@
                 {} $ :class-name $ str-spaced css/row css/gap8
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "|respo-ui.comp/comp-close\n\ncomp-close $ {}\n  :style $ {}\n  :class-name |\n  :on-click nil"
+                  comp-cirru-snippet "|respo-ui.comp/comp-close\n\ncomp-close $ {}\n  :style $ {}\n  :class-name |\n  :on-click nil" $ Option :none
                 div
                   {}
                     :class-name $ str-spaced css/flex css/row
@@ -2018,8 +2050,12 @@
                       {}
                         :class-name $ str-spaced css/row-middle css/gap16
                         :style $ {} $ :padding-top |28px
-                      comp-tooltip (comp-button |Save) "|Saves the current draft" $ Option :none
-                      comp-tooltip (comp-button |Publish) "|Shown below the trigger" $ Option :some $ respo-ui.schema/TooltipOptions :placement (Option :some :bottom)
+                      comp-tooltip
+                        comp-button |Save $ Option :none
+                        , "|Saves the current draft" $ Option :none
+                      comp-tooltip
+                        comp-button |Publish $ Option :none
+                        , "|Shown below the trigger" $ Option :some $ respo-ui.schema/TooltipOptions :placement (Option :some :bottom)
                   Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Keyboard and tooltip"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
@@ -2178,7 +2214,7 @@
                   comp-cirru-snippet "|respo-ui.comp/comp-snippet\n\ncomp-snippet \"\\\"defn f (a b)\\n  + a b\" $ {}\n  :class-name style-demo\n  :style $ {}"
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "|defn f (a b)\n  + a b"
+                  comp-cirru-snippet "|defn f (a b)\n  + a b" $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -2193,7 +2229,7 @@
                   <> "|Tabs demo"
                 div
                   {} $ :class-name $ str-spaced css/row css/gap8
-                  comp-cirru-snippet "|respo-ui.comp/comp-tabs\n\nTyped tabs use TabsOptions<Tag> and TabRoute<Tag>."
+                  comp-cirru-snippet "|respo-ui.comp/comp-tabs\n\nTyped tabs use TabsOptions<Tag> and TabRoute<Tag>." $ Option :none
                   div
                     {} $ :class-name css/flex
                     comp-tabs
@@ -2210,7 +2246,7 @@
                 =< 0 8
                 div
                   {} $ :class-name $ str-spaced css/row css/gap8
-                  comp-cirru-snippet "|Vertical tabs use the same typed route callback."
+                  comp-cirru-snippet "|Vertical tabs use the same typed route callback." $ Option :none
                   div
                     {} $ :class-name css/flex
                     comp-tabs
@@ -2256,7 +2292,7 @@
                 {} $ :class-name $ str-spaced css/row css/gap8
                 div
                   {} $ :class-name css/flex
-                  comp-cirru-snippet "|respo-ui.comp/comp-time\n\ncomp-time |2023-11-17T04:07:18.435Z"
+                  comp-cirru-snippet "|respo-ui.comp/comp-time\n\ncomp-time |2023-11-17T04:07:18.435Z" $ Option :none
                 div
                   {} $ :class-name css/flex
                   div ({})
@@ -2418,7 +2454,7 @@
                         tab-echo! $ {} (:type :message)
                           :demo $ {} $ :a 1
                           :vv $ range $ random-count
-                  comp-cirru-snippet "|respo-ui.util/tab-echo! data"
+                  comp-cirru-snippet "|respo-ui.util/tab-echo! data" $ Option :none
                 div
                   {} $ :class-name $ str-spaced css/row css/gap8
                   div
@@ -2430,7 +2466,7 @@
                             :demo $ {} $ :a 1
                             :html "|code <code> cc c cc </code>"
                           Option :some :json
-                  comp-cirru-snippet "|respo-ui.util/tab-echo! data :json"
+                  comp-cirru-snippet "|respo-ui.util/tab-echo! data :json" $ Option :none
                 div
                   {} $ :class-name $ str-spaced css/row css/gap8
                   div
@@ -2442,7 +2478,7 @@
                             :demo $ {} $ :a 1
                             :html "|code <code> cc c cc </code>"
                           Option :some :edn
-                  comp-cirru-snippet "|respo-ui.util/tab-echo! data :edn"
+                  comp-cirru-snippet "|respo-ui.util/tab-echo! data :edn" $ Option :none
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -2578,7 +2614,7 @@
                 div $ {} (:class-name style-home-heading) (:inner-text "|Quick start")
                 div $ {} (:class-name style-home-text)
                   :inner-text "|Add the module to deps.cirru, run caps, then import components and their option structs:"
-                comp-cirru-snippet "|{} (:calcit-version |0.30.1-alpha.4)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |0.7.41" $ Option :none
+                comp-cirru-snippet "|{} (:calcit-version |0.30.1-alpha.4)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |0.8.0" $ Option :none
                 comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
                 div $ {} (:class-name style-home-text)
                   :inner-text "|Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
@@ -2596,7 +2632,7 @@
             :args $ [] 'String 'String
         'style-home $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-home
-            {} $ |& $ {} (:font-size 40) (:font-family "|Josefin Sans") (:font-weight 100) (:line-height |1.2)
+            {} $ |& $ {} (:font-size 40) (:font-family "|Josefin Sans") (:font-weight |100) (:line-height |1.2)
               :color $ hsl 200 100 66
           :examples $ []
           :schema $ :: 'String
@@ -2608,7 +2644,7 @@
           :schema $ :: 'String
         'style-home-heading $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-home-heading
-            {} $ |& $ {} (:font-size 15) (:font-weight 600)
+            {} $ |& $ {} (:font-size 15) (:font-weight |600)
               :color $ hsl 0 0 20
           :examples $ []
           :schema $ :: 'String
@@ -3134,7 +3170,7 @@
           :schema $ :: 'String
         'expand $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def expand
-            {} (:flex 1) (:overflow :auto)
+            {} (:flex |1) (:overflow :auto)
           :examples $ []
           :schema $ :: 'Map 'Tag 'Dynamic
         'flex $ %{} 'CodeEntry (:doc |)
@@ -3394,7 +3430,7 @@
           :schema $ :: 'String
         'flex $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle flex
-            {} $ |$0 $ {} (:flex 1)
+            {} $ |$0 $ {} (:flex |1)
           :examples $ []
           :schema $ :: 'String
         'font-code $ %{} 'CodeEntry (:doc |)
@@ -3893,6 +3929,7 @@
           :doc "|Typed options for comp-input and comp-textarea. :on-change receives the current text and d!; :on-input still receives the raw event map."
           :code $ quote $ defstruct InputOptions
             [] $ quote Op
+            :id $ :: 'Option 'String
             :type $ :: 'Option 'String
             :placeholder $ :: 'Option 'String
             :disabled $ :: 'Option 'Bool
@@ -3965,6 +4002,7 @@
           :doc "|Typed options for comp-select. The Op generic preserves the operation accepted by the dispatcher passed to on-change."
           :code $ quote $ defstruct SelectOptions
             [] $ quote Op
+            :id $ :: 'Option 'String
             :disabled $ :: 'Option 'Bool
             :on-change $ :: 'Option $ :: 'Fn
               {}
