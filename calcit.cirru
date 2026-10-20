@@ -154,6 +154,44 @@
             comp-avatar |CY $ Option :some $ respo-ui.schema/AvatarOptions :title (Option :some "|Chen Yong") :size (Option :some :large)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/AvatarOptions
+        'comp-badge $ %{} 'CodeEntry
+          :doc "|Render a small count or status badge. Options: :kind (:info, :success, :warning, :error), :dot? (render a dot and expose content as aria-label), :class-name, and :style."
+          :code $ quote $ defcomp comp-badge (content options)
+            let
+                dot? $ or (respo-ui.schema/read-field options :dot?) false
+              span
+                {}
+                  :class-name $ str-spaced style-badge
+                    match
+                      either (respo-ui.schema/read-field options :kind) :neutral
+                      :info style-badge-info
+                      :success style-badge-success
+                      :warning style-badge-warning
+                      :error style-badge-error
+                      _ |
+                    if dot? style-badge-dot
+                    respo-ui.schema/read-field options :class-name
+                  :aria-label $ if dot? content
+                  :style $ respo-ui.schema/read-field options :style
+                if dot? nil $ <> content
+          :examples $ [] $ quote
+            comp-badge |12 $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :error)
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/BadgeOptions
+          :tests $ [] $ %{} 'TestEntry (:name |render-options)
+            :code $ quote $ let
+                count-html $ respo.render.html/make-string $ comp-badge |12
+                  Option :some $ respo-ui.schema/BadgeOptions :kind $ Option :some :success
+                dot-html $ respo.render.html/make-string $ comp-badge "|3 unread"
+                  Option :some $ respo-ui.schema/BadgeOptions :dot? $ Option :some true
+                plain-html $ respo.render.html/make-string $ comp-badge |new (Option :none)
+              assert= true $ .includes? count-html |>12<
+              assert= true $ .includes? count-html |style-badge-success
+              assert= true $ .includes? dot-html |style-badge-dot
+              assert= true $ .includes? dot-html "|aria-label=\"3 unread\""
+              assert= false $ .includes? dot-html "|>3 unread<"
+              assert= true $ .includes? plain-html |>new<
+            :tags $ #{} :js-only
         'comp-button $ %{} 'CodeEntry
           :doc "|Render a native button with Respo UI variants. Options: :kind (:primary, :danger, :danger-outline), :type, :disabled, :on-click, :class-name, :style."
           :code $ quote $ defcomp comp-button (content options)
@@ -327,6 +365,52 @@
             comp-empty "|No results" $ Option :some $ respo-ui.schema/EmptyOptions :description (Option :some "|Try another search term.")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/EmptyOptions
+        'comp-field $ %{} 'CodeEntry
+          :doc "|Wrap a form control with a label, optional description, and error message. Options: :for (id of the labelled control), :description, :error (rendered with role=alert), :required?, :class-name, and :style."
+          :code $ quote $ defcomp comp-field (label control options)
+            div
+              {}
+                :class-name $ str-spaced style-field $ respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              create-element :label
+                {} (:class-name style-field-label)
+                  :for $ respo-ui.schema/read-field options :for
+                <> label
+                if (respo-ui.schema/read-field options :required?)
+                  span $ {} (:class-name style-field-required) (:aria-hidden |true) (:inner-text |*)
+              , control
+                when
+                  non-nil? $ respo-ui.schema/read-field options :description
+                  div
+                    {} $ :class-name style-field-description
+                    <> $ either (respo-ui.schema/read-field options :description) |
+                when
+                  non-nil? $ respo-ui.schema/read-field options :error
+                  div
+                    {} (:class-name style-field-error) (:role |alert)
+                    <> $ either (respo-ui.schema/read-field options :error) |
+          :examples $ [] $ quote
+            comp-field |Email
+              comp-input | $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |you@example.com)
+              Option :some $ respo-ui.schema/FieldOptions :description (Option :some "|Used for notifications.") :required? $ Option :some true
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String 'Control $ :: 'calcit.core/Option 'respo-ui.schema/FieldOptions
+            :generics $ [] 'Control
+          :tests $ [] $ %{} 'TestEntry (:name |render-options)
+            :code $ quote $ let
+                control $ comp-input | $ Option :none
+                html $ respo.render.html/make-string $ comp-field |Email control
+                  Option :some $ respo-ui.schema/FieldOptions :for (Option :some |email) :description (Option :some |Hint) :error (Option :some |Invalid) :required? $ Option :some true
+                plain $ respo.render.html/make-string $ comp-field |Name control (Option :none)
+              assert= true $ .includes? html "|for=\"email\""
+              assert= true $ .includes? html |>Hint<
+              assert= true $ .includes? html "|role=\"alert\""
+              assert= true $ .includes? html |>Invalid<
+              assert= true $ .includes? html |style-field-required
+              assert= true $ .includes? plain |>Name<
+              assert= false $ .includes? plain "|role=\"alert\""
+              assert= false $ .includes? plain |style-field-required
+            :tags $ #{} :js-only
         'comp-input $ %{} 'CodeEntry
           :doc "|Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-input (value options)
@@ -365,6 +449,63 @@
           :examples $ [] $ quote (comp-progress 72)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Number $ :: 'calcit.core/Option 'respo-ui.schema/PresentationOptions
+        'comp-radio-group $ %{} 'CodeEntry
+          :doc "|Render a controlled radio group from SelectOption items. Options: :name, :label (group aria-label), :vertical?, :disabled, :on-change (receives the picked value and d!), :class-name, and :style."
+          :code $ quote $ defcomp comp-radio-group (value items options)
+            create-list-element :div
+              {} (:role |radiogroup)
+                :aria-label $ respo-ui.schema/read-field options :label
+                :class-name $ str-spaced style-radio-group
+                  if (respo-ui.schema/read-field options :vertical?) style-radio-group-vertical
+                  respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              -> items $ map $ fn (item)
+                let
+                    item-value item.:value
+                    disabled? $ or (respo-ui.schema/read-field options :disabled) (option:unwrap-or item.:disabled false)
+                  [] item-value $ create-element :label
+                    {} $ :class-name $ str-spaced style-radio-item (if disabled? style-control-disabled)
+                    input $ {} (:type |radio) (:value item-value)
+                      :name $ respo-ui.schema/read-field options :name
+                      :checked $ = value item-value
+                      :disabled disabled?
+                      :class-name style-radio-input
+                      :on-change $ fn (e d!)
+                        hint-fn $ {}
+                          :args $ [] (:: 'Map 'Tag 'Dynamic)
+                            :: 'Fn $ {}
+                              :args $ [] 'Op
+                              :return 'Unit
+                          :return 'Unit
+                        let
+                            on-change $ respo-ui.schema/read-field options :on-change
+                          when (non-nil? on-change) (on-change item-value d!)
+                        , &unit
+                    span ({}) (<> item.:label)
+          :examples $ [] $ quote
+            comp-radio-group |calcit
+              [] (respo-ui.schema/SelectOption :value |calcit :label |Calcit) (respo-ui.schema/SelectOption :value |clojure :label |Clojure)
+              Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |language) :label $ Option :some |Language
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'String (:: 'List 'respo-ui.schema/SelectOption)
+              :: 'calcit.core/Option $ :: 'respo-ui.schema/RadioGroupOptions 'Op
+            :generics $ [] 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |render-options)
+            :code $ quote $ let
+                items $ [] (respo-ui.schema/SelectOption :value |a :label |Alpha)
+                  respo-ui.schema/SelectOption :value |b :label |Beta :disabled $ Option :some true
+                html $ respo.render.html/make-string $ comp-radio-group |a items
+                  Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |pick) :label (Option :some "|Pick one") :vertical? $ Option :some true
+                plain $ respo.render.html/make-string $ comp-radio-group |b items (Option :none)
+              assert= true $ .includes? html "|role=\"radiogroup\""
+              assert= true $ .includes? html "|aria-label=\"Pick one\""
+              assert= true $ .includes? html "|name=\"pick\""
+              assert= true $ .includes? html |style-radio-group-vertical
+              assert= true $ .includes? html |>Alpha<
+              assert= true $ .includes? html |style-control-disabled
+              assert= false $ .includes? plain |style-radio-group-vertical
+              assert= false $ .includes? plain |name=
+            :tags $ #{} :js-only
         'comp-select $ %{} 'CodeEntry
           :doc "|Render a controlled native select from keyed option maps. Each item uses :value, :label, and optional :disabled; :on-change receives the next value and d!."
           :code $ quote $ defcomp comp-select (value items options)
@@ -775,6 +916,43 @@
             {} $ |& $ {} (:width |24px) (:height |24px) (:font-size |10px)
           :examples $ []
           :schema $ :: 'String
+        'style-badge $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:box-sizing :border-box) (:min-width |20px) (:height |20px) (:padding "|0 6px") (:border-radius |10px) (:font-size 12) (:font-weight 500) (:line-height 1) (:white-space :nowrap)
+              :color $ hsl 0 0 30
+              :background-color $ hsl 0 0 92
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-dot $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-dot
+            {} $ |& $ {} (:min-width |8px) (:width |8px) (:height |8px) (:padding 0) (:border-radius |50%)
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-error $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-error
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 0 75 52
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-info $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-info
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 210 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-success $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-success
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 140 60 40
+          :examples $ []
+          :schema $ :: 'String
+        'style-badge-warning $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-badge-warning
+            {} $ |& $ {}
+              :color $ hsl 30 90 20
+              :background-color $ hsl 40 95 60
+          :examples $ []
+          :schema $ :: 'String
         'style-card $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-card
             {} $ |& $ {}
@@ -894,6 +1072,35 @@
               :color $ hsl 220 20 25
           :examples $ []
           :schema $ :: 'String
+        'style-field $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field
+            {} $ |& $ {} (:display :flex) (:flex-direction :column) (:gap |6px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-description $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-description
+            {} $ |& $ {} (:font-size 12) (:line-height |18px)
+              :color $ hsl 0 0 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-error $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-error
+            {} $ |& $ {} (:font-size 12) (:line-height |18px)
+              :color $ hsl 0 70 44
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-label $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-label
+            {} $ |& $ {} (:font-size 14) (:font-weight 500) (:line-height |20px)
+              :color $ hsl 0 0 20
+          :examples $ []
+          :schema $ :: 'String
+        'style-field-required $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-field-required
+            {} $ |& $ {} (:margin-left |4px)
+              :color $ hsl 0 70 50
+          :examples $ []
+          :schema $ :: 'String
         'style-item $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-item
             {}
@@ -918,6 +1125,27 @@
             {} $ |& $ {} (:height |100%) (:border-radius |inherit)
               :background-color $ hsl 220 80 62
               :transition "|width 180ms ease"
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-group $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-group
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap "|8px 16px")
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-group-vertical $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-group-vertical
+            {} $ |& $ {} (:flex-direction :column) (:align-items :flex-start) (:gap |8px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-input $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-input
+            {} $ |& $ {} (:margin 0) (:width |16px) (:height |16px) (:cursor :inherit)
+              :accent-color $ hsl 200 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-radio-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-radio-item
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |6px) (:cursor :pointer) (:line-height |20px)
           :examples $ []
           :schema $ :: 'String
         'style-selected-tab $ %{} 'CodeEntry (:doc |)
@@ -1274,6 +1502,23 @@
                     comp-button "|Danger outline" $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :danger-outline)
                     comp-button |Unavailable $ Option :some $ respo-ui.schema/ButtonOptions :disabled (Option :some true)
                   Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Button states"
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap16
+                    comp-field |Language
+                      comp-radio-group |calcit language-options $ Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |demo-language) :label (Option :some |Language)
+                      Option :some $ respo-ui.schema/FieldOptions :description $ Option :some "|Radio groups share SelectOption items with comp-select."
+                    comp-field |Email
+                      comp-input | $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |you@example.com)
+                      Option :some $ respo-ui.schema/FieldOptions :error (Option :some "|Enter an email address.") :required? $ Option :some true
+                    div
+                      {} $ :class-name $ str-spaced css/row-middle css/gap8
+                      comp-badge |3 $ Option :none
+                      comp-badge |12 $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :info)
+                      comp-badge |New $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :success)
+                      comp-badge |99+ $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :error)
+                      comp-badge "|Unread messages" $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :warning) :dot? (Option :some true)
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Choices, fields and badges"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
@@ -1532,7 +1777,7 @@
             respo-ui.css :as css
             respo.util.format :refer $ hsl
             respo.css :refer $ defstyle
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider comp-radio-group comp-field comp-badge
             js-ffi.shared :as shared
     'respo-ui.comp.container $ %{} 'FileEntry
       :defs $ {}
@@ -2915,6 +3160,15 @@
           :examples $ [] $ quote
             AvatarOptions :title (Option :some "|Chen Yong") :size $ Option :some :large
           :schema $ :: 'Enum
+        'BadgeOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct BadgeOptions
+            :kind $ :: 'Option 'Tag
+            :dot? $ :: 'Option 'Bool
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            BadgeOptions :dot? $ Option :some true
+          :schema $ :: 'Enum
         'ButtonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style."
           :code $ quote $ defstruct ButtonOptions
@@ -2957,6 +3211,17 @@
           :examples $ [] $ quote
             EmptyOptions :description $ Option :some "|Try another search term."
           :schema $ :: 'Enum
+        'FieldOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct FieldOptions
+            :for $ :: 'Option 'String
+            :description $ :: 'Option 'String
+            :error $ :: 'Option 'String
+            :required? $ :: 'Option 'Bool
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            FieldOptions :error $ Option :some "|Required field"
+          :schema $ :: 'Enum
         'InputOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct InputOptions
             :type $ :: 'Option 'String
@@ -2978,6 +3243,25 @@
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
             PresentationOptions :class-name $ Option :some |status
+          :schema $ :: 'Enum
+        'RadioGroupOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct RadioGroupOptions
+            [] $ quote Op
+            :name $ :: 'Option 'String
+            :label $ :: 'Option 'String
+            :vertical? $ :: 'Option 'Bool
+            :disabled $ :: 'Option 'Bool
+            :on-change $ :: 'Option $ :: 'Fn
+              {}
+                :args $ [] 'String $ :: 'Fn
+                  {}
+                    :args $ [] $ quote Op
+                    :return 'Unit
+                :return 'Unit
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            RadioGroupOptions :name $ Option :some |language
           :schema $ :: 'Enum
         'SelectOption $ %{} 'CodeEntry
           :doc "|A typed native select item with string value and label plus optional disabled state."
