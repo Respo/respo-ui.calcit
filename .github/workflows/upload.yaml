@@ -44,6 +44,8 @@ jobs:
           caps deps.cirru verify --toolchain
           calcit calcit.cirru edit format
           git diff --exit-code -- calcit.cirru
+          node scripts/gen-components-doc.mjs
+          git diff --exit-code -- docs/components.md
           calcit calcit.cirru --check-only
           calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
           calcit calcit.cirru test --exclude-tag js-only --require-match --summary-only --format json

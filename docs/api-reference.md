@@ -4,36 +4,9 @@ This page is a compact inventory. See [Components](./components.md) and [Styles]
 
 ## `respo-ui.comp`
 
-| API | Signature | Purpose |
-| --- | --- | --- |
-| `comp-alert` | `(kind content ? options)` | Info/success/warning/error feedback |
-| `comp-attributes` | `(options)` | Responsive label/value grid |
-| `comp-avatar` | `(text ? options)` | Initials or image avatar |
-| `comp-button` | `(content ? options)` | Native button with variants |
-| `comp-card` | `(content ? options)` | Card with optional title/footer |
-| `comp-catoptric-text` | `(text ? options)` | CSS-content text |
-| `comp-checkbox` | `(checked ? options)` | Controlled checkbox |
-| `comp-cirru-snippet` | `(text ? options)` | Highlighted Cirru snippet |
-| `comp-close` | `(? options)` | Close icon |
-| `comp-copy` | `(code ? f)` | Clipboard copy affordance |
-| `comp-divider` | `(? options)` | Horizontal/vertical separator |
-| `comp-empty` | `(title ? options)` | Empty state with description/action |
-| `comp-input` | `(value ? options)` | Controlled input |
-| `comp-placeholder` | `(text)` | Empty-state placeholder |
-| `comp-progress` | `(value ? options)` | Progress track |
-| `comp-snippet` | `(code ? options)` | Plain code snippet |
-| `comp-select` | `(value items ? options)` | Controlled native select |
-| `comp-skeleton` | `(? options)` | Animated loading placeholder |
-| `comp-spinner` | `(? options)` | Loading status indicator |
-| `comp-switch` | `(checked ? options)` | Controlled native-checkbox switch |
-| `comp-tabs` | `(options tabs on-route)` | Horizontal or vertical tabs |
-| `comp-tag` | `(kind content ? options)` | Semantic tag |
-| `comp-textarea` | `(value ? options)` | Controlled textarea |
-| `comp-time` | `(time & options)` | Day.js time presentation |
-
-All newly added primitives return `respo.schema/Component`. Text inputs use
-string values, switches use booleans, progress uses a number, and callback
-options retain their dispatch operation through a generic `Op` parameter.
+[Components](./components.md) lists every component with its signature,
+options, and an example, grouped by category. It is generated from the
+definitions, so it stays in step with the source.
 
 ## `respo-ui.schema`
 
@@ -53,6 +26,15 @@ options retain their dispatch operation through a generic `Op` parameter.
 | `AttributesOptions<Item>` | Attribute collection and typed grid presentation |
 | `TabRoute<Value>` | Normalized tab value and string display label |
 | `TabsOptions<Value>` | Tab selection, orientation, width, and presentation |
+| `InputOptions<Op>` | Input/textarea type, placeholder, disabled state, raw `:on-input`, and `(string, dispatch<Op>)` `:on-change` |
+| `RadioGroupOptions<Op>` | Radio group name, label, orientation, disabled state, and `(string, dispatch<Op>)` callback |
+| `FieldOptions` | Field `:for` id, description, error, and required mark |
+| `BadgeOptions` | Badge kind and dot mode |
+| `BreadcrumbItem` / `BreadcrumbOptions` | Breadcrumb label with optional href, and separator |
+| `PaginationOptions<Op>` | Sibling count and `(number, dispatch<Op>)` page callback |
+| `StepItem` / `StepsOptions` | Step title with optional description, and orientation |
+| `CollapseOptions` | Initial open state and exclusive group name |
+| `TooltipOptions` | Tooltip placement |
 
 ## `respo-ui.css`
 
