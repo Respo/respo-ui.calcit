@@ -151,13 +151,7 @@
                   :class-name style-avatar-image
                 <> text
           :examples $ [] $ quote
-            comp-avatar |CY $ %some $ %{} respo-ui.schema/AvatarOptions
-              :src $ %none
-              :alt $ %none
-              :title $ %some "|Chen Yong"
-              :size $ %some :large
-              :class-name $ %none
-              :style $ %none
+            comp-avatar |CY $ Option :some $ respo-ui.schema/AvatarOptions :title (Option :some "|Chen Yong") :size (Option :some :large)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/AvatarOptions
         'comp-button $ %{} 'CodeEntry
@@ -176,13 +170,7 @@
                 <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
                 , content
           :examples $ [] $ quote
-            comp-button |Save $ %some $ %{} respo-ui.schema/ButtonOptions
-              :kind $ %some :primary
-              :type $ %none
-              :disabled $ %none
-              :on-click $ %none
-              :class-name $ %none
-              :style $ %none
+            comp-button |Save $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :primary)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content $ :: 'calcit.core/Option 'respo-ui.schema/ButtonOptions
             :generics $ [] 'Content
@@ -212,11 +200,7 @@
                   {} $ :class-name style-card-footer
                   respo-ui.schema/read-field options :footer
           :examples $ [] $ quote
-            comp-card |Content $ %some $ %{} respo-ui.schema/CardOptions
-              :title $ %some |Summary
-              :footer $ %none
-              :class-name $ %none
-              :style $ %none
+            comp-card |Content $ Option :some $ respo-ui.schema/CardOptions :title (Option :some |Summary)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content $ :: 'calcit.core/Option 'respo-ui.schema/CardOptions
             :generics $ [] 'Content
@@ -312,10 +296,7 @@
                 respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
           :examples $ [] $ quote
-            comp-divider $ %some $ %{} respo-ui.schema/DividerOptions
-              :vertical? $ %some true
-              :class-name $ %none
-              :style $ %none
+            comp-divider $ Option :some $ respo-ui.schema/DividerOptions :vertical? (Option :some true)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/DividerOptions
         'comp-empty $ %{} 'CodeEntry
@@ -343,12 +324,7 @@
                 non-nil? $ respo-ui.schema/read-field options :action
                 div ({}) (respo-ui.schema/read-field options :action)
           :examples $ [] $ quote
-            comp-empty "|No results" $ %some $ %{} respo-ui.schema/EmptyOptions
-              :icon $ %none
-              :description $ %some "|Try another search term."
-              :action $ %none
-              :class-name $ %none
-              :style $ %none
+            comp-empty "|No results" $ Option :some $ respo-ui.schema/EmptyOptions :description (Option :some "|Try another search term.")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/EmptyOptions
         'comp-input $ %{} 'CodeEntry
@@ -363,13 +339,7 @@
               :style $ respo-ui.schema/read-field options :style
               :on-input $ respo-ui.schema/read-field options :on-input
           :examples $ [] $ quote
-            comp-input |query $ %some $ %{} respo-ui.schema/InputOptions
-              :type $ %none
-              :placeholder $ %some |Search
-              :disabled $ %none
-              :on-input $ %none
-              :class-name $ %none
-              :style $ %none
+            comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Search)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/InputOptions
         'comp-placeholder $ %{} 'CodeEntry (:doc |)
@@ -432,13 +402,8 @@
                     :inner-text item.:label
           :examples $ [] $ quote
             comp-select |calcit
-              [] $ %{} respo-ui.schema/SelectOption (:value |calcit) (:label |Calcit)
-                :disabled $ %none
-              %some $ %{} respo-ui.schema/SelectOptions
-                :disabled $ %none
-                :on-change $ %none
-                :class-name $ %none
-                :style $ %none
+              [] $ respo-ui.schema/SelectOption :value |calcit :label |Calcit
+              Option :some $ respo-ui.schema/SelectOptions
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String (:: 'List 'respo-ui.schema/SelectOption)
               :: 'calcit.core/Option $ :: 'respo-ui.schema/SelectOptions 'Op
@@ -463,13 +428,7 @@
                   :height $ respo-ui.schema/read-field options :height
                 either (respo-ui.schema/read-field options :style) ({})
           :examples $ [] $ quote
-            comp-skeleton $ %some $ %{} respo-ui.schema/SkeletonOptions
-              :label $ %some "|Loading title"
-              :kind $ %none
-              :width $ %some |60%
-              :height $ %none
-              :class-name $ %none
-              :style $ %none
+            comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :some "|Loading title") :width (Option :some |60%)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/SkeletonOptions
         'comp-snippet $ %{} 'CodeEntry (:doc |)
@@ -493,10 +452,7 @@
               :class-name $ str-spaced style-spinner $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
           :examples $ [] $ quote
-            comp-spinner $ %some $ %{} respo-ui.schema/SpinnerOptions
-              :label $ %some "|Loading results"
-              :class-name $ %none
-              :style $ %none
+            comp-spinner $ Option :some $ respo-ui.schema/SpinnerOptions :label (Option :some "|Loading results")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/SpinnerOptions
         'comp-switch $ %{} 'CodeEntry
@@ -544,12 +500,7 @@
                 span ({})
                   <> $ either (respo-ui.schema/read-field options :label) |
           :examples $ [] $ quote
-            comp-switch false $ %some $ %{} respo-ui.schema/SwitchOptions
-              :label $ %some "|Compact mode"
-              :disabled $ %none
-              :on-change $ %none
-              :class-name $ %none
-              :style $ %none
+            comp-switch false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Compact mode")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Bool $ :: 'calcit.core/Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
@@ -634,13 +585,7 @@
               :style $ respo-ui.schema/read-field options :style
               :on-input $ respo-ui.schema/read-field options :on-input
           :examples $ [] $ quote
-            comp-textarea |notes $ %some $ %{} respo-ui.schema/InputOptions
-              :type $ %none
-              :placeholder $ %some |Notes
-              :disabled $ %none
-              :on-input $ %none
-              :class-name $ %none
-              :style $ %none
+            comp-textarea |notes $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Notes)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/InputOptions
         'comp-time $ %{} 'CodeEntry
@@ -2956,17 +2901,7 @@
             :css-value $ :: 'Option 'String
             :css-title $ :: 'Option 'String
           :examples $ [] $ quote
-            %{} AttributesOptions
-              :items $ []
-              :title $ %none
-              :item-width $ %none
-              :item-height $ %none
-              :class-name $ %none
-              :style $ %none
-              :css-item $ %none
-              :css-label $ %none
-              :css-value $ %none
-              :css-title $ %none
+            AttributesOptions :items $ []
           :schema $ :: 'Enum
         'AvatarOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-avatar image metadata, size, class name, and style."
@@ -2978,13 +2913,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} AvatarOptions
-              :src $ %none
-              :alt $ %none
-              :title $ %some "|Chen Yong"
-              :size $ %some :large
-              :class-name $ %none
-              :style $ %none
+            AvatarOptions :title (Option :some "|Chen Yong") :size $ Option :some :large
           :schema $ :: 'Enum
         'ButtonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style."
@@ -2996,13 +2925,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} ButtonOptions
-              :kind $ %some :primary
-              :type $ %none
-              :disabled $ %none
-              :on-click $ %none
-              :class-name $ %none
-              :style $ %none
+            ButtonOptions :kind $ Option :some :primary
           :schema $ :: 'Enum
         'CardOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-card with a string title and generic footer content."
@@ -3012,11 +2935,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} CardOptions
-              :title $ %some |Summary
-              :footer $ %none
-              :class-name $ %none
-              :style $ %none
+            CardOptions :title $ Option :some |Summary
           :schema $ :: 'Enum
         'DividerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-divider, including vertical orientation."
@@ -3025,10 +2944,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} DividerOptions
-              :vertical? $ %some true
-              :class-name $ %none
-              :style $ %none
+            DividerOptions :vertical? $ Option :some true
           :schema $ :: 'Enum
         'EmptyOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-empty with generic icon and action slots."
@@ -3039,12 +2955,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} EmptyOptions
-              :icon $ %none
-              :description $ %some "|Try another search term."
-              :action $ %none
-              :class-name $ %none
-              :style $ %none
+            EmptyOptions :description $ Option :some "|Try another search term."
           :schema $ :: 'Enum
         'InputOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct InputOptions
@@ -3066,17 +2977,13 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} PresentationOptions
-              :class-name $ %some |status
-              :style $ %none
+            PresentationOptions :class-name $ Option :some |status
           :schema $ :: 'Enum
         'SelectOption $ %{} 'CodeEntry
           :doc "|A typed native select item with string value and label plus optional disabled state."
           :code $ quote $ defstruct SelectOption (:value 'String) (:label 'String)
             :disabled $ :: 'Option 'Bool
-          :examples $ [] $ quote
-            %{} SelectOption (:value |calcit) (:label |Calcit)
-              :disabled $ %none
+          :examples $ [] $ quote (SelectOption :value |calcit :label |Calcit)
           :schema $ :: 'Enum
         'SelectOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-select. The Op generic preserves the operation accepted by the dispatcher passed to on-change."
@@ -3093,11 +3000,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} SelectOptions
-              :disabled $ %some false
-              :on-change $ %none
-              :class-name $ %none
-              :style $ %none
+            SelectOptions :disabled $ Option :some false
           :schema $ :: 'Enum
         'SkeletonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-skeleton: label, kind, dimensions, class name, and style."
@@ -3109,13 +3012,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} SkeletonOptions
-              :label $ %none
-              :kind $ %some :text
-              :width $ %some |60%
-              :height $ %none
-              :class-name $ %none
-              :style $ %none
+            SkeletonOptions :kind (Option :some :text) :width $ Option :some |60%
           :schema $ :: 'Enum
         'SpinnerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-spinner, including its accessible label."
@@ -3124,10 +3021,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} SpinnerOptions
-              :label $ %some "|Loading results"
-              :class-name $ %none
-              :style $ %none
+            SpinnerOptions :label $ Option :some "|Loading results"
           :schema $ :: 'Enum
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
@@ -3152,12 +3046,7 @@
             :class-name $ :: 'Option 'String
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} SwitchOptions
-              :label $ %some "|Compact mode"
-              :disabled $ %none
-              :on-change $ %none
-              :class-name $ %none
-              :style $ %none
+            SwitchOptions :label $ Option :some "|Compact mode"
           :schema $ :: 'Enum
         'TabRoute $ %{} 'CodeEntry
           :doc "|Normalized typed tab route carrying a generic value and string display label."
@@ -3179,15 +3068,7 @@
             :tab-style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
             :selected-tab-style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
-            %{} TabsOptions
-              :selected $ %some :book
-              :vertical? $ %none
-              :width $ %none
-              :class-name $ %none
-              :style $ %none
-              :tab-class-name $ %none
-              :tab-style $ %none
-              :selected-tab-style $ %none
+            TabsOptions :selected $ Option :some :book
           :schema $ :: 'Enum
         'read-field $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defmacro read-field (value field)
@@ -3204,9 +3085,7 @@
             let
                 option-value |outer
               assert= |status $ read-field
-                %some $ %{} PresentationOptions
-                  :class-name $ %some |status
-                  :style $ %none
+                Option :some $ PresentationOptions :class-name $ Option :some |status
                 , :class-name
           :schema $ :: 'Macro $ {}
             :capabilities $ #{}
