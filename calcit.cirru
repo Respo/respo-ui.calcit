@@ -1616,13 +1616,13 @@
           :schema $ :: 'String
         'style-switch-input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-input
-            {} $ |& $ {} (:position :absolute) (:width |1px) (:height |1px) (:opacity 0) (:pointer-events :none)
+            {} $ |& $ {} (:position :absolute) (:top 0) (:left 0) (:width |1px) (:height |1px) (:margin 0) (:opacity 0) (:pointer-events :none)
           :examples $ []
           :schema $ :: 'String
         'style-switch-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-switch-label
             {}
-              |& $ {} (:display :inline-flex) (:align-items :center) (:gap tokens/space-2) (:font-size tokens/text-md) (:cursor :pointer) (:user-select :none)
+              |& $ {} (:position :relative) (:display :inline-flex) (:align-items :center) (:gap tokens/space-2) (:font-size tokens/text-md) (:cursor :pointer) (:user-select :none)
               "|& > input:focus-visible + span" $ {} $ :box-shadow tokens/focus-ring
           :examples $ []
           :schema $ :: 'String
@@ -1631,7 +1631,7 @@
             {}
               |& $ {} (:position :relative) (:display :inline-block) (:flex-shrink 0) (:width |36px) (:height tokens/space-5) (:border-radius tokens/radius-full) (:background-color tokens/color-border-strong)
                 :transition $ str "|background-color " tokens/duration-fast "| " tokens/ease
-              |&::after $ {} (:content ||) (:position :absolute) (:top |2px) (:left |2px) (:width tokens/space-4) (:height tokens/space-4) (:border-radius tokens/radius-full) (:background-color tokens/color-surface) (:box-shadow tokens/shadow-sm)
+              |&::after $ {} (:content "|\"\"") (:position :absolute) (:top |2px) (:left |2px) (:width tokens/space-4) (:height tokens/space-4) (:border-radius tokens/radius-full) (:background-color tokens/color-surface) (:box-shadow tokens/shadow-sm)
                 :transition $ str "|transform " tokens/duration-fast "| " tokens/ease
           :examples $ []
           :schema $ :: 'String
