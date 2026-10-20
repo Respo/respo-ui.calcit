@@ -192,6 +192,53 @@
               assert= false $ .includes? dot-html "|>3 unread<"
               assert= true $ .includes? plain-html |>new<
             :tags $ #{} :js-only
+        'comp-breadcrumb $ %{} 'CodeEntry
+          :doc "|Render a breadcrumb trail. Items with :href render links; the last item is marked aria-current=page. Options: :separator (default /), :class-name, and :style."
+          :code $ quote $ defcomp comp-breadcrumb (items options)
+            let
+                separator $ either (respo-ui.schema/read-field options :separator) |/
+                last-idx $ dec $ count items
+              create-element :nav
+                {} (:aria-label |Breadcrumb)
+                  :class-name $ str-spaced style-breadcrumb $ respo-ui.schema/read-field options :class-name
+                  :style $ respo-ui.schema/read-field options :style
+                create-list-element :ol
+                  {} $ :class-name style-breadcrumb-list
+                  -> items $ map-indexed $ fn (idx item)
+                    [] (str idx)
+                      create-element :li
+                        {} $ :class-name style-breadcrumb-item
+                        if (= idx last-idx)
+                          span $ {} (:aria-current |page) (:class-name style-breadcrumb-current) (:inner-text item.:label)
+                          match item.:href
+                            (:some href)
+                              a $ {} (:href href) (:class-name style-breadcrumb-link) (:inner-text item.:label)
+                            (:none)
+                              span $ {} $ :inner-text item.:label
+                        if (< idx last-idx)
+                          span $ {} (:class-name style-breadcrumb-separator) (:aria-hidden |true) (:inner-text separator)
+          :examples $ [] $ quote
+            comp-breadcrumb
+              []
+                respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/
+                respo-ui.schema/BreadcrumbItem :label |Components
+              Option :none
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] (:: 'List 'respo-ui.schema/BreadcrumbItem) (:: 'calcit.core/Option 'respo-ui.schema/BreadcrumbOptions)
+          :tests $ [] $ %{} 'TestEntry (:name |render-links)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-breadcrumb
+                  []
+                    respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/
+                    respo-ui.schema/BreadcrumbItem :label |Docs
+                    respo-ui.schema/BreadcrumbItem :label |Badge :href $ Option :some |#/badge
+                  Option :some $ respo-ui.schema/BreadcrumbOptions :separator $ Option :some "|›"
+              assert= true $ .includes? html "|href=\"#/\""
+              assert= true $ .includes? html |>Docs<
+              assert= false $ .includes? html "|href=\"#/badge\""
+              assert= true $ .includes? html "|aria-current=\"page\""
+              assert= true $ .includes? html "|>›<"
+            :tags $ #{} :js-only
         'comp-button $ %{} 'CodeEntry
           :doc "|Render a native button with Respo UI variants. Options: :kind (:primary, :danger, :danger-outline), :type, :disabled, :on-click, :class-name, :style."
           :code $ quote $ defcomp comp-button (content options)
@@ -426,6 +473,44 @@
             comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Search)
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/InputOptions
+        'comp-pagination $ %{} 'CodeEntry
+          :doc "|Render page buttons for a 1-based page out of total pages, collapsing distant pages into gaps. Options: :siblings (pages beside the current one, default 1), :on-change (receives the next page and d!), :class-name, and :style."
+          :code $ quote $ defcomp comp-pagination (page total options)
+            let
+                siblings $ match options
+                  (:some o) (option:unwrap-or o.:siblings 1)
+                  (:none) 1
+              create-list-element :nav
+                {} (:aria-label |Pagination)
+                  :class-name $ str-spaced style-pagination $ respo-ui.schema/read-field options :class-name
+                  :style $ respo-ui.schema/read-field options :style
+                concat
+                  [] $ [] |prev $ render-page-button page total (dec page) "|‹" "|Previous page" options
+                  -> (pagination-pages page total siblings)
+                    map-indexed $ fn (idx n)
+                      if (= n 0)
+                        [] (str |gap- idx)
+                          span $ {} (:class-name style-pagination-gap) (:aria-hidden |true) (:inner-text "|…")
+                        [] (str |page- n)
+                          render-page-button page total n (str n) (str "|Page " n) options
+                  [] $ [] |next $ render-page-button page total (inc page) "|›" "|Next page" options
+          :examples $ [] $ quote
+            comp-pagination 5 20 $ Option :some $ respo-ui.schema/PaginationOptions :siblings (Option :some 1)
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Number 'Number $ :: 'calcit.core/Option (:: 'respo-ui.schema/PaginationOptions 'Op)
+            :generics $ [] 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |render-and-current)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-pagination 5 10 (Option :none)
+                first-html $ respo.render.html/make-string $ comp-pagination 1 3 (Option :none)
+              assert= true $ .includes? html "|aria-label=\"Pagination\""
+              assert= true $ .includes? html "|aria-current=\"page\""
+              assert= true $ .includes? html |style-pagination-current
+              assert= true $ .includes? html "|…"
+              assert= true $ .includes? html "|aria-label=\"Page 10\""
+              assert= false $ .includes? html "|disabled=\"true\""
+              assert= true $ .includes? first-html "|disabled=\"true\""
+            :tags $ #{} :js-only
         'comp-placeholder $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-placeholder (text)
             div
@@ -596,6 +681,54 @@
             comp-spinner $ Option :some $ respo-ui.schema/SpinnerOptions :label (Option :some "|Loading results")
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/SpinnerOptions
+        'comp-steps $ %{} 'CodeEntry
+          :doc "|Render a step indicator. current is the 0-based active step; earlier steps show as done. Items carry :title and optional :description. Options: :vertical?, :class-name, and :style."
+          :code $ quote $ defcomp comp-steps (current items options)
+            create-list-element :ol
+              {}
+                :class-name $ str-spaced style-steps
+                  if (respo-ui.schema/read-field options :vertical?) style-steps-vertical
+                  respo-ui.schema/read-field options :class-name
+                :style $ respo-ui.schema/read-field options :style
+              -> items $ map-indexed $ fn (idx item)
+                [] (str idx)
+                  create-element :li
+                    {}
+                      :class-name $ str-spaced style-step $ if (= idx current) style-step-current
+                      :aria-current $ if (= idx current) |step
+                    span $ {}
+                      :class-name $ str-spaced style-step-marker $ cond
+                          < idx current
+                          , style-step-marker-done
+                        (= idx current) style-step-marker-current
+                        true |
+                      :inner-text $ if (< idx current) "|✓" $ str (inc idx)
+                    div ({})
+                      div $ {} (:class-name style-step-title) (:inner-text item.:title)
+                      match item.:description
+                        (:some description)
+                          div $ {} (:class-name style-step-description) (:inner-text description)
+                        (:none) nil
+          :examples $ [] $ quote
+            comp-steps 1
+              [] (respo-ui.schema/StepItem :title |Account) (respo-ui.schema/StepItem :title |Profile) (respo-ui.schema/StepItem :title |Done)
+              Option :none
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ [] 'Number (:: 'List 'respo-ui.schema/StepItem) (:: 'calcit.core/Option 'respo-ui.schema/StepsOptions)
+          :tests $ [] $ %{} 'TestEntry (:name |render-status)
+            :code $ quote $ let
+                html $ respo.render.html/make-string $ comp-steps 1
+                  [] (respo-ui.schema/StepItem :title |Account)
+                    respo-ui.schema/StepItem :title |Profile :description $ Option :some |About
+                    respo-ui.schema/StepItem :title |Done
+                  Option :some $ respo-ui.schema/StepsOptions :vertical? $ Option :some true
+              assert= true $ .includes? html |style-step-marker-done
+              assert= true $ .includes? html "|>✓<"
+              assert= true $ .includes? html "|aria-current=\"step\""
+              assert= true $ .includes? html |>About<
+              assert= true $ .includes? html |>3<
+              assert= true $ .includes? html |style-steps-vertical
+            :tags $ #{} :js-only
         'comp-switch $ %{} 'CodeEntry
           :doc "|Render a controlled accessible switch backed by a native checkbox. Options: :label, :disabled, :on-change, :class-name, and :style."
           :code $ quote $ defcomp comp-switch (checked options)
@@ -847,6 +980,73 @@
           :schema $ :: 'Fn $ {} (:return 'Bool)
             :args $ [] 'Value
             :generics $ [] 'Value
+        'pagination-pages $ %{} 'CodeEntry
+          :doc "|Page numbers shown by comp-pagination for a 1-based page, the total page count, and how many siblings sit beside the current page. 0 marks a collapsed gap."
+          :code $ quote $ defn pagination-pages (page total siblings)
+            let
+                window $ inc $ * 2 siblings
+              if
+                <= total $ + window 4
+                range 1 $ inc total
+                let
+                    start $ &max 2 $ &min (- page siblings) (- total window)
+                    end $ dec $ + start window
+                  concat ([] 1)
+                    cond
+                        = start 2
+                        []
+                      (= start 3) ([] 2)
+                      true $ [] 0
+                    range start $ inc end
+                    cond
+                        = end $ dec total
+                        []
+                      (= end (- total 2))
+                        [] $ dec total
+                      true $ [] 0
+                    [] total
+          :examples $ [] $ quote (pagination-pages 5 20 1)
+          :schema $ :: 'Fn $ {}
+            :args $ [] 'Number 'Number 'Number
+            :return $ :: 'List 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |window-and-gaps)
+            :code $ quote $ do
+              assert= ([] 1 2 3 4 5) (pagination-pages 3 5 1)
+              assert= ([] 1 2 3 4 5 6 7) (pagination-pages 1 7 1)
+              assert= ([] 1 2 3 4 0 10) (pagination-pages 1 10 1)
+              assert= ([] 1 0 4 5 6 0 10) (pagination-pages 5 10 1)
+              assert= ([] 1 2 3 4 5 0 10) (pagination-pages 4 10 1)
+              assert= ([] 1 0 7 8 9 10) (pagination-pages 10 10 1)
+              assert=
+                [] 1 0 8 9 10 11 12 0 20
+                pagination-pages 10 20 2
+            :tags $ #{} :boundary
+        'render-page-button $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn render-page-button (page total target text label options)
+            let
+                current? $ and (= target page)
+                  = text $ str target
+                disabled? $ or (< target 1) (> target total)
+              button $ {} (:type |button) (:inner-text text) (:aria-label label) (:disabled disabled?)
+                :aria-current $ if current? |page
+                :class-name $ str-spaced style-pagination-item $ if current? style-pagination-current
+                :on-click $ fn (e d!)
+                  hint-fn $ {}
+                    :args $ [] (:: 'Map 'Tag 'Dynamic)
+                      :: 'Fn $ {}
+                        :args $ [] 'Op
+                        :return 'Unit
+                    :return 'Unit
+                  let
+                      on-change $ respo-ui.schema/read-field options :on-change
+                    when
+                      and (non-nil? on-change) (not current?) (not disabled?)
+                      on-change target d!
+                  , &unit
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
+            :args $ [] 'Number 'Number 'Number 'String 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/PaginationOptions 'Op)
+            :generics $ [] 'Op
         'style-alert $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert
             {} $ |& $ {} (:padding "|10px 12px") (:border "|1px solid transparent") (:border-radius |6px) (:line-height |1.5)
@@ -951,6 +1151,42 @@
             {} $ |& $ {}
               :color $ hsl 30 90 20
               :background-color $ hsl 40 95 60
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb
+            {} $ |& $ {} (:font-size 14) (:line-height |20px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-current
+            {} $ |& $ {} (:font-weight 500)
+              :color $ hsl 0 0 15
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-item
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:gap |6px)
+              :color $ hsl 0 0 45
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-link $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-link
+            {}
+              |& $ {} (:color :inherit) (:text-decoration :none)
+              |&:hover $ {} (:text-decoration :underline)
+                :color $ hsl 200 80 40
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-list $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-list
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap |6px) (:margin 0) (:padding 0) (:list-style :none)
+          :examples $ []
+          :schema $ :: 'String
+        'style-breadcrumb-separator $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-breadcrumb-separator
+            {} $ |& $ {}
+              :color $ hsl 0 0 70
           :examples $ []
           :schema $ :: 'String
         'style-card $ %{} 'CodeEntry (:doc |)
@@ -1114,6 +1350,38 @@
                 :box-shadow $ str "|0 0 4px 1px " $ hsl 0 0 0 0.08
           :examples $ []
           :schema $ :: 'String
+        'style-pagination $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap |4px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-pagination-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination-current
+            {}
+              |&& $ {} (:color :white) (:cursor :default)
+                :background-color $ hsl 200 80 50
+                :border-color $ hsl 200 80 50
+              "|&&:hover:not(:disabled)" $ {} $ :color :white
+          :examples $ []
+          :schema $ :: 'String
+        'style-pagination-gap $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination-gap
+            {} $ |& $ {} (:min-width |24px) (:text-align :center)
+              :color $ hsl 0 0 60
+          :examples $ []
+          :schema $ :: 'String
+        'style-pagination-item $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-pagination-item
+            {}
+              |& $ {} (:min-width |32px) (:height |32px) (:padding "|0 8px") (:border-radius |6px) (:font-size 14) (:cursor :pointer) (:background-color :white)
+                :border $ str "|1px solid " $ hsl 0 0 86
+                :color $ hsl 0 0 25
+              "|&:hover:not(:disabled)" $ {}
+                :border-color $ hsl 200 80 50
+                :color $ hsl 200 80 40
+              |&:disabled $ {} (:cursor :not-allowed) (:opacity 0.4)
+          :examples $ []
+          :schema $ :: 'String
         'style-progress $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-progress
             {} $ |& $ {} (:width |100%) (:height |8px) (:overflow :hidden) (:border-radius |999px)
@@ -1185,6 +1453,59 @@
                 :animation "|respo-ui-spin 700ms linear infinite"
               "|@keyframes respo-ui-spin" $ {} $ |to
                 {} $ :transform "|rotate(360deg)"
+          :examples $ []
+          :schema $ :: 'String
+        'style-step $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step
+            {} $ |& $ {} (:display :flex) (:align-items :flex-start) (:gap |8px)
+              :color $ hsl 0 0 35
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-current
+            {} $ |& $ {} (:font-weight 500)
+              :color $ hsl 0 0 15
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-description $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-description
+            {} $ |& $ {} (:font-size 12) (:line-height |18px) (:font-weight 400)
+              :color $ hsl 0 0 55
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-marker $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-marker
+            {} $ |& $ {} (:display :inline-flex) (:align-items :center) (:justify-content :center) (:flex-shrink 0) (:box-sizing :border-box) (:width |24px) (:height |24px) (:border-radius |50%) (:font-size 12)
+              :border $ str "|1px solid " $ hsl 0 0 80
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-marker-current $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-marker-current
+            {} $ |& $ {} (:color :white)
+              :background-color $ hsl 200 80 50
+              :border-color $ hsl 200 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-marker-done $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-marker-done
+            {} $ |& $ {}
+              :color $ hsl 200 80 40
+              :border-color $ hsl 200 80 50
+          :examples $ []
+          :schema $ :: 'String
+        'style-step-title $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-step-title
+            {} $ |& $ {} (:font-size 14) (:line-height |24px)
+          :examples $ []
+          :schema $ :: 'String
+        'style-steps $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-steps
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:gap "|12px 24px") (:margin 0) (:padding 0) (:list-style :none)
+          :examples $ []
+          :schema $ :: 'String
+        'style-steps-vertical $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-steps-vertical
+            {} $ |& $ {} (:flex-direction :column) (:gap |16px)
           :examples $ []
           :schema $ :: 'String
         'style-switch-input $ %{} 'CodeEntry (:doc |)
@@ -1326,6 +1647,7 @@
                   render-entry |https://github.com/Respo/respo-message.calcit |respo-message
                   render-entry |https://github.com/Respo/respo-markdown.calcit |respo-markdown
               comp-demo-form-controls
+              comp-demo-navigation
               comp-demo-data-display
               comp-demo-loading-states
               comp-divider
@@ -1562,6 +1884,43 @@
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ []
+        'comp-demo-navigation $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defcomp comp-demo-navigation ()
+            div
+              {} $ :class-name style-demo-section
+              div
+                {} $ :class-name style-section-title
+                <> |Navigation
+              div
+                {} $ :class-name style-demo-grid
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap16
+                    comp-breadcrumb
+                      []
+                        respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/index.html
+                        respo-ui.schema/BreadcrumbItem :label |Components :href $ Option :some |#/components.html
+                        respo-ui.schema/BreadcrumbItem :label |Navigation
+                      Option :none
+                    comp-pagination 6 20 $ Option :none
+                    comp-pagination 2 5 $ Option :none
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some "|Breadcrumb and pagination"
+                comp-card
+                  div
+                    {} $ :class-name $ str-spaced css/column css/gap16
+                    comp-steps 1
+                      [] (respo-ui.schema/StepItem :title |Account) (respo-ui.schema/StepItem :title |Profile) (respo-ui.schema/StepItem :title |Review)
+                      Option :none
+                    comp-steps 2
+                      []
+                        respo-ui.schema/StepItem :title "|Create project" :description $ Option :some "|Pick a name and template."
+                        respo-ui.schema/StepItem :title "|Add members" :description $ Option :some "|Invite people by email."
+                        respo-ui.schema/StepItem :title |Deploy :description $ Option :some "|Ship the first build."
+                      Option :some $ respo-ui.schema/StepsOptions :vertical? $ Option :some true
+                  Option :some $ respo-ui.schema/CardOptions :title $ Option :some |Steps
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
+            :args $ []
         'comp-demo-placeholder $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-demo-placeholder ()
             div ({})
@@ -1777,7 +2136,7 @@
             respo-ui.css :as css
             respo.util.format :refer $ hsl
             respo.css :refer $ defstyle
-            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider comp-radio-group comp-field comp-badge
+            respo-ui.comp :refer $ comp-tabs comp-placeholder comp-cirru-snippet comp-button comp-attributes comp-snippet comp-time comp-tag comp-close comp-catoptric-text comp-copy comp-input comp-textarea comp-select comp-switch comp-avatar comp-skeleton comp-spinner comp-empty comp-card comp-progress comp-alert comp-divider comp-radio-group comp-field comp-badge comp-breadcrumb comp-pagination comp-steps
             js-ffi.shared :as shared
     'respo-ui.comp.container $ %{} 'FileEntry
       :defs $ {}
@@ -3169,6 +3528,19 @@
           :examples $ [] $ quote
             BadgeOptions :dot? $ Option :some true
           :schema $ :: 'Enum
+        'BreadcrumbItem $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct BreadcrumbItem (:label 'String)
+            :href $ :: 'Option 'String
+          :examples $ [] $ quote
+            BreadcrumbItem :label |Home :href $ Option :some |#/
+          :schema $ :: 'Enum
+        'BreadcrumbOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct BreadcrumbOptions
+            :separator $ :: 'Option 'String
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ []
+          :schema $ :: 'Enum
         'ButtonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style."
           :code $ quote $ defstruct ButtonOptions
@@ -3236,6 +3608,22 @@
           :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:components) (:utils) (:not-found 'String)
           :examples $ []
           :schema $ :: 'EnumDef
+        'PaginationOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct PaginationOptions
+            [] $ quote Op
+            :siblings $ :: 'Option 'Number
+            :on-change $ :: 'Option $ :: 'Fn
+              {}
+                :args $ [] 'Number $ :: 'Fn
+                  {}
+                    :args $ [] $ quote Op
+                    :return 'Unit
+                :return 'Unit
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ [] $ quote
+            PaginationOptions :siblings $ Option :some 2
+          :schema $ :: 'Enum
         'PresentationOptions $ %{} 'CodeEntry
           :doc "|Shared typed class-name and style options for presentation-only components."
           :code $ quote $ defstruct PresentationOptions
@@ -3306,6 +3694,19 @@
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ [] $ quote
             SpinnerOptions :label $ Option :some "|Loading results"
+          :schema $ :: 'Enum
+        'StepItem $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct StepItem (:title 'String)
+            :description $ :: 'Option 'String
+          :examples $ [] $ quote
+            StepItem :title |Profile :description $ Option :some "|Tell us about you"
+          :schema $ :: 'Enum
+        'StepsOptions $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct StepsOptions
+            :vertical? $ :: 'Option 'Bool
+            :class-name $ :: 'Option 'String
+            :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
+          :examples $ []
           :schema $ :: 'Enum
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
