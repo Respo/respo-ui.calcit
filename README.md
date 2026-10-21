@@ -20,7 +20,8 @@ value and `d!`. The full list with signatures and examples is in
 
 新增组件：单选组、表单字段、徽标、面包屑、分页、步骤条、折叠面板、按键提示和
 文字提示。`comp-input` 与 `comp-textarea` 新增 `:on-change`，回调收到输入值和 `d!`。
-完整列表见 [docs/components.md](docs/components.md)。依赖版本与 0.7.41 相同。
+完整列表见 [docs/components.md](docs/components.md)。当前候选配对正式 Calcit 0.30.1；
+依赖版本及升级边界见下文。
 
 ### Dependency boundary
 
@@ -49,10 +50,11 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 
 ### Calcit 0.30.1 配对迁移
 
-使用者影响：UI `0.7.41` 候选使用已发布的 Respo `0.16.122`、Router `0.8.36`
-和 JS-FFI `0.2.3`，Calcit CLI/runtime 成对固定为已发布的 `0.30.1-alpha.4`。
-这是使用预发布编译器的迁移候选，不是 Calcit 稳定版支持声明。本次不改变组件 API、
-样式、路由或渲染行为；应用中的其他模块也需请求相同的 Respo / Router / JS-FFI
+使用者影响：UI `0.8.0` 候选使用已发布的 Respo `0.16.124`、Router `0.8.37`
+和 JS-FFI `0.2.5`，Calcit CLI/runtime 成对固定为正式 `0.30.1`。
+保留 main 现有的 0.8.0 新组件和输入回调 API，不退回 0.7.x，也不切换至
+Respo 0.17 的破坏性 dispatch 接口。本次配对不改组件源码、样式、路由或渲染行为；
+应用中的其他模块也需请求相同的 Respo / Router / JS-FFI
 版本，不能只改根依赖或放宽 Caps strict。本模块发版前，不要把候选分支当作发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
@@ -68,7 +70,8 @@ caps --strict --ci
 yarn install --immutable
 caps deps.cirru verify --toolchain
 calcit calcit.cirru query context respo-ui.schema/route-from-router --format edn
-calcit calcit.cirru --check-only
+calcit calcit.cirru --check-only --all-defs
+calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
 calcit calcit.cirru test --exclude-tag js-only --require-match
 yarn test:js
 calcit calcit.cirru --check-only --ns respo-ui.schema --ns respo-ui.comp
@@ -76,10 +79,11 @@ calcit calcit.cirru js
 yarn vite build
 ```
 
-完整公开检查覆盖原 17 个命名空间（264 个定义）；原 9 项 native、10 项 JS
-附带测试、15 个 schema 示例和 14 个 JS component 示例保留。路由 `:tests` 在 native 与
-真实生成 JS 中重放同一份 AST；JS 另验证 3 组 skeleton 渲染，以及首页、Layouts、
-Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Attributes demo
+CI 保留 21 个项目命名空间的显式检查，并将普通入口检查替换为全定义检查。
+当前基线含 11 项 native 测试，JS 重放全部 22 项附带测试。
+路由 `:tests` 在 native 与真实生成 JS 中重放同一份 AST；JS 另验证
+3 组 skeleton 渲染、首页、Design、Layouts、Widgets、Fonts、Components、Utils
+全部 7 个展示入口，以及 33 个组件独立页面的 SSR。Attributes demo
 使用完整的 `AttributesOptions`，组件先解包各 Option 字段再生成 CSS/DOM 属性，
 不将业务 Map 冒充具名 Struct。回放只通过 CLI 修改
 隔离 Snapshot，不修改 canonical 源码或模块缓存，也不修补生成文件的跨模块路径。
@@ -88,11 +92,14 @@ Widgets、Fonts、Components、Utils 全部 6 个真实展示入口的 SSR。Att
 最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
 该步骤不代替 Reel/Alerts/Diary 的完整应用验收。
 
-本次不修改 Snapshot；通过正常 Caps 安装和不可变 Yarn 锁文件验证完整发布图，
-不替换模块缓存或修补生成 JS。完整公开检查为 264/264，完整 strict 通过；
-6 个真实浏览器展示入口、文本输入、checkbox/select、后退和刷新均完成回归，
-控制台无 warning/error。现有开放样式值、状态载荷和 FFI unsafe 边界仍需逐项收窄，
-本次依赖配对不表示类型债务清零。
+Snapshot 只修正主页 Quick start 中过期的 alpha 编译器版本示例，组件实现不变。
+文档生成、组件元数据和设计 token 回归改用官方 CLI 查询的
+AST，不再正则解析 Snapshot 序列化文本；示例通过 runtime 的 Cirru formatter
+生成，排版变化不改变表达式。原测试断言保留，不新增上传校验或另一套质量脚本。
+正式配对由 Linux CI 的正常 Caps 安装、不可变 Yarn 锁文件、完整 strict、公开定义、
+示例和原 JS 回归验证；浏览器交互和真实下游消费者另行验收，SSR 不代替它们。
+现有开放样式值、状态载荷和 FFI unsafe 边界仍需逐项收窄，本次依赖配对不表示
+类型债务清零。
 
 0.7.36 的 demo updater 在操作边界检查状态 cursor 的 List 容器、导航 String 和
 路由 Map。状态更新复用原 `update-state-tree`，校验外层状态 Map 后写回已知 Store 字段，
@@ -106,9 +113,9 @@ key 行为保持，未知操作仍返回原 Store。动态状态值和路由载�
 仍不生成节点，不用空文本节点替代；`false`、`0`、空字符串和已有子节点保持原行为。
 组件参数与业务回调类型不变，不增加 Dynamic 或 unsafe。
 
-验证保留原 9 项 native 测试，JS 重放全部 10 项附带测试（包含新增的
+验证保留当前 11 项 native 测试，JS 重放全部 22 项附带测试（包含
 `js-only` 属性渲染回归），并通过真实生成的事件回调验证缺失、nil、有效值、错误
-载荷和 dispatch 失败。原 3 组 skeleton 与 6 个展示入口 SSR、严格检查、示例、
+载荷和 dispatch 失败。原 3 组 skeleton 与 7 个展示入口 SSR、严格检查、示例、
 dynamic-method 零命中、文档、构建及浏览器交互验收继续保留。
 
 移除过期的汇总/逐定义纯计数基线，以严格类型和可观察行为判断正确性；不以
