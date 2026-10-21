@@ -75,7 +75,7 @@ try {
   // Exercise every real showcase route, not only isolated component examples.
   const pages = "respo-ui.comp.container/replay-js-pages";
   const routes = ["index", "design", "layouts", "widgets", "fonts", "components", "utils"];
-  // Every exported component needs a demo block on the components page.
+  // Every exported component needs a card on the overview and its own page.
   const categoryTitles = ["Form controls", "Navigation", "Disclosure and hints", "Feedback", "Data display", "Code and utilities"];
   const componentIds = ["button", "input", "textarea", "select", "checkbox", "switch", "radio-group", "field", "tabs", "breadcrumb",
     "pagination", "steps", "collapse", "tooltip", "kbd", "alert", "progress", "spinner", "skeleton", "empty", "badge", "card", "avatar",
@@ -84,11 +84,49 @@ try {
   const pageScenarios = routes.flatMap((route) => [["println", `|Showcase route: ${route}`], ["let", [["html", ["respo.render.html/make-string", ["comp-container",
     ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address", `|/${route}.html`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
     ["assert", [".includes?", "html", "|Respo UI"], `|Showcase route ${route} must render`],
-    ...(route === "components" ? [...categoryTitles, ...componentIds.map((id) => `id="demo-${id}"`)].map((text) =>
+    ...(route === "components" ? [...categoryTitles, ...componentIds.map((id) => `>comp-${id}<`), 'id="component-search"', `>${componentIds.length} components<`].map((text) =>
       ["assert", [".includes?", "html", `|${text}`], `|Missing component showcase section: ${text}`]) : []),
     ...(route === "design" ? designSections.map((id) => `id="design-${id}"`).map((text) =>
       ["assert", [".includes?", "html", `|${text}`], `|Missing design system section: ${text}`]) : []),
   ]]);
+  const searchHtml = ["respo.render.html/make-string", ["comp-container", ["respo-ui.schema/Store", ":router",
+    ["respo-router.parser/parse-address", "|/components.html", "respo-ui.router/dict"], ":states", ["{}", [":components", ["{}", [":data", "|TOOLTIP"]]]]]]];
+  pageScenarios.push(["println", "|Showcase route: components search"], ["let", [["html", searchHtml]],
+    ["assert", [".includes?", "html", "|>comp-tooltip<"], "|Search must keep matching components"],
+    ["assert", ["not", [".includes?", "html", "|>comp-button<"]], "|Search must hide components that do not match"],
+    ["assert", [".includes?", "html", `|>1 of ${componentIds.length} components<`], "|Search must report the match count"]]);
+  for (const id of componentIds) {
+    pageScenarios.push(["let", [["html", ["respo.render.html/make-string", ["comp-container",
+      ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address", `|/component/${id}`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
+      ...[`>comp-${id}<`, "style-demo-stage", ">API<"].map((text) =>
+        ["assert", [".includes?", "html", `|${text}`], `|Component page ${id} is missing ${text}`])]);
+  }
+  // Component pages and API tables must cover every component and match respo-ui.schema.
+  const source = original.toString();
+  const docIds = [...source.matchAll(/ComponentDoc :id \|([\w-]+)/g)].map((m) => m[1]);
+  assert.deepEqual(docIds, componentIds, "respo-ui.comp.component-docs/component-docs must list every component in sidebar order");
+  // The sidenav and pager both read component-docs, so its groups must appear in component-groups order.
+  const groupIds = [...source.slice(source.indexOf("def component-groups")).matchAll(/ComponentGroup :id \|([\w-]+)/g)].slice(0, categoryTitles.length).map((m) => m[1]);
+  const docGroups = [...source.matchAll(/ComponentDoc :id \|[\w-]+ :title (?:"\|[^"]*"|\|\S+) :group \|([\w-]+)/g)].map((m) => m[1]);
+  assert.equal(docGroups.length, componentIds.length, "every ComponentDoc must declare its :group");
+  assert.deepEqual([...new Set(docGroups)], groupIds, "component-docs must be grouped in component-groups order");
+  assert.ok(docGroups.every((g, i) => i === 0 || groupIds.indexOf(g) >= groupIds.indexOf(docGroups[i - 1])), "component-docs must keep each group contiguous");
+  // Every struct a component page references needs a StructDoc, or its field table silently disappears.
+  const referencedStructs = new Set([...source.matchAll(/:structs \$ \[\]([^\n]*)/g)].flatMap((m) => [...m[1].matchAll(/\|(\w+)/g)].map((n) => n[1])));
+  const structDocNames = new Set([...source.matchAll(/StructDoc :name \|(\w+)/g)].map((m) => m[1]));
+  assert.deepEqual([...referencedStructs].filter((n) => !structDocNames.has(n)), [], "every struct in ComponentDoc :structs must have a StructDoc");
+  assert.ok(referencedStructs.size > 0, "ComponentDoc :structs must be parsed");
+  const structDocs = source.slice(source.indexOf("def struct-docs"));
+  for (const [, name, body] of structDocs.matchAll(/StructDoc :name \|(\w+)[^\n]*\n((?:\s+FieldDoc[^\n]*\n)*)/g)) {
+    const documented = [...body.matchAll(/FieldDoc :name \|:([\w?-]+)/g)].map((m) => m[1]);
+    const def = source.match(new RegExp(`defstruct ${name}\\b([^\\n]*)\\n((?:\\s+[^']\\S[^\\n]*\\n)*?)\\s+:examples`));
+    assert.ok(def, `respo-ui.schema/${name} must exist`);
+    const lines = def[2].split("\n").filter((l) => l.trim());
+    const base = lines.length ? Math.min(...lines.map((l) => l.length - l.trimStart().length)) : 0;
+    const declared = [...def[1].matchAll(/\(:([\w?-]+) /g)].map((m) => m[1])
+      .concat(lines.filter((l) => l.length - l.trimStart().length === base).map((l) => l.trim().match(/^:([\w?-]+) /)?.[1]).filter(Boolean));
+    assert.deepEqual(documented, declared, `struct-docs for ${name} must list the fields of respo-ui.schema/${name}`);
+  }
   operations.push(["edit", "def", pages, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-js-pages", [], ...pageScenarios, "&unit"])]);
   operations.push(["edit", "schema", pages, "--input-format", "cirru", "--code",

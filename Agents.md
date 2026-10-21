@@ -48,17 +48,22 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
   sharing `:name`, `role`/`aria-*` attributes for state.
 - Reuse existing item structs (`SelectOption` serves both select and radio
   group) before adding new ones.
-- New components get a `demo-block` in the matching category of the components
-  page (`comp-demo-form-controls`, `comp-demo-navigation`, and so on), a chip in
-  `comp-component-index`, and a name in that namespace's `respo-ui.comp :refer`
-  list. `demo-block id title options-struct description & exprs` renders the
-  expressions live and shows the same expressions as Cirru code, generated when
-  the macro expands, so write short struct names (`ButtonOptions`, referred from
-  `respo-ui.schema`) and wrap siblings in one `div` only when the layout needs it.
-  Also add the component id to `componentIds` in `scripts/test-ui-js.mjs`, which
-  is hand-written; the replay test then checks that the new block renders.
+- Every component has its own page at `#/component/<id>`. A new component needs:
+  a branch in `respo-ui.comp.components/component-demo`, whose `demo-example`
+  macro renders the expressions live and shows the same expressions as Cirru
+  code, so write short struct names (`ButtonOptions`, referred from
+  `respo-ui.schema`) and wrap siblings in one `div` only when the layout needs it;
+  a `ComponentDoc` in `respo-ui.comp.component-docs/component-docs` (title,
+  group, signature, summary, positional arguments, structs shown in the API
+  tables), placed next to the other docs of its group because the sidenav,
+  the home cards and the previous/next pager all read that order; a `StructDoc`
+  in `struct-docs` for any new options or item struct; and its id in
+  `componentIds` in `scripts/test-ui-js.mjs`. The replay test renders every page
+  and fails when `component-docs` is out of group order, a referenced struct has
+  no `StructDoc`, or a `StructDoc` field list drifts from `respo-ui.schema`.
 - The site shell lives in `respo-ui.comp.sidebar` (`comp-topbar`, `comp-sidenav`, and
-  `component-groups`, which also feeds the index chips and the home category cards).
+  `component-groups`, the category ids and titles; `group-item-ids` lists a group's
+  components from `component-docs`).
   The version shown there comes from `respo-ui.config/version`; bump it with `deps.cirru`.
 
 ## Styles
