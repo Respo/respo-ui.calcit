@@ -20,7 +20,7 @@ value and `d!`. The full list with signatures and examples is in
 
 新增组件：单选组、表单字段、徽标、面包屑、分页、步骤条、折叠面板、按键提示和
 文字提示。`comp-input` 与 `comp-textarea` 新增 `:on-change`，回调收到输入值和 `d!`。
-完整列表见 [docs/components.md](docs/components.md)。当前候选配对正式 Calcit 0.30.1；
+完整列表见 [docs/components.md](docs/components.md)。0.8.0 已正式发布，配对正式 Calcit 0.30.1；
 依赖版本及升级边界见下文。
 
 ### Dependency boundary
@@ -50,12 +50,12 @@ Action 内置的逐文件公网下载与 checksum 校验，沿用默认 `verify-
 
 ### Calcit 0.30.1 配对迁移
 
-使用者影响：UI `0.8.0` 候选使用已发布的 Respo `0.16.124`、Router `0.8.37`
+使用者影响：UI `0.8.0` 正式版使用已发布的 Respo `0.16.124`、Router `0.8.37`
 和 JS-FFI `0.2.5`，Calcit CLI/runtime 成对固定为正式 `0.30.1`。
 保留 main 现有的 0.8.0 新组件和输入回调 API，不退回 0.7.x，也不切换至
 Respo 0.17 的破坏性 dispatch 接口。本次配对不改组件源码、样式、路由或渲染行为；
 应用中的其他模块也需请求相同的 Respo / Router / JS-FFI
-版本，不能只改根依赖或放宽 Caps strict。本模块发版前，不要把候选分支当作发布依赖。
+版本，不能只改根依赖或放宽 Caps strict。使用正式 tag `0.8.0`，不要以候选分支代替发布依赖。
 
 路由适配先处理 Map 查询的 Option，再校验路径 List 与首个 Enum；缺失或空路径
 回到首页。404 payload 按 Router 的真实契约校验为 `List<String>`，再以 `/` 拼接为
@@ -89,8 +89,12 @@ CI 保留 21 个项目命名空间的显式检查，并将普通入口检查替�
 隔离 Snapshot，不修改 canonical 源码或模块缓存，也不修补生成文件的跨模块路径。
 组件 CSS 依赖 JS 宿主，不宣称支持 native 或 WASM 渲染。
 
-最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
-该步骤不代替 Reel/Alerts/Diary 的完整应用验收。
+`0.8.0` 发布提交为 `2fe5e239010585d11f7283c2aafbf9792bc26cba`，合并后的
+[main CI 与原 Demo 部署](https://github.com/Respo/respo-ui.calcit/actions/runs/39570598757)
+通过；[正式 release](https://github.com/Respo/respo-ui.calcit/releases/tag/0.8.0)
+已发布。Message 原源码在同图下的全定义 181/181、完整 strict、原 unit 4/4 和 JS
+codegen 通过；源码回归不代表 Message 自身的 npm 图已迁移，也不代替
+Reel/Alerts/Diary 的完整应用验收。
 
 Snapshot 只修正主页 Quick start 中过期的 alpha 编译器版本示例，组件实现不变。
 文档生成、组件元数据和设计 token 回归改用官方 CLI 查询的
