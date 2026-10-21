@@ -146,31 +146,25 @@
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               if
-                non-nil? $ respo-ui.schema/read-field options :src
+                .some? $ respo-ui.schema/option-field options :src
                 create-element :img $ {}
                   :src $ respo-ui.schema/read-field options :src
-                  :alt $ either (respo-ui.schema/read-field options :alt) (str text)
+                  :alt $ respo-ui.schema/field-or options :alt $ str text
                   :class-name style-avatar-image
                 <> text
           :examples $ [] $ quote
-            comp-avatar |CY $ Option :some $ respo-ui.schema/AvatarOptions :title (Option :some "|Chen Yong") :size (Option :some :large)
+            comp-avatar |CY $ respo-ui.schema/opts respo-ui.schema/AvatarOptions :title "|Chen Yong" :size :large
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/AvatarOptions
         'comp-badge $ %{} 'CodeEntry
           :doc "|Render a small count or status badge. Options: :kind (:info, :success, :warning, :error), :dot? (render a dot and expose content as aria-label), :class-name, and :style."
           :code $ quote $ defcomp comp-badge (content options)
             let
-                dot? $ or (respo-ui.schema/read-field options :dot?) false
+                dot? $ respo-ui.schema/field-or options :dot? false
               span
                 {}
                   :class-name $ str-spaced style-badge
-                    match
-                      either (respo-ui.schema/read-field options :kind) :neutral
-                      :info style-badge-info
-                      :success style-badge-success
-                      :warning style-badge-warning
-                      :error style-badge-error
-                      _ |
+                    match (respo-ui.schema/field-or options :kind :neutral) (:info style-badge-info) (:success style-badge-success) (:warning style-badge-warning) (:error style-badge-error) (_ |)
                     if dot? style-badge-dot
                     respo-ui.schema/read-field options :class-name
                   :role $ if dot? |img
@@ -178,7 +172,7 @@
                   :style $ respo-ui.schema/read-field options :style
                 if dot? nil $ <> content
           :examples $ [] $ quote
-            comp-badge |12 $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :error)
+            comp-badge |12 $ respo-ui.schema/opts respo-ui.schema/BadgeOptions :kind :error
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/BadgeOptions
           :tests $ [] $ %{} 'TestEntry (:name |render-options)
@@ -200,7 +194,7 @@
           :doc "|Render a breadcrumb trail. Items with :href render links; the last item is marked aria-current=page. Options: :separator (default /), :class-name, and :style."
           :code $ quote $ defcomp comp-breadcrumb (items options)
             let
-                separator $ either (respo-ui.schema/read-field options :separator) |/
+                separator $ respo-ui.schema/field-or options :separator |/
                 last-idx $ dec $ count items
               create-element :nav
                 {} (:aria-label |Breadcrumb)
@@ -248,8 +242,8 @@
           :code $ quote $ defcomp comp-button (content options)
             button
               {}
-                :type $ either (respo-ui.schema/read-field options :type) |button
-                :disabled $ or (respo-ui.schema/read-field options :disabled) false
+                :type $ respo-ui.schema/field-or options :type |button
+                :disabled $ respo-ui.schema/field-or options :disabled false
                 :class-name $ str-spaced
                   match (respo-ui.schema/read-field options :kind) (:primary css/button-primary) (:danger css/button-danger) (:danger-outline css/button-danger-outline) (_ css/button)
                   respo-ui.schema/read-field options :class-name
@@ -259,7 +253,7 @@
                 <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
                 , content
           :examples $ [] $ quote
-            comp-button |Save $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :primary)
+            comp-button |Save $ respo-ui.schema/opts respo-ui.schema/ButtonOptions :kind :primary
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content $ :: 'calcit.core/Option 'respo-ui.schema/ButtonOptions
             :generics $ [] 'Content
@@ -271,25 +265,24 @@
                 :class-name $ str-spaced style-card $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               when
-                non-nil? $ respo-ui.schema/read-field options :title
+                .some? $ respo-ui.schema/option-field options :title
                 div
                   {} $ :class-name style-card-title
                   <> $ if
-                    nil? $ either (respo-ui.schema/read-field options :title) |
-                    , | $ respo.util.format/scalar-attribute-text
-                      either (respo-ui.schema/read-field options :title) |
+                    nil? $ respo-ui.schema/field-or options :title |
+                    , | $ respo.util.format/scalar-attribute-text (respo-ui.schema/field-or options :title |)
               div
                 {} $ :class-name style-card-body
                 if (literal? content)
                   <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
                   , content
               when
-                non-nil? $ respo-ui.schema/read-field options :footer
+                .some? $ respo-ui.schema/option-field options :footer
                 div
                   {} $ :class-name style-card-footer
                   respo-ui.schema/read-field options :footer
           :examples $ [] $ quote
-            comp-card |Content $ Option :some $ respo-ui.schema/CardOptions :title (Option :some |Summary)
+            comp-card |Content $ respo-ui.schema/opts respo-ui.schema/CardOptions :title |Summary
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content $ :: 'calcit.core/Option 'respo-ui.schema/CardOptions
             :generics $ [] 'Content
@@ -312,7 +305,7 @@
                 :class-name $ str-spaced css/checkbox-label $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               input $ {} (:type |checkbox) (:class-name css/checkbox) (:checked checked)
-                :disabled $ or (respo-ui.schema/read-field options :disabled) false
+                :disabled $ respo-ui.schema/field-or options :disabled false
                 :on $ {} $ :input
                   fn (e d!)
                     hint-fn $ {}
@@ -336,10 +329,10 @@
                           , d!
                     , &unit
               if
-                non-nil? $ respo-ui.schema/read-field options :label
+                .some? $ respo-ui.schema/option-field options :label
                 <> $ str $ respo-ui.schema/read-field options :label
           :examples $ [] $ quote
-            comp-checkbox true $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Remember me")
+            comp-checkbox true $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Remember me"
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Bool $ :: 'calcit.core/Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
@@ -388,7 +381,7 @@
                   <> $ respo.util.format/scalar-attribute-text content
                   , content
           :examples $ [] $ quote
-            comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ Option :some $ respo-ui.schema/CollapseOptions :open? (Option :some true)
+            comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ respo-ui.schema/opts respo-ui.schema/CollapseOptions :open? true
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String 'Content $ :: 'calcit.core/Option 'respo-ui.schema/CollapseOptions
             :generics $ [] 'Content
@@ -425,11 +418,11 @@
           :code $ quote $ defcomp comp-divider (options)
             div $ {} (:role |separator)
               :class-name $ str-spaced
-                if (respo-ui.schema/read-field options :vertical?) style-divider-vertical style-divider
+                if (respo-ui.schema/field-or options :vertical? false) style-divider-vertical style-divider
                 respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
           :examples $ [] $ quote
-            comp-divider $ Option :some $ respo-ui.schema/DividerOptions :vertical? (Option :some true)
+            comp-divider $ respo-ui.schema/opts respo-ui.schema/DividerOptions :vertical? true
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/DividerOptions
         'comp-empty $ %{} 'CodeEntry
@@ -442,22 +435,22 @@
               div
                 {} $ :class-name style-empty-icon
                 if
-                  non-nil? $ respo-ui.schema/read-field options :icon
+                  .some? $ respo-ui.schema/option-field options :icon
                   respo-ui.schema/read-field options :icon
                   <> "|◇"
               div
                 {} $ :class-name style-empty-title
                 <> title
               when
-                non-nil? $ respo-ui.schema/read-field options :description
+                .some? $ respo-ui.schema/option-field options :description
                 div
                   {} $ :class-name style-empty-description
-                  <> $ either (respo-ui.schema/read-field options :description) |
+                  <> $ respo-ui.schema/field-or options :description |
               when
-                non-nil? $ respo-ui.schema/read-field options :action
+                .some? $ respo-ui.schema/option-field options :action
                 div ({}) (respo-ui.schema/read-field options :action)
           :examples $ [] $ quote
-            comp-empty "|No results" $ Option :some $ respo-ui.schema/EmptyOptions :description (Option :some "|Try another search term.")
+            comp-empty "|No results" $ respo-ui.schema/opts respo-ui.schema/EmptyOptions :description "|Try another search term."
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/EmptyOptions
         'comp-field $ %{} 'CodeEntry
@@ -471,22 +464,22 @@
                 {} (:class-name style-field-label)
                   :for $ respo-ui.schema/read-field options :for
                 <> label
-                if (respo-ui.schema/read-field options :required?)
+                if (respo-ui.schema/field-or options :required? false)
                   span $ {} (:class-name style-field-required) (:aria-hidden |true) (:inner-text |*)
               , control
                 when
-                  non-nil? $ respo-ui.schema/read-field options :description
+                  .some? $ respo-ui.schema/option-field options :description
                   div
                     {} $ :class-name style-field-description
-                    <> $ either (respo-ui.schema/read-field options :description) |
+                    <> $ respo-ui.schema/field-or options :description |
                 when
-                  non-nil? $ respo-ui.schema/read-field options :error
+                  .some? $ respo-ui.schema/option-field options :error
                   div
                     {} (:class-name style-field-error) (:role |alert)
-                    <> $ either (respo-ui.schema/read-field options :error) |
+                    <> $ respo-ui.schema/field-or options :error |
           :examples $ [] $ quote
             comp-field |Email
-              comp-input | $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |you@example.com)
+              comp-input | $ respo-ui.schema/opts respo-ui.schema/InputOptions :placeholder |you@example.com
               Option :some $ respo-ui.schema/FieldOptions :description (Option :some "|Used for notifications.") :required? $ Option :some true
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String 'Control $ :: 'calcit.core/Option 'respo-ui.schema/FieldOptions
@@ -511,15 +504,15 @@
           :code $ quote $ defcomp comp-input (value options)
             input $ {}
               :id $ respo-ui.schema/read-field options :id
-              :type $ either (respo-ui.schema/read-field options :type) |text
+              :type $ respo-ui.schema/field-or options :type |text
               :value value
               :placeholder $ respo-ui.schema/read-field options :placeholder
-              :disabled $ or (respo-ui.schema/read-field options :disabled) false
+              :disabled $ respo-ui.schema/field-or options :disabled false
               :class-name $ str-spaced css/input $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
               :on-input $ input-handler options
           :examples $ [] $ quote
-            comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Search)
+            comp-input |query $ respo-ui.schema/opts respo-ui.schema/InputOptions :placeholder |Search
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/InputOptions 'Op)
             :generics $ [] 'Op
@@ -572,7 +565,7 @@
                           render-page-button page total n (str n) (str "|Page " n) options
                   [] $ [] |next $ render-page-button page total (inc page) "|›" "|Next page" options
           :examples $ [] $ quote
-            comp-pagination 5 20 $ Option :some $ respo-ui.schema/PaginationOptions :siblings (Option :some 1)
+            comp-pagination 5 20 $ respo-ui.schema/opts respo-ui.schema/PaginationOptions :siblings 1
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Number 'Number $ :: 'calcit.core/Option (:: 'respo-ui.schema/PaginationOptions 'Op)
             :generics $ [] 'Op
@@ -630,7 +623,7 @@
               {} (:role |radiogroup)
                 :aria-label $ respo-ui.schema/read-field options :label
                 :class-name $ str-spaced style-radio-group
-                  if (respo-ui.schema/read-field options :vertical?) style-radio-group-vertical
+                  if (respo-ui.schema/field-or options :vertical? false) style-radio-group-vertical
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               -> items $ map $ fn (item)
@@ -686,7 +679,7 @@
             create-list-element :select
               {} (:value value)
                 :id $ respo-ui.schema/read-field options :id
-                :disabled $ or (respo-ui.schema/read-field options :disabled) false
+                :disabled $ respo-ui.schema/field-or options :disabled false
                 :class-name $ str-spaced css/select $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
                 :on-change $ fn (e d!)
@@ -719,7 +712,7 @@
           :examples $ [] $ quote
             comp-select |calcit
               [] $ respo-ui.schema/SelectOption :value |calcit :label |Calcit
-              Option :some $ respo-ui.schema/SelectOptions
+              respo-ui.schema/opts respo-ui.schema/SelectOptions
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String (:: 'List 'respo-ui.schema/SelectOption)
               :: 'calcit.core/Option $ :: 'respo-ui.schema/SelectOptions 'Op
@@ -729,22 +722,22 @@
           :code $ quote $ defcomp comp-skeleton (options)
             div $ {}
               :role $ if
-                non-nil? $ respo-ui.schema/read-field options :label
+                .some? $ respo-ui.schema/option-field options :label
                 , |status |
               :aria-label $ respo-ui.schema/read-field options :label
-              :aria-hidden $ nil? $ respo-ui.schema/read-field options :label
+              :aria-hidden $ .none? $ respo-ui.schema/option-field options :label
               :class-name $ str-spaced style-skeleton
                 if
-                  = :circle $ either (respo-ui.schema/read-field options :kind) :text
+                  = :circle $ respo-ui.schema/field-or options :kind :text
                   , style-skeleton-circle style-skeleton-text
                 respo-ui.schema/read-field options :class-name
               :style $ ui/merge-styles
                 {}
                   :width $ respo-ui.schema/read-field options :width
                   :height $ respo-ui.schema/read-field options :height
-                either (respo-ui.schema/read-field options :style) ({})
+                respo-ui.schema/field-or options :style $ {}
           :examples $ [] $ quote
-            comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :some "|Loading title") :width (Option :some |60%)
+            comp-skeleton $ respo-ui.schema/opts respo-ui.schema/SkeletonOptions :label "|Loading title" :width |60%
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/SkeletonOptions
         'comp-snippet $ %{} 'CodeEntry
@@ -766,11 +759,11 @@
           :doc "|Render an accessible loading spinner. Options support :label, :class-name, and :style."
           :code $ quote $ defcomp comp-spinner (options)
             span $ {} (:role |status)
-              :aria-label $ either (respo-ui.schema/read-field options :label) |Loading
+              :aria-label $ respo-ui.schema/field-or options :label |Loading
               :class-name $ str-spaced style-spinner $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
           :examples $ [] $ quote
-            comp-spinner $ Option :some $ respo-ui.schema/SpinnerOptions :label (Option :some "|Loading results")
+            comp-spinner $ respo-ui.schema/opts respo-ui.schema/SpinnerOptions :label "|Loading results"
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] $ :: 'calcit.core/Option 'respo-ui.schema/SpinnerOptions
         'comp-steps $ %{} 'CodeEntry
@@ -779,7 +772,7 @@
             create-list-element :ol
               {}
                 :class-name $ str-spaced style-steps
-                  if (respo-ui.schema/read-field options :vertical?) style-steps-vertical
+                  if (respo-ui.schema/field-or options :vertical? false) style-steps-vertical
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               -> items $ map-indexed $ fn (idx item)
@@ -827,11 +820,11 @@
             create-element :label
               {}
                 :class-name $ str-spaced style-switch-label
-                  if (respo-ui.schema/read-field options :disabled) style-control-disabled
+                  if (respo-ui.schema/field-or options :disabled false) style-control-disabled
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               input $ {} (:type |checkbox) (:checked checked)
-                :disabled $ or (respo-ui.schema/read-field options :disabled) false
+                :disabled $ respo-ui.schema/field-or options :disabled false
                 :aria-label $ respo-ui.schema/read-field options :label
                 :class-name style-switch-input
                 :on-input $ fn (e d!)
@@ -862,11 +855,11 @@
               span $ {} $ :class-name
                 str-spaced style-switch-track $ if checked style-switch-track-checked
               when
-                non-nil? $ respo-ui.schema/read-field options :label
+                .some? $ respo-ui.schema/option-field options :label
                 span ({})
-                  <> $ either (respo-ui.schema/read-field options :label) |
+                  <> $ respo-ui.schema/field-or options :label |
           :examples $ [] $ quote
-            comp-switch false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Compact mode")
+            comp-switch false $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Compact mode"
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Bool $ :: 'calcit.core/Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
@@ -948,8 +941,7 @@
                   match kind (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error) (_ |)
                   respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-                :on-click $ either (respo-ui.schema/read-field options :on-click)
-                  fn $ e d!
+                :on-click $ respo-ui.schema/field-or options :on-click $ fn (e d!)
               <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
           :examples $ [] $ quote
             comp-tag :success |Stable $ Option :none
@@ -962,12 +954,12 @@
             textarea $ {} (:value value)
               :id $ respo-ui.schema/read-field options :id
               :placeholder $ respo-ui.schema/read-field options :placeholder
-              :disabled $ or (respo-ui.schema/read-field options :disabled) false
+              :disabled $ respo-ui.schema/field-or options :disabled false
               :class-name $ str-spaced css/textarea $ respo-ui.schema/read-field options :class-name
               :style $ respo-ui.schema/read-field options :style
               :on-input $ input-handler options
           :examples $ [] $ quote
-            comp-textarea |notes $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Notes)
+            comp-textarea |notes $ respo-ui.schema/opts respo-ui.schema/InputOptions :placeholder |Notes
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/InputOptions 'Op)
             :generics $ [] 'Op
@@ -996,7 +988,7 @@
                 , content
               span $ {} (:role |tooltip) (:class-name style-tooltip-tip) (:inner-text tip)
           :examples $ [] $ quote
-            comp-tooltip |Save "|Saves the draft" $ Option :some $ respo-ui.schema/TooltipOptions :placement (Option :some :bottom)
+            comp-tooltip |Save "|Saves the draft" $ respo-ui.schema/opts respo-ui.schema/TooltipOptions :placement :bottom
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content 'String $ :: 'calcit.core/Option 'respo-ui.schema/TooltipOptions
             :generics $ [] 'Content
@@ -2427,9 +2419,9 @@
                 comp-card "|Cards hold any content: text or nodes." $ Option :some $ CardOptions :title (Option :some |Summary) :footer
                   Option :some $ comp-button |Open
               |avatar $ demo-example
-                comp-avatar |CY $ Option :some $ AvatarOptions :title (Option :some "|Small avatar") :size (Option :some :small)
-                comp-avatar |RS $ Option :some $ AvatarOptions :title (Option :some "|Default avatar")
-                comp-avatar |UI $ Option :some $ AvatarOptions :title (Option :some "|Large avatar") :size (Option :some :large)
+                comp-avatar |CY $ respo-ui.schema/opts AvatarOptions :title "|Small avatar" :size :small
+                comp-avatar |RS $ respo-ui.schema/opts AvatarOptions :title "|Default avatar"
+                comp-avatar |UI $ respo-ui.schema/opts AvatarOptions :title "|Large avatar" :size :large
               |tag $ demo-example (comp-tag :default |default) (comp-tag :info |info) (comp-tag :success |success) (comp-tag :warning |warning) (comp-tag :error |error)
               |attributes $ demo-example $ div
                 {} $ :style $ {} (:width |560px) (:max-width |100%)
@@ -2439,7 +2431,7 @@
               |divider $ demo-example $ div
                 {} $ :class-name $ str-spaced css/row-middle css/gap8
                 comp-button |Previous
-                comp-divider $ Option :some $ DividerOptions :vertical? (Option :some true)
+                comp-divider $ respo-ui.schema/opts DividerOptions :vertical? true
                 comp-button |Next
               |time $ demo-example
                 comp-time $ current-iso-string
@@ -2448,15 +2440,15 @@
                 {}
                   :class-name $ str-spaced css/column css/gap8
                   :style $ {} (:width |420px) (:max-width |100%)
-                comp-collapse "|What does Respo UI include?" "|Form controls, navigation, feedback and display components with typed options." $ Option :some $ CollapseOptions :open? (Option :some true) :name (Option :some |demo-faq)
-                comp-collapse "|Does it need JavaScript to toggle?" "|No. The browser handles toggling and keyboard access." $ Option :some $ CollapseOptions :name (Option :some |demo-faq)
+                comp-collapse "|What does Respo UI include?" "|Form controls, navigation, feedback and display components with typed options." $ respo-ui.schema/opts CollapseOptions :open? true :name |demo-faq
+                comp-collapse "|Does it need JavaScript to toggle?" "|No. The browser handles toggling and keyboard access." $ respo-ui.schema/opts CollapseOptions :name |demo-faq
               |tooltip $ demo-example
                 comp-tooltip
                   comp-button |Save $ Option :none
                   , "|Saves the current draft" $ Option :none
                 comp-tooltip
                   comp-button |Publish $ Option :none
-                  , "|Shown below the trigger" $ Option :some $ TooltipOptions :placement (Option :some :bottom)
+                  , "|Shown below the trigger" $ respo-ui.schema/opts TooltipOptions :placement :bottom
               |kbd $ demo-example (<> "|Search with")
                 comp-kbd ([] |Ctrl |K) (Option :none)
                 <> |or
@@ -2473,53 +2465,53 @@
                 {} $ :style $ {} (:width |320px)
                 comp-progress 78
               |spinner $ demo-example
-                comp-spinner $ Option :some $ SpinnerOptions :label (Option :some "|Loading results")
+                comp-spinner $ respo-ui.schema/opts SpinnerOptions :label "|Loading results"
                 <> "|Loading results"
               |skeleton $ demo-example $ div
                 {}
                   :class-name $ str-spaced css/row-middle css/gap8
                   :style $ {} $ :width |320px
-                comp-skeleton $ Option :some $ SkeletonOptions :label (Option :some "|Loading avatar") :kind (Option :some :circle)
+                comp-skeleton $ respo-ui.schema/opts SkeletonOptions :label "|Loading avatar" :kind :circle
                 div
                   {} $ :class-name $ str-spaced css/column css/gap8 css/expand
-                  comp-skeleton $ Option :some $ SkeletonOptions :width (Option :some |48%)
-                  comp-skeleton $ Option :some $ SkeletonOptions :width (Option :some |72%)
+                  comp-skeleton $ respo-ui.schema/opts SkeletonOptions :width |48%
+                  comp-skeleton $ respo-ui.schema/opts SkeletonOptions :width |72%
               |empty $ demo-example $ comp-empty "|No components found"
                 Option :some $ EmptyOptions :description $ Option :some "|Try another search term or clear the filters."
               |badge $ demo-example
                 comp-badge |3 $ Option :none
-                comp-badge |12 $ Option :some $ BadgeOptions :kind (Option :some :info)
-                comp-badge |New $ Option :some $ BadgeOptions :kind (Option :some :success)
-                comp-badge |99+ $ Option :some $ BadgeOptions :kind (Option :some :error)
-                comp-badge "|Unread messages" $ Option :some $ BadgeOptions :kind (Option :some :warning) :dot? (Option :some true)
+                comp-badge |12 $ respo-ui.schema/opts BadgeOptions :kind :info
+                comp-badge |New $ respo-ui.schema/opts BadgeOptions :kind :success
+                comp-badge |99+ $ respo-ui.schema/opts BadgeOptions :kind :error
+                comp-badge "|Unread messages" $ respo-ui.schema/opts BadgeOptions :kind :warning :dot? true
               |button $ demo-example (comp-button |Default)
-                comp-button |Primary $ Option :some $ ButtonOptions :kind (Option :some :primary)
-                comp-button |Danger $ Option :some $ ButtonOptions :kind (Option :some :danger)
-                comp-button "|Danger outline" $ Option :some $ ButtonOptions :kind (Option :some :danger-outline)
-                comp-button |Disabled $ Option :some $ ButtonOptions :disabled (Option :some true)
+                comp-button |Primary $ respo-ui.schema/opts ButtonOptions :kind :primary
+                comp-button |Danger $ respo-ui.schema/opts ButtonOptions :kind :danger
+                comp-button "|Danger outline" $ respo-ui.schema/opts ButtonOptions :kind :danger-outline
+                comp-button |Disabled $ respo-ui.schema/opts ButtonOptions :disabled true
               |input $ demo-example
-                comp-input | $ Option :some $ InputOptions :placeholder (Option :some "|Search components")
-                comp-input |Respo $ Option :some $ InputOptions :disabled (Option :some true)
+                comp-input | $ respo-ui.schema/opts InputOptions :placeholder "|Search components"
+                comp-input |Respo $ respo-ui.schema/opts InputOptions :disabled true
               |textarea $ demo-example $ comp-textarea |
                 Option :some $ InputOptions :placeholder $ Option :some "|Notes about this component"
               |select $ demo-example
                 comp-select |calcit language-options $ Option :none
-                comp-select |clojure language-options $ Option :some $ SelectOptions :disabled (Option :some true)
+                comp-select |clojure language-options $ respo-ui.schema/opts SelectOptions :disabled true
               |checkbox $ demo-example
-                comp-checkbox true $ Option :some $ SwitchOptions :label (Option :some |Subscribed)
-                comp-checkbox false $ Option :some $ SwitchOptions :label (Option :some |Unchecked)
+                comp-checkbox true $ respo-ui.schema/opts SwitchOptions :label |Subscribed
+                comp-checkbox false $ respo-ui.schema/opts SwitchOptions :label |Unchecked
               |switch $ demo-example
-                comp-switch true $ Option :some $ SwitchOptions :label (Option :some "|Compact mode")
-                comp-switch false $ Option :some $ SwitchOptions :label (Option :some |Disabled) :disabled (Option :some true)
+                comp-switch true $ respo-ui.schema/opts SwitchOptions :label "|Compact mode"
+                comp-switch false $ respo-ui.schema/opts SwitchOptions :label |Disabled :disabled true
               |radio-group $ demo-example $ comp-radio-group |calcit language-options
                 Option :some $ RadioGroupOptions :name (Option :some |demo-language) :label $ Option :some |Language
               |field $ demo-example $ div
                 {} $ :class-name $ str-spaced css/column css/gap16
                 comp-field |Email
-                  comp-input | $ Option :some $ InputOptions :placeholder (Option :some |you@example.com)
+                  comp-input | $ respo-ui.schema/opts InputOptions :placeholder |you@example.com
                   Option :some $ FieldOptions :description (Option :some "|Used for notifications.") :required? $ Option :some true
                 comp-field |Name
-                  comp-input | $ Option :some $ InputOptions :placeholder (Option :some |Name)
+                  comp-input | $ respo-ui.schema/opts InputOptions :placeholder |Name
                   Option :some $ FieldOptions :error $ Option :some "|Name is required."
               |tabs $ demo-example
                 div
@@ -3623,13 +3615,13 @@
               comp-card
                 div
                   {} $ :class-name $ str-spaced css/column css/gap8
-                  comp-input | $ Option :some $ InputOptions :placeholder (Option :some "|Search components")
+                  comp-input | $ respo-ui.schema/opts InputOptions :placeholder "|Search components"
                   comp-select |calcit language-options $ Option :none
-                  comp-switch true $ Option :some $ SwitchOptions :label (Option :some "|Compact mode")
+                  comp-switch true $ respo-ui.schema/opts SwitchOptions :label "|Compact mode"
                   div
                     {} $ :class-name $ str-spaced css/row css/gap8
                     comp-button |Cancel
-                    comp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)
+                    comp-button |Save $ respo-ui.schema/opts ButtonOptions :kind :primary
                 Option :some $ CardOptions :title $ Option :some "|Form controls"
               comp-card
                 div
@@ -3639,8 +3631,8 @@
                   comp-progress 72
                   div
                     {} $ :class-name $ str-spaced css/row-middle css/gap8
-                    comp-badge |12 $ Option :some $ BadgeOptions :kind (Option :some :info)
-                    comp-badge |New $ Option :some $ BadgeOptions :kind (Option :some :success)
+                    comp-badge |12 $ respo-ui.schema/opts BadgeOptions :kind :info
+                    comp-badge |New $ respo-ui.schema/opts BadgeOptions :kind :success
                     comp-tag :info |beta
                     comp-tag :error |deprecated
                 Option :some $ CardOptions :title $ Option :some |Feedback
@@ -3661,9 +3653,9 @@
                   {} $ :class-name $ str-spaced css/column css/gap16
                   div
                     {} $ :class-name $ str-spaced css/row-middle css/gap8
-                    comp-avatar |CY $ Option :some $ AvatarOptions :size (Option :some :small)
+                    comp-avatar |CY $ respo-ui.schema/opts AvatarOptions :size :small
                     comp-avatar |RS $ Option :none
-                    comp-avatar |UI $ Option :some $ AvatarOptions :size (Option :some :large)
+                    comp-avatar |UI $ respo-ui.schema/opts AvatarOptions :size :large
                   div
                     {} $ :class-name $ str-spaced css/row-middle css/gap8
                     <> "|Search with"
@@ -4507,11 +4499,11 @@
               div ({})
                 div ({}) (<> |Checkboxes ui/text-label)
                 =< 0 4
-                comp-checkbox false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Option A")
+                comp-checkbox false $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Option A"
                 =< 0 4
-                comp-checkbox true $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Option B (default checked)")
+                comp-checkbox true $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Option B (default checked)"
                 =< 0 4
-                comp-checkbox false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Option C (disabled)") :disabled (Option :some true)
+                comp-checkbox false $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Option C (disabled)" :disabled true
               =< 0 8
               comp-tags-styles
           :examples $ []
@@ -5231,6 +5223,18 @@
         :code $ quote $ ns respo-ui.router
     'respo-ui.schema $ %{} 'FileEntry
       :defs $ {}
+        '&opts-fields $ %{} 'CodeEntry
+          :doc "|Internal helper of `opts`: wraps every value of a field/value list in `Option :some`."
+          :code $ quote $ defn &opts-fields (pairs)
+            if
+              even? $ count pairs
+              map-indexed pairs $ fn (idx node)
+                if (even? idx) node $ [] 'calcit.core/Option :some node
+              raise "|opts expects field and value pairs"
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ [] $ :: 'List 'Dynamic
+            :return $ :: 'List 'Dynamic
         'AttributesOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-attributes. Item keeps the collection item type visible to callers."
           :code $ quote $ defstruct AttributesOptions
@@ -5524,7 +5528,58 @@
           :examples $ [] $ quote
             TooltipOptions :placement $ Option :some :bottom
           :schema $ :: 'Enum
-        'read-field $ %{} 'CodeEntry (:doc |)
+        'field-or $ %{} 'CodeEntry
+          :doc "|Read an optional field from optional options, falling back to `default` when either the options or the field is none: `field-or options :disabled false`."
+          :code $ quote $ defmacro field-or (value field default)
+            let
+                option-value $ gensym |option-value
+                field-value $ gensym |field-value
+              quasiquote $ match ~value
+                (:some ~option-value)
+                  match (~field ~option-value)
+                    (:some ~field-value) ~field-value
+                    (:none) ~default
+                (:none) ~default
+          :examples $ [] $ quote
+            field-or (opts ButtonOptions :kind :primary) :disabled false
+          :schema $ :: 'Macro $ {}
+            :capabilities $ #{}
+            :expansion $ :: 'Expr 'Dynamic
+            :required $ [] 'Syntax 'Syntax 'Syntax
+        'option-field $ %{} 'CodeEntry
+          :doc "|Read an optional field from optional options and keep it as an Option, for `match` or `.some?` checks."
+          :code $ quote $ defmacro option-field (value field)
+            let
+                option-value $ gensym |option-value
+              quasiquote $ match ~value
+                (:some ~option-value) (~field ~option-value)
+                (:none) (calcit.core/Option :none)
+          :examples $ [] $ quote
+            option-field (opts ButtonOptions :kind :primary) :kind
+          :schema $ :: 'Macro $ {}
+            :capabilities $ #{}
+            :expansion $ :: 'Expr 'Dynamic
+            :required $ [] 'Syntax 'Syntax
+        'opts $ %{} 'CodeEntry
+          :doc "|Shorthand for typed component options: `opts ButtonOptions :kind :primary :on-click f` expands to `Option :some $ ButtonOptions :kind (Option :some :primary) :on-click (Option :some f)`. Fields you leave out stay `Option :none`."
+          :code $ quote $ defmacro opts (struct-name & pairs)
+            let
+                fields $ &opts-fields pairs
+              quasiquote $ calcit.core/Option :some $ ~struct-name ~@fields
+          :examples $ [] $ quote (opts ButtonOptions :kind :primary :type |submit)
+          :schema $ :: 'Macro $ {} (:rest 'Syntax)
+            :capabilities $ #{}
+            :expansion $ :: 'Expr 'Dynamic
+            :required $ [] 'Syntax
+          :tests $ [] $ %{} 'TestEntry (:name |reads-shorthand-options)
+            :code $ quote $ let
+                options $ respo-ui.schema/opts PresentationOptions :class-name |status
+              assert= |status $ field-or options :class-name |
+              assert= |none $ field-or (respo-ui.schema/opts PresentationOptions) :class-name |none
+              assert= (calcit.core/Option :some |status) (option-field options :class-name)
+              assert= true $ .none? $ option-field (respo-ui.schema/opts PresentationOptions) :style
+        'read-field $ %{} 'CodeEntry
+          :doc "|Read an optional field from optional options and return nil when absent. Use it for DOM props, where nil means the attribute is left out; prefer `field-or` or `option-field` everywhere else."
           :code $ quote $ defmacro read-field (value field)
             let
                 option-value $ gensym |option-value
