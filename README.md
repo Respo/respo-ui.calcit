@@ -154,6 +154,29 @@ The component no longer maintains an untyped item-normalization branch.
 旧 Map/匿名 Enum 项目需在升级调用方时改用已有的具名 `TabRoute` 构造器，
 保留原 value/label；这里不放宽成 Dynamic，也不新增兼容改写规则。
 
+### Typed options shorthand / 组件选项简写
+
+`respo-ui.schema/opts` builds a typed options value without repeating
+`Option :some` on every field. Fields you leave out stay `Option :none`.
+Inside components, `field-or` reads a field with a default and `option-field`
+keeps it as an Option; `read-field` still returns nil and is meant for DOM props,
+where nil leaves the attribute out.
+
+`opts` 用于构造组件选项，省去每个字段的 `Option :some`，未写的字段保持
+`Option :none`。组件内部用 `field-or` 读取带缺省值的字段，用 `option-field`
+保留 Option；`read-field` 仍返回 nil，只用于 DOM 属性。
+
+```cirru
+ns app.demo $ :require
+  respo-ui.schema :refer $ opts field-or option-field ButtonOptions
+
+let
+    options $ opts ButtonOptions :kind :primary :type |submit
+  assert= :primary $ field-or options :kind :neutral
+  assert= false $ field-or options :disabled false
+  assert= true $ .none? $ option-field options :on-click
+```
+
 ### License
 
 MIT
