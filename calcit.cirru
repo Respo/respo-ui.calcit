@@ -2004,7 +2004,7 @@
                       <> |/
                     button
                       {} (:type |button) (:class-name style-crumb-link)
-                        :on-click $ on-route-to |components.html $ str |#category- doc.:group
+                        :on-click $ on-open-category doc.:group
                       <> $ group-title doc.:group
                   div
                     {} $ :class-name style-title-row
@@ -2057,6 +2057,26 @@
           :schema $ :: 'Fn $ {}
             :args $ [] 'String 'Number
             :return $ :: 'Option 'respo-ui.comp.component-docs/ComponentDoc
+        'on-open-category $ %{} 'CodeEntry
+          :doc "|Group crumb handler: clear the overview search so every category is rendered, then open the overview scrolled to this group."
+          :code $ quote $ defn on-open-category (group-id)
+            fn (e dispatch!)
+              hint-fn $ {}
+                :args $ [] (:: 'Map 'Tag 'Dynamic)
+                  :: 'Fn $ {}
+                    :args $ [] 'Dynamic
+                    :return 'Unit
+                :return 'Unit
+              dispatch! $ :: :states ([] :components) |
+              dispatch! $ :: :router/nav |components.html
+              match
+                query-selector $ str |#category- group-id
+                (:some el) (element-scroll-into-view! el)
+                (:none) &unit
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
+            :args $ [] 'String
+            :features $ #{} :js-ffi
         'render-api $ %{} 'CodeEntry
           :doc "|Signature, positional arguments and one table per options or item struct."
           :code $ quote $ defn render-api (doc)
@@ -2325,8 +2345,9 @@
             respo-ui.tokens :as tokens
             respo-ui.comp :refer $ comp-cirru-snippet
             respo-ui.comp.components :refer $ component-demo
-            respo-ui.comp.sidebar :refer $ on-route on-route-to component-path component-groups
+            respo-ui.comp.sidebar :refer $ on-route component-path component-groups
             respo-ui.comp.component-docs :refer $ component-docs struct-docs
+            js-ffi.browser :refer $ query-selector element-scroll-into-view!
     'respo-ui.comp.components $ %{} 'FileEntry
       :defs $ {}
         'comp-components-page $ %{} 'CodeEntry
