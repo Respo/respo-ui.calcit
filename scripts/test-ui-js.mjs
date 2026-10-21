@@ -15,8 +15,11 @@ const literalList = (code) => {
   assert.equal(code[0], "[]", "Expected a literal metadata list");
   return code.slice(1);
 };
-const constructorFields = (code) => Object.fromEntries(
-  Array.from({ length: (code.length - 1) / 2 }, (_, i) => [code[1 + i * 2], code[2 + i * 2]]));
+const constructorFields = (code) => {
+  assert.ok(Array.isArray(code) && code.length % 2 === 1, "Expected constructor key/value pairs");
+  return Object.fromEntries(
+    Array.from({ length: (code.length - 1) / 2 }, (_, i) => [code[1 + i * 2], code[2 + i * 2]]));
+};
 const stringValue = (code) => {
   assert.equal(typeof code, "string");
   assert.ok(code.startsWith("|"), "Expected a metadata string literal");
