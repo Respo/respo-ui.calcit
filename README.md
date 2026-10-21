@@ -97,7 +97,10 @@ Snapshot 只修正主页 Quick start 中过期的 alpha 编译器版本示例，
 AST，不再正则解析 Snapshot 序列化文本；示例通过 runtime 的 Cirru formatter
 生成，排版变化不改变表达式。原测试断言保留，不新增上传校验或另一套质量脚本。
 正式配对由 Linux CI 的正常 Caps 安装、不可变 Yarn 锁文件、完整 strict、公开定义、
-示例和原 JS 回归验证；浏览器交互和真实下游消费者另行验收，SSR 不代替它们。
+示例和原 JS 回归验证。原 CI 还加载已发布 Message 0.0.37 源码，使用隔离模块视图
+验证当前 UI 候选和同一正式底层依赖图：全定义、完整 strict、原 unit 测试及 JS codegen。
+消费者源码不变；该兼容性检查不是 Message 已发布依赖图或正式迁移完成的声明。
+Message 原 JS 渲染回归、完整浏览器交互另行验收，SSR 不代替它们。
 现有开放样式值、状态载荷和 FFI unsafe 边界仍需逐项收窄，本次依赖配对不表示
 类型债务清零。
 

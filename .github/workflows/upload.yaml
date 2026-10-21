@@ -58,6 +58,32 @@ jobs:
           calcit docs check-md README.md --dep ./ --failures-only
           calcit calcit.cirru js
 
+      - name: Check out released Message consumer
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Respo/respo-message.calcit
+          ref: 0.0.37
+          path: .calcit/message-consumer
+          persist-credentials: false
+
+      - name: Check Message against this UI candidate
+        working-directory: .calcit/message-consumer
+        run: |
+          set -euo pipefail
+          # Candidate compatibility test, not the consumer's published dependency graph.
+          # Only this fresh checkout's module view is changed; source stays untouched.
+          git rev-parse HEAD
+          mkdir -p .calcit/modules
+          for module in respo.calcit respo-router.calcit js-ffi; do
+            ln -s "$GITHUB_WORKSPACE/.calcit/modules/$module" ".calcit/modules/$module"
+          done
+          ln -s "$GITHUB_WORKSPACE" .calcit/modules/respo-ui.calcit
+          calcit calcit.cirru --check-only --all-defs
+          calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
+          calcit calcit.cirru test --tag unit --require-match --summary-only --format json
+          calcit calcit.cirru js
+          git diff --exit-code
+
       - name: Select CDN asset prefix
         id: asset-path
         if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
