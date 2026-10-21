@@ -71,7 +71,7 @@ jobs:
         run: |
           set -euo pipefail
           # Candidate compatibility test, not the consumer's published dependency graph.
-          # Only this fresh checkout's module view is changed; source stays untouched.
+          # Only this fresh checkout's metadata/module view changes; Snapshot source stays untouched.
           git rev-parse HEAD
           # Explicitly migrate this disposable fixture's toolchain metadata; do not
           # bypass strict preflight or claim the original alpha release was paired.
