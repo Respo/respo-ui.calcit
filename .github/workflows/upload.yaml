@@ -73,6 +73,22 @@ jobs:
           # Candidate compatibility test, not the consumer's published dependency graph.
           # Only this fresh checkout's module view is changed; source stays untouched.
           git rev-parse HEAD
+          # Explicitly migrate this disposable fixture's toolchain metadata; do not
+          # bypass strict preflight or claim the original alpha release was paired.
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const manifest = JSON.parse(readFileSync('package.json', 'utf8'));
+          manifest.dependencies['@calcit/procs'] = '0.30.1';
+          writeFileSync('package.json', JSON.stringify(manifest, null, 2) + '\n');
+          const deps = readFileSync('deps.cirru', 'utf8')
+            .replace('|0.30.1-alpha.4', '|0.30.1')
+            .replace('|0.7.41', '|0.8.0')
+            .replace('|0.16.122', '|0.16.124')
+            .replace('|0.2.3', '|0.2.5');
+          writeFileSync('deps.cirru', deps);
+          NODE
+          yarn install
+          yarn install --immutable
           mkdir -p .calcit/modules
           for module in respo.calcit respo-router.calcit js-ffi; do
             ln -s "$GITHUB_WORKSPACE/.calcit/modules/$module" ".calcit/modules/$module"
@@ -82,7 +98,7 @@ jobs:
           calcit fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status == "passed" and .diagnostics == [] then true else ., false end'
           calcit calcit.cirru test --tag unit --require-match --summary-only --format json
           calcit calcit.cirru js
-          git diff --exit-code
+          git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock'
 
       - name: Select CDN asset prefix
         id: asset-path
