@@ -92,7 +92,8 @@ CI 保留 21 个项目命名空间的显式检查，并将普通入口检查替�
 最新 HEAD 的 Actions/review 通过、合并提交部署成功之后才发布 UI 模块。
 该步骤不代替 Reel/Alerts/Diary 的完整应用验收。
 
-本次不修改 Snapshot。文档生成、组件元数据和设计 token 回归改用官方 CLI 查询的
+Snapshot 只修正主页 Quick start 中过期的 alpha 编译器版本示例，组件实现不变。
+文档生成、组件元数据和设计 token 回归改用官方 CLI 查询的
 AST，不再正则解析 Snapshot 序列化文本；示例通过 runtime 的 Cirru formatter
 生成，排版变化不改变表达式。原测试断言保留，不新增上传校验或另一套质量脚本。
 正式配对由 Linux CI 的正常 Caps 安装、不可变 Yarn 锁文件、完整 strict、公开定义、
