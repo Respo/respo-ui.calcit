@@ -2330,31 +2330,67 @@
     'respo-ui.comp.components $ %{} 'FileEntry
       :defs $ {}
         'comp-components-page $ %{} 'CodeEntry
-          :doc "|Component overview: a hero, then every component as a card grouped by category. A card opens the component's own page."
-          :code $ quote $ defcomp comp-components-page ()
-            div
-              {} $ :class-name style-components-page
+          :doc "|Component overview: a hero, a search box that filters by name, group or summary, then the matching components as cards grouped by category. A card opens the component's own page."
+          :code $ quote $ defcomp comp-components-page (states)
+            let
+                cursor $ decode-map-as
+                  either
+                    .unwrap-or (calcit.core/get states :cursor) nil
+                    []
+                  :: 'List 'Dynamic
+                query $ decode-map-as
+                  either
+                    .unwrap-or (calcit.core/get states :data) nil
+                    , |
+                  , 'String
+                matched $ filter component-docs $ fn (doc) (doc-matches? doc query)
               div
-                {} $ :class-name style-page-hero
+                {} $ :class-name style-components-page
                 div
-                  {} $ :class-name style-page-title
-                  <> |Components
+                  {} $ :class-name style-page-hero
+                  div
+                    {} $ :class-name style-page-title
+                    <> |Components
+                  div
+                    {} $ :class-name style-hero-lead
+                    <> $ str (count component-docs) "| typed components with controlled state and static CSS classes. Each one has its own page with live examples, the code that produced them and an API table."
+                  div
+                    {} $ :class-name $ str-spaced css/row css/gap8 style-resource-links
+                    render-entry |https://github.com/Respo/respo-ui.calcit |respo-ui
+                    render-entry |https://github.com/Respo/alerts.calcit |respo-alerts
+                    render-entry |https://github.com/Respo/respo-feather.calcit |respo-feather
+                    render-entry |https://github.com/Respo/respo-message.calcit |respo-message
+                    render-entry |https://github.com/Respo/respo-markdown.calcit |respo-markdown
                 div
-                  {} $ :class-name style-hero-lead
-                  <> $ str (count component-docs) "| typed components with controlled state and static CSS classes. Each one has its own page with live examples, the code that produced them and an API table."
-                div
-                  {} $ :class-name $ str-spaced css/row css/gap8 style-resource-links
-                  render-entry |https://github.com/Respo/respo-ui.calcit |respo-ui
-                  render-entry |https://github.com/Respo/alerts.calcit |respo-alerts
-                  render-entry |https://github.com/Respo/respo-feather.calcit |respo-feather
-                  render-entry |https://github.com/Respo/respo-message.calcit |respo-message
-                  render-entry |https://github.com/Respo/respo-markdown.calcit |respo-markdown
-              list-> ({})
-                map component-groups $ fn (group)
-                  [] group.:id $ render-card-group group
+                  {} $ :class-name style-search-bar
+                  comp-input query $ Option :some $ InputOptions :id (Option :some |component-search) :type (Option :some |search) :placeholder (Option :some "|Search components by name or purpose") :class-name (Option :some style-search-input) :on-change
+                    Option :some $ fn (text d!)
+                      hint-fn $ {} (:return 'Unit)
+                        :args $ [] 'String $ :: 'Fn
+                          {}
+                            :args $ [] 'Dynamic
+                            :return 'Unit
+                      d! $ :: :states cursor text
+                  div
+                    {} $ :class-name style-search-count
+                    <> $ if (blank? query)
+                      str (count component-docs) "| components"
+                      str (count matched) "| of " (count component-docs) "| components"
+                if (empty? matched)
+                  div
+                    {} $ :class-name style-card-group
+                    comp-empty "|No matching components" $ Option :some $ EmptyOptions :description
+                      Option :some $ str "|Nothing matches \"" (trim query) "|\". Try a shorter word such as input or tag."
+                  list-> ({})
+                    map
+                      filter component-groups $ fn (group)
+                        any? matched $ fn (doc) (= doc.:group group.:id)
+                      fn (group)
+                        [] group.:id $ render-card-group group $ filter matched
+                          fn (doc) (= doc.:group group.:id)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
-            :args $ []
+            :args $ [] 'Dynamic
         'component-demo $ %{} 'CodeEntry
           :doc "|Live examples for one component page, keyed by component id. Each branch renders the component and the Cirru code that produced it."
           :code $ quote $ defn component-demo (id)
@@ -2530,6 +2566,29 @@
             :expansion $ :: 'Expr 'respo.schema/Element
             :required $ []
             :rest $ :: 'Expr 'Dynamic
+        'doc-matches? $ %{} 'CodeEntry
+          :doc "|True when the query is blank or appears, ignoring ASCII case, in the doc's title, name, group or summary."
+          :code $ quote $ defn doc-matches? (doc query)
+            let
+                needle $ lower-ascii $ trim query
+              if (blank? needle) true $ includes?
+                lower-ascii $ str doc.:title "| " doc.:id "| comp-" doc.:id "| " doc.:group "| " doc.:summary
+                , needle
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'Bool)
+            :args $ [] 'respo-ui.comp.component-docs/ComponentDoc 'String
+          :tests $ [] $ %{} 'TestEntry (:name |matches-fields)
+            :code $ quote $ match
+              find component-docs $ fn (doc) (= doc.:id |radio-group)
+              (:some doc)
+                do
+                  assert= true $ doc-matches? doc "|  "
+                  assert= true $ doc-matches? doc |RADIO
+                  assert= true $ doc-matches? doc |comp-radio
+                  assert= true $ doc-matches? doc |form
+                  assert= true $ doc-matches? doc "|vertical layout"
+                  assert= false $ doc-matches? doc |tooltip
+              (:none) (raise "|radio-group doc is missing")
         'ignore-tab-route $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn ignore-tab-route (route dispatch!) &unit
           :examples $ []
@@ -2544,9 +2603,18 @@
               respo-ui.schema/SelectOption :value |rust :label |Rust :disabled $ Option :some true
           :examples $ []
           :schema $ :: 'List 'respo-ui.schema/SelectOption
+        'lower-ascii $ %{} 'CodeEntry
+          :doc "|Lower-case ASCII letters so search ignores case. Calcit has no built-in lower-case."
+          :code $ quote $ defn lower-ascii (text)
+            foldl (range 65 91) text $ fn (acc code)
+              &str:replace acc (char-from-code code)
+                char-from-code $ + code 32
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'String)
+            :args $ [] 'String
         'render-card-group $ %{} 'CodeEntry
-          :doc "|One category heading and the grid of its component cards."
-          :code $ quote $ defn render-card-group (group)
+          :doc "|One category heading and the grid of the given component cards."
+          :code $ quote $ defn render-card-group (group docs)
             div
               {}
                 :id $ str |category- group.:id
@@ -2556,13 +2624,11 @@
                 <> group.:title
               list->
                 {} $ :class-name style-card-grid
-                map
-                  filter component-docs $ fn (doc) (= doc.:group group.:id)
-                  fn (doc)
-                    [] doc.:id $ render-component-card doc
+                map docs $ fn (doc)
+                  [] doc.:id $ render-component-card doc
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
-            :args $ [] 'respo-ui.comp.sidebar/ComponentGroup
+            :args $ [] 'respo-ui.comp.sidebar/ComponentGroup $ :: 'List 'respo-ui.comp.component-docs/ComponentDoc
         'render-component-card $ %{} 'CodeEntry
           :doc "|A clickable card with the component's title, name and summary."
           :code $ quote $ defn render-component-card (doc)
@@ -2671,6 +2737,21 @@
             {} $ |& $ {} (:flex-wrap :wrap) (:margin-top tokens/space-3)
           :examples $ []
           :schema $ :: 'String
+        'style-search-bar $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-search-bar
+            {} $ |& $ {} (:display :flex) (:flex-wrap :wrap) (:align-items :center) (:gap tokens/space-3) (:margin-top tokens/space-6)
+          :examples $ []
+          :schema $ :: 'String
+        'style-search-count $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-search-count
+            {} $ |& $ {} (:font-size tokens/text-sm) (:color tokens/color-text-muted)
+          :examples $ []
+          :schema $ :: 'String
+        'style-search-input $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstyle style-search-input
+            {} $ |& $ {} (:flex 1) (:min-width |240px) (:max-width |420px)
+          :examples $ []
+          :schema $ :: 'String
       :ns $ %{} 'NsEntry
         :doc "|Component overview page and the live examples shown on each component page."
         :code $ quote $ ns respo-ui.comp.components
@@ -2722,7 +2803,8 @@
                       (:layouts) (comp-layouts-page)
                       (:fonts) (comp-fonts-page)
                       (:design) (comp-design-page)
-                      (:components) (comp-components-page)
+                      (:components)
+                        comp-components-page $ >> states :components
                       (:component id) (comp-component-page id)
                       (:utils) (comp-utils-page)
                       (:not-found pp)
