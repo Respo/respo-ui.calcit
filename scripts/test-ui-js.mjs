@@ -99,6 +99,17 @@ try {
   const source = original.toString();
   const docIds = [...source.matchAll(/ComponentDoc :id \|([\w-]+)/g)].map((m) => m[1]);
   assert.deepEqual(docIds, componentIds, "respo-ui.comp.component-docs/component-docs must list every component in sidebar order");
+  // The sidenav and pager both read component-docs, so its groups must appear in component-groups order.
+  const groupIds = [...source.slice(source.indexOf("def component-groups")).matchAll(/ComponentGroup :id \|([\w-]+)/g)].slice(0, categoryTitles.length).map((m) => m[1]);
+  const docGroups = [...source.matchAll(/ComponentDoc :id \|[\w-]+ :title (?:"\|[^"]*"|\|\S+) :group \|([\w-]+)/g)].map((m) => m[1]);
+  assert.equal(docGroups.length, componentIds.length, "every ComponentDoc must declare its :group");
+  assert.deepEqual([...new Set(docGroups)], groupIds, "component-docs must be grouped in component-groups order");
+  assert.ok(docGroups.every((g, i) => i === 0 || groupIds.indexOf(g) >= groupIds.indexOf(docGroups[i - 1])), "component-docs must keep each group contiguous");
+  // Every struct a component page references needs a StructDoc, or its field table silently disappears.
+  const referencedStructs = new Set([...source.matchAll(/:structs \$ \[\]([^\n]*)/g)].flatMap((m) => [...m[1].matchAll(/\|(\w+)/g)].map((n) => n[1])));
+  const structDocNames = new Set([...source.matchAll(/StructDoc :name \|(\w+)/g)].map((m) => m[1]));
+  assert.deepEqual([...referencedStructs].filter((n) => !structDocNames.has(n)), [], "every struct in ComponentDoc :structs must have a StructDoc");
+  assert.ok(referencedStructs.size > 0, "ComponentDoc :structs must be parsed");
   const structDocs = source.slice(source.indexOf("def struct-docs"));
   for (const [, name, body] of structDocs.matchAll(/StructDoc :name \|(\w+)[^\n]*\n((?:\s+FieldDoc[^\n]*\n)*)/g)) {
     const documented = [...body.matchAll(/FieldDoc :name \|:([\w?-]+)/g)].map((m) => m[1]);
