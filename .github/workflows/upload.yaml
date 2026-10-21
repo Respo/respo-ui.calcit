@@ -48,7 +48,7 @@ jobs:
           node scripts/gen-components-doc.mjs
           git diff --exit-code -- docs/components.md
           calcit calcit.cirru --check-only --all-defs
-          calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
+          calcit fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status == "passed" and .diagnostics == [] then true else ., false end'
           calcit calcit.cirru test --exclude-tag js-only --require-match --summary-only --format json
           yarn test:js
           calcit calcit.cirru --check-only --ns 'respo-ui.$meta' --ns respo-ui.comp --ns respo-ui.comp.component-docs --ns respo-ui.comp.component-page --ns respo-ui.comp.components --ns respo-ui.comp.container --ns respo-ui.comp.design-page --ns respo-ui.comp.docs --ns respo-ui.comp.fonts-page --ns respo-ui.comp.home --ns respo-ui.comp.layouts-page --ns respo-ui.comp.sidebar --ns respo-ui.comp.widgets-page --ns respo-ui.config --ns respo-ui.core --ns respo-ui.css --ns respo-ui.main --ns respo-ui.router --ns respo-ui.schema --ns respo-ui.tokens --ns respo-ui.util --summary-only --format json
@@ -57,6 +57,35 @@ jobs:
           calcit calcit.cirru analyze weak-types --only dynamic-method --format json | jq -e '.data.summary.findings == 0'
           calcit docs check-md README.md --dep ./ --failures-only
           calcit calcit.cirru js
+
+      - name: Check out released Message consumer
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Respo/respo-message.calcit
+          ref: 0.0.37
+          path: .calcit/message-consumer
+          persist-credentials: false
+
+      - name: Check Message against this UI candidate
+        working-directory: .calcit/message-consumer
+        run: |
+          set -euo pipefail
+          # Candidate compatibility test, not the consumer's published dependency graph.
+          # This is a Calcit source fixture using the producer's verified host graph,
+          # not a migration or approval of Message's own npm/dependency policy.
+          git rev-parse HEAD
+          cp "$GITHUB_WORKSPACE/deps.cirru" "$GITHUB_WORKSPACE/package.json" "$GITHUB_WORKSPACE/yarn.lock" .
+          ln -s "$GITHUB_WORKSPACE/node_modules" node_modules
+          mkdir -p .calcit/modules
+          for module in respo.calcit respo-router.calcit js-ffi; do
+            ln -s "$GITHUB_WORKSPACE/.calcit/modules/$module" ".calcit/modules/$module"
+          done
+          ln -s "$GITHUB_WORKSPACE" .calcit/modules/respo-ui.calcit
+          calcit calcit.cirru --check-only --all-defs
+          calcit fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status == "passed" and .diagnostics == [] then true else ., false end'
+          calcit calcit.cirru test --tag unit --require-match --summary-only --format json
+          calcit calcit.cirru js
+          git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock'
 
       - name: Select CDN asset prefix
         id: asset-path
