@@ -1,49 +1,21 @@
 // Regenerates docs/components.md from the :doc and :examples of every
 // respo-ui.comp/comp-* definition in calcit.cirru.
-import { readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { format_cirru } from "@calcit/procs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const lines = readFileSync(`${root}calcit.cirru`, "utf8").split("\n");
-const indent = (line) => line.length - line.trimStart().length;
-const dedent = (block) => {
-  const width = Math.min(...block.filter((l) => l.trim()).map(indent));
-  return block.map((l) => l.slice(width)).join("\n");
-};
-
-const start = lines.indexOf("    'respo-ui.comp $ %{} 'FileEntry");
-let end = lines.findIndex((l, i) => i > start && /^    '\S+ \$ %\{\} 'FileEntry/.test(l));
-if (end < 0) end = lines.length;
-
-const defs = new Map();
-for (let i = start; i < end; i++) {
-  const head = lines[i].match(/^        '(comp-[a-z-]+) \$ %\{\} 'CodeEntry/);
-  if (!head) continue;
-  let j = i + 1;
-  while (j < end && !/^        '/.test(lines[j])) j++;
-  const block = lines.slice(i, j);
-  const text = block.join("\n");
-  const doc = (text.match(/\(:doc \|([^)]*)\)/) ?? text.match(/^\s+:doc "\|(.*)"$/m) ?? text.match(/^\s+:doc \|(.*)$/m))?.[1] ?? "";
-  const args = text.match(new RegExp(`defcomp ${head[1]} \\(([^)]*)\\)`))?.[1] ?? "";
-  const examples = [];
-  block.forEach((line, k) => {
-    const m = line.match(/^(\s+):examples \$ \[\] \$ quote(.*)$/);
-    if (!m) return;
-    const inline = m[2].trim();
-    if (inline) {
-      examples.push(inline.startsWith("(") && inline.endsWith(")") ? inline.slice(1, -1) : inline);
-      return;
-    }
-    const body = [];
-    for (const next of block.slice(k + 1)) {
-      if (indent(next) <= m[1].length) break;
-      body.push(next);
-    }
-    examples.push(dedent(body));
-  });
-  defs.set(head[1], { args, doc: doc.replaceAll("\\n", "\n").replaceAll('\\"', '"'), examples });
-  i = j - 1;
-}
+const query = (...args) => JSON.parse(execFileSync(process.env.CALCIT_BIN ?? "calcit",
+  ["query", ...args, "--format", "json"], { cwd: root, encoding: "utf8" })).data;
+const inventory = query("search", "defcomp", "--exact", "--filter", "respo-ui.comp", "--source", "project");
+const defs = new Map(inventory.definitions
+  .filter(({ namespace, name }) => namespace === "respo-ui.comp" && name.startsWith("comp-"))
+  .map(({ id, name }) => {
+    const { code, doc, examples } = query("def", id);
+    return [name, { args: code[2].join(" "), doc,
+      examples: examples.map((example) => format_cirru([example], true).trim()) }];
+  }));
 
 const sections = [
   ["Form controls", ["button", "input", "textarea", "select", "checkbox", "switch", "radio-group", "field"]],

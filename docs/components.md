@@ -34,7 +34,8 @@ Run `calcit query def respo-ui.comp/<name>` for the full schema of any component
 Render a native button with Respo UI variants. Options: :kind (:primary, :danger, :danger-outline), :type, :disabled, :on-click, :class-name, :style.
 
 ```cirru
-comp-button |Save $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :some :primary)
+comp-button |Save $ Option :some
+  respo-ui.schema/ButtonOptions :kind $ Option :some :primary
 ```
 
 ### `comp-input (value options)`
@@ -42,7 +43,8 @@ comp-button |Save $ Option :some $ respo-ui.schema/ButtonOptions :kind (Option :
 Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style.
 
 ```cirru
-comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Search)
+comp-input |query $ Option :some
+  respo-ui.schema/InputOptions :placeholder $ Option :some |Search
 ```
 
 ### `comp-textarea (value options)`
@@ -50,7 +52,8 @@ comp-input |query $ Option :some $ respo-ui.schema/InputOptions :placeholder (Op
 Render a controlled textarea. Pass the current value and optional :placeholder, :disabled, :on-input, :class-name, and :style.
 
 ```cirru
-comp-textarea |notes $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |Notes)
+comp-textarea |notes $ Option :some
+  respo-ui.schema/InputOptions :placeholder $ Option :some |Notes
 ```
 
 ### `comp-select (value items options)`
@@ -68,7 +71,8 @@ comp-select |calcit
 Render a controlled native checkbox. Shares SwitchOptions with comp-switch: :label, :disabled, :on-change (receives the next Bool and d!), :class-name, and :style.
 
 ```cirru
-comp-checkbox true $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Remember me")
+comp-checkbox true $ Option :some
+  respo-ui.schema/SwitchOptions :label $ Option :some "|Remember me"
 ```
 
 ### `comp-switch (checked options)`
@@ -76,7 +80,8 @@ comp-checkbox true $ Option :some $ respo-ui.schema/SwitchOptions :label (Option
 Render a controlled accessible switch backed by a native checkbox. Options: :label, :disabled, :on-change, :class-name, and :style.
 
 ```cirru
-comp-switch false $ Option :some $ respo-ui.schema/SwitchOptions :label (Option :some "|Compact mode")
+comp-switch false $ Option :some
+  respo-ui.schema/SwitchOptions :label $ Option :some "|Compact mode"
 ```
 
 ### `comp-radio-group (value items options)`
@@ -86,7 +91,7 @@ Render a controlled radio group from SelectOption items. Options: :name, :label 
 ```cirru
 comp-radio-group |calcit
   [] (respo-ui.schema/SelectOption :value |calcit :label |Calcit) (respo-ui.schema/SelectOption :value |clojure :label |Clojure)
-  Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |language) :label $ Option :some |Language
+  Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |language) :label (Option :some |Language)
 ```
 
 ### `comp-field (label control options)`
@@ -95,8 +100,9 @@ Wrap a form control with a label, optional description, and error message. Optio
 
 ```cirru
 comp-field |Email
-  comp-input | $ Option :some $ respo-ui.schema/InputOptions :placeholder (Option :some |you@example.com)
-  Option :some $ respo-ui.schema/FieldOptions :description (Option :some "|Used for notifications.") :required? $ Option :some true
+  comp-input | $ Option :some
+    respo-ui.schema/InputOptions :placeholder $ Option :some |you@example.com
+  Option :some $ respo-ui.schema/FieldOptions :description (Option :some "|Used for notifications.") :required? (Option :some true)
 ```
 
 ## Navigation
@@ -137,7 +143,8 @@ comp-breadcrumb
 Render page buttons for a 1-based page out of total pages, collapsing distant pages into gaps. Options: :siblings (pages beside the current one, default 1), :on-change (receives the next page and d!), :class-name, and :style.
 
 ```cirru
-comp-pagination 5 20 $ Option :some $ respo-ui.schema/PaginationOptions :siblings (Option :some 1)
+comp-pagination 5 20 $ Option :some
+  respo-ui.schema/PaginationOptions :siblings $ Option :some 1
 ```
 
 ### `comp-steps (current items options)`
@@ -157,7 +164,8 @@ comp-steps 1
 Render a native details/summary disclosure. Content may be text or a Respo node. Options: :open? (initial state), :name (details sharing a name open one at a time), :class-name, and :style.
 
 ```cirru
-comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ Option :some $ respo-ui.schema/CollapseOptions :open? (Option :some true)
+comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ Option :some
+  respo-ui.schema/CollapseOptions :open? $ Option :some true
 ```
 
 ### `comp-tooltip (content tip options)`
@@ -165,7 +173,8 @@ comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ Option :so
 Show a CSS-only tooltip when the content is hovered or focused. Options: :placement (:top by default, or :bottom), :class-name, and :style.
 
 ```cirru
-comp-tooltip |Save "|Saves the draft" $ Option :some $ respo-ui.schema/TooltipOptions :placement (Option :some :bottom)
+comp-tooltip |Save "|Saves the draft" $ Option :some
+  respo-ui.schema/TooltipOptions :placement $ Option :some :bottom
 ```
 
 ### `comp-kbd (key-names options)`
@@ -199,7 +208,8 @@ comp-progress 72
 Render an accessible loading spinner. Options support :label, :class-name, and :style.
 
 ```cirru
-comp-spinner $ Option :some $ respo-ui.schema/SpinnerOptions :label (Option :some "|Loading results")
+comp-spinner $ Option :some
+  respo-ui.schema/SpinnerOptions :label $ Option :some "|Loading results"
 ```
 
 ### `comp-skeleton (options)`
@@ -207,7 +217,8 @@ comp-spinner $ Option :some $ respo-ui.schema/SpinnerOptions :label (Option :som
 Render an animated loading placeholder. Unlabeled skeletons are decorative; pass :label to expose role=status. Options: :kind (:text or :circle), :width, :height, :class-name, and :style.
 
 ```cirru
-comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :some "|Loading title") :width (Option :some |60%)
+comp-skeleton $ Option :some
+  respo-ui.schema/SkeletonOptions :label (Option :some "|Loading title") :width $ Option :some |60%
 ```
 
 ### `comp-empty (title options)`
@@ -215,7 +226,8 @@ comp-skeleton $ Option :some $ respo-ui.schema/SkeletonOptions :label (Option :s
 Render a richer empty state with optional :icon, :description, :action, :class-name, and :style.
 
 ```cirru
-comp-empty "|No results" $ Option :some $ respo-ui.schema/EmptyOptions :description (Option :some "|Try another search term.")
+comp-empty "|No results" $ Option :some
+  respo-ui.schema/EmptyOptions :description $ Option :some "|Try another search term."
 ```
 
 ### `comp-badge (content options)`
@@ -223,7 +235,8 @@ comp-empty "|No results" $ Option :some $ respo-ui.schema/EmptyOptions :descript
 Render a small count or status badge. Options: :kind (:info, :success, :warning, :error), :dot? (render a dot and expose content as aria-label), :class-name, and :style.
 
 ```cirru
-comp-badge |12 $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some :error)
+comp-badge |12 $ Option :some
+  respo-ui.schema/BadgeOptions :kind $ Option :some :error
 ```
 
 ## Data display
@@ -233,7 +246,8 @@ comp-badge |12 $ Option :some $ respo-ui.schema/BadgeOptions :kind (Option :some
 Render a composable card. Content may be text or a Respo node; options support :title, :footer, :class-name, and :style.
 
 ```cirru
-comp-card |Content $ Option :some $ respo-ui.schema/CardOptions :title (Option :some |Summary)
+comp-card |Content $ Option :some
+  respo-ui.schema/CardOptions :title $ Option :some |Summary
 ```
 
 ### `comp-avatar (text options)`
@@ -241,7 +255,8 @@ comp-card |Content $ Option :some $ respo-ui.schema/CardOptions :title (Option :
 Render initials or an image avatar. Options: :src, :alt, :title, :size (:small or :large), :class-name, and :style.
 
 ```cirru
-comp-avatar |CY $ Option :some $ respo-ui.schema/AvatarOptions :title (Option :some "|Chen Yong") :size (Option :some :large)
+comp-avatar |CY $ Option :some
+  respo-ui.schema/AvatarOptions :title (Option :some "|Chen Yong") :size $ Option :some :large
 ```
 
 ### `comp-tag (kind content options)`
@@ -257,7 +272,8 @@ comp-tag :success |Stable $ Option :none
 Render a responsive label/value grid from AttributesOptions :items. Each item may carry :label, :value (text or a Respo node), and :span; options also set the title, item size, and CSS overrides.
 
 ```cirru
-comp-attributes $ respo-ui.schema/AttributesOptions :title (Option :some |Project) :items $ [] (:: :attr |Name |Respo) (:: :attr-span |Description "|A virtual DOM library in Calcit" 2)
+comp-attributes $ respo-ui.schema/AttributesOptions :title (Option :some |Project) :items
+  [] (:: :attr |Name |Respo) (:: :attr-span |Description "|A virtual DOM library in Calcit" 2)
 ```
 
 ### `comp-divider (options)`
@@ -265,7 +281,8 @@ comp-attributes $ respo-ui.schema/AttributesOptions :title (Option :some |Projec
 Render a horizontal divider, or a vertical divider with :vertical? true.
 
 ```cirru
-comp-divider $ Option :some $ respo-ui.schema/DividerOptions :vertical? (Option :some true)
+comp-divider $ Option :some
+  respo-ui.schema/DividerOptions :vertical? $ Option :some true
 ```
 
 ### `comp-time (time)`

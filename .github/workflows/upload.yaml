@@ -35,6 +35,7 @@ jobs:
       - uses: calcit-lang/setup-calcit@ca701be5a471759e442aa053cd100720bbe1f09f # v1.5.0
         with:
           tools: calcit,caps
+          deps-file: deps.cirru
 
       - name: Validate and compile
         run: |
@@ -46,7 +47,7 @@ jobs:
           git diff --exit-code -- calcit.cirru
           node scripts/gen-components-doc.mjs
           git diff --exit-code -- docs/components.md
-          calcit calcit.cirru --check-only
+          calcit calcit.cirru --check-only --all-defs
           calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
           calcit calcit.cirru test --exclude-tag js-only --require-match --summary-only --format json
           yarn test:js

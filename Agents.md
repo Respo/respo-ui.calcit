@@ -109,7 +109,7 @@ calcit calcit.cirru edit format
 git diff --exit-code -- calcit.cirru
 node scripts/gen-components-doc.mjs
 git diff --exit-code -- docs/components.md
-calcit calcit.cirru --check-only
+calcit calcit.cirru --check-only --all-defs
 calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
 calcit calcit.cirru test --exclude-tag js-only --require-match --summary-only
 yarn test:js

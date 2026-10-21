@@ -10,13 +10,25 @@ const cli = process.env.CALCIT_BIN ?? "calcit";
 const run = (...args) => execFileSync(cli, args, {
   cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
 });
+const queryDef = (target) => JSON.parse(run("query", "def", target, "--format", "json")).data;
+const literalList = (code) => {
+  assert.equal(code[0], "[]", "Expected a literal metadata list");
+  return code.slice(1);
+};
+const constructorFields = (code) => Object.fromEntries(
+  Array.from({ length: (code.length - 1) / 2 }, (_, i) => [code[1 + i * 2], code[2 + i * 2]]));
+const stringValue = (code) => {
+  assert.equal(typeof code, "string");
+  assert.ok(code.startsWith("|"), "Expected a metadata string literal");
+  return code.slice(1);
+};
 // These existing discovery APIs expose JSON; executable ASTs come from the CLI.
 const listed = JSON.parse(run("test", "--list", "--require-match", "--format", "json"));
 assert.ok(listed.selected > 0, "No attached ui tests selected");
 assert.equal(listed.tests.length, listed.selected);
 const targets = [...new Set(listed.tests.map(({ id }) => id.split("#")[0]))];
 const definitions = new Map(targets.map((target) => [target,
-  JSON.parse(run("query", "def", target, "--format", "json")).data]));
+  queryDef(target)]));
 const scratch = mkdtempSync(path.join(root, ".calcit", "ui-js-replay-"));
 const snapshot = path.join(scratch, "calcit.cirru");
 const original = readFileSync(path.join(root, "calcit.cirru"));
@@ -102,29 +114,29 @@ try {
         ["assert", [".includes?", "html", `|${text}`], `|Component page ${id} is missing ${text}`])]);
   }
   // Component pages and API tables must cover every component and match respo-ui.schema.
-  const source = original.toString();
-  const docIds = [...source.matchAll(/ComponentDoc :id \|([\w-]+)/g)].map((m) => m[1]);
+  const componentDocs = literalList(queryDef("respo-ui.comp.component-docs/component-docs").code[2]).map(constructorFields);
+  const docIds = componentDocs.map((doc) => stringValue(doc[":id"]));
   assert.deepEqual(docIds, componentIds, "respo-ui.comp.component-docs/component-docs must list every component in sidebar order");
   // The sidenav and pager both read component-docs, so its groups must appear in component-groups order.
-  const groupIds = [...source.slice(source.indexOf("def component-groups")).matchAll(/ComponentGroup :id \|([\w-]+)/g)].slice(0, categoryTitles.length).map((m) => m[1]);
-  const docGroups = [...source.matchAll(/ComponentDoc :id \|[\w-]+ :title (?:"\|[^"]*"|\|\S+) :group \|([\w-]+)/g)].map((m) => m[1]);
+  const groupIds = literalList(queryDef("respo-ui.comp.sidebar/component-groups").code[2])
+    .map((group) => stringValue(constructorFields(group)[":id"]));
+  const docGroups = componentDocs.map((doc) => stringValue(doc[":group"]));
   assert.equal(docGroups.length, componentIds.length, "every ComponentDoc must declare its :group");
   assert.deepEqual([...new Set(docGroups)], groupIds, "component-docs must be grouped in component-groups order");
   assert.ok(docGroups.every((g, i) => i === 0 || groupIds.indexOf(g) >= groupIds.indexOf(docGroups[i - 1])), "component-docs must keep each group contiguous");
   // Every struct a component page references needs a StructDoc, or its field table silently disappears.
-  const referencedStructs = new Set([...source.matchAll(/:structs \$ \[\]([^\n]*)/g)].flatMap((m) => [...m[1].matchAll(/\|(\w+)/g)].map((n) => n[1])));
-  const structDocNames = new Set([...source.matchAll(/StructDoc :name \|(\w+)/g)].map((m) => m[1]));
+  const referencedStructs = new Set(componentDocs.flatMap((doc) => literalList(doc[":structs"]).map(stringValue)));
+  const structDocs = literalList(queryDef("respo-ui.comp.component-docs/struct-docs").code[2]).map(constructorFields);
+  const structDocNames = new Set(structDocs.map((doc) => stringValue(doc[":name"])));
   assert.deepEqual([...referencedStructs].filter((n) => !structDocNames.has(n)), [], "every struct in ComponentDoc :structs must have a StructDoc");
   assert.ok(referencedStructs.size > 0, "ComponentDoc :structs must be parsed");
-  const structDocs = source.slice(source.indexOf("def struct-docs"));
-  for (const [, name, body] of structDocs.matchAll(/StructDoc :name \|(\w+)[^\n]*\n((?:\s+FieldDoc[^\n]*\n)*)/g)) {
-    const documented = [...body.matchAll(/FieldDoc :name \|:([\w?-]+)/g)].map((m) => m[1]);
-    const def = source.match(new RegExp(`defstruct ${name}\\b([^\\n]*)\\n((?:\\s+[^']\\S[^\\n]*\\n)*?)\\s+:examples`));
-    assert.ok(def, `respo-ui.schema/${name} must exist`);
-    const lines = def[2].split("\n").filter((l) => l.trim());
-    const base = lines.length ? Math.min(...lines.map((l) => l.length - l.trimStart().length)) : 0;
-    const declared = [...def[1].matchAll(/\(:([\w?-]+) /g)].map((m) => m[1])
-      .concat(lines.filter((l) => l.length - l.trimStart().length === base).map((l) => l.trim().match(/^:([\w?-]+) /)?.[1]).filter(Boolean));
+  for (const doc of structDocs) {
+    const name = stringValue(doc[":name"]);
+    const documented = literalList(doc[":fields"]).map((field) => stringValue(constructorFields(field)[":name"]).slice(1));
+    const def = queryDef(`respo-ui.schema/${name}`).code;
+    assert.equal(def[0], "defstruct", `respo-ui.schema/${name} must exist`);
+    const declared = def.slice(2).filter((field) => Array.isArray(field) && field[0]?.startsWith(":"))
+      .map((field) => field[0].slice(1));
     assert.deepEqual(documented, declared, `struct-docs for ${name} must list the fields of respo-ui.schema/${name}`);
   }
   operations.push(["edit", "def", pages, "--input-format", "json-ast", "--code",
@@ -170,7 +182,8 @@ try {
   assert.equal(typeof generated.replay_all_attached, "function");
   generated.replay_all_attached();
   // Every var(--rui-*) in the generated code must name a declared design token.
-  const declared = new Set([...original.toString().matchAll(/DesignToken :group \S+ :name \|([\w-]+)/g)].map((m) => m[1]));
+  const declared = new Set(literalList(queryDef("respo-ui.tokens/design-tokens").code[2])
+    .map((token) => stringValue(constructorFields(token)[":name"])));
   assert.ok(declared.size > 100, "design tokens must be declared in respo-ui.tokens/design-tokens");
   for (const file of readdirSync(output).filter((name) => name.startsWith("respo-ui.") && name.endsWith(".mjs"))) {
     for (const [, name] of readFileSync(path.join(output, file), "utf8").matchAll(/var\(--rui-([\w-]+)\)/g)) {
