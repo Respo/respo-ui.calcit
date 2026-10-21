@@ -1967,7 +1967,7 @@
                 FieldDoc :name |:items :type |List :optional? false :note "|Label/value items, each with :label, :value and optional :span."
                 FieldDoc :name |:title :type |String :optional? true :note "|Heading above the grid."
                 FieldDoc :name |:item-width :type |Number :optional? true :note "|Minimum column width in px."
-                FieldDoc :name |:item-height :type |Number :optional? true :note "|Row height in px."
+                FieldDoc :name |:item-height :type |Number :optional? true :note "|Reserved. Currently has no effect."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
                 FieldDoc :name |:css-item :type |String :optional? true :note "|Class names for each item."
@@ -1995,16 +1995,16 @@
                   {} $ :class-name style-component-page
                   div
                     {} $ :class-name style-crumbs
-                    span
-                      {} (:class-name style-crumb-link)
+                    button
+                      {} (:type |button) (:class-name style-crumb-link)
                         :on-click $ on-route |components.html
                       <> |Components
                     span
                       {} $ :class-name style-crumb-sep
                       <> |/
-                    span
-                      {} (:class-name style-crumb-link)
-                        :on-click $ on-route |components.html
+                    button
+                      {} (:type |button) (:class-name style-crumb-link)
+                        :on-click $ on-route-to |components.html $ str |#category- doc.:group
                       <> $ group-title doc.:group
                   div
                     {} $ :class-name style-title-row
@@ -2189,8 +2189,9 @@
         'style-crumb-link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-crumb-link
             {}
-              |& $ {} (:cursor :pointer) (:color tokens/color-text-secondary)
+              |& $ {} (:padding 0) (:border :none) (:border-radius tokens/radius-sm) (:font :inherit) (:cursor :pointer) (:color tokens/color-text-secondary) (:background :none)
               |&:hover $ {} $ :color tokens/color-primary
+              |&:focus-visible $ {} (:outline :none) (:box-shadow tokens/focus-ring)
           :examples $ []
           :schema $ :: 'String
         'style-crumb-sep $ %{} 'CodeEntry (:doc |)
@@ -2324,7 +2325,7 @@
             respo-ui.tokens :as tokens
             respo-ui.comp :refer $ comp-cirru-snippet
             respo-ui.comp.components :refer $ component-demo
-            respo-ui.comp.sidebar :refer $ on-route component-path component-groups
+            respo-ui.comp.sidebar :refer $ on-route on-route-to component-path component-groups
             respo-ui.comp.component-docs :refer $ component-docs struct-docs
     'respo-ui.comp.components $ %{} 'FileEntry
       :defs $ {}
@@ -2352,7 +2353,7 @@
                     <> |Components
                   div
                     {} $ :class-name style-hero-lead
-                    <> "|33 typed components with controlled state and static CSS classes. Each one has its own page with live examples, the code that produced them and an API table."
+                    <> $ str (count component-docs) "| typed components with controlled state and static CSS classes. Each one has its own page with live examples, the code that produced them and an API table."
                   div
                     {} $ :class-name $ str-spaced css/row css/gap8 style-resource-links
                     render-entry |https://github.com/Respo/respo-ui.calcit |respo-ui
@@ -3661,7 +3662,7 @@
                 <> group.:title
               div
                 {} $ :class-name style-cat-items
-                <> $ join-string group.:items "|  "
+                <> $ join-string (group-item-ids group.:id) "|  "
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'respo-ui.comp.sidebar/ComponentGroup
@@ -3829,7 +3830,7 @@
             respo-ui.core :as ui
             respo-ui.config :as config
             respo-ui.schema :refer $ ButtonOptions InputOptions SwitchOptions CardOptions BadgeOptions TabsOptions TabRoute StepItem AvatarOptions AttributesOptions
-            respo-ui.comp.sidebar :refer $ on-route component-groups
+            respo-ui.comp.sidebar :refer $ on-route component-groups group-item-ids
             respo-ui.comp.components :refer $ ignore-tab-route language-options
     'respo-ui.comp.layouts-page $ %{} 'FileEntry
       :defs $ {}
@@ -4081,7 +4082,6 @@
       :defs $ {}
         'ComponentGroup $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct ComponentGroup (:id 'String) (:title 'String)
-            :items $ :: 'List 'String
           :examples $ []
           :schema $ :: 'StructDef
         'comp-sidebar $ %{} 'CodeEntry (:doc |)
@@ -4167,13 +4167,7 @@
             :args $ [] 'Tag
         'component-groups $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def component-groups
-            []
-              ComponentGroup :id |form :title "|Form controls" :items $ [] |button |input |textarea |select |checkbox |switch |radio-group |field
-              ComponentGroup :id |navigation :title |Navigation :items $ [] |tabs |breadcrumb |pagination |steps
-              ComponentGroup :id |disclosure :title "|Disclosure and hints" :items $ [] |collapse |tooltip |kbd
-              ComponentGroup :id |feedback :title |Feedback :items $ [] |alert |progress |spinner |skeleton |empty |badge
-              ComponentGroup :id |data :title "|Data display" :items $ [] |card |avatar |tag |attributes |divider |time
-              ComponentGroup :id |utilities :title "|Code and utilities" :items $ [] |cirru-snippet |snippet |copy |close |placeholder |catoptric-text
+            [] (ComponentGroup :id |form :title "|Form controls") (ComponentGroup :id |navigation :title |Navigation) (ComponentGroup :id |disclosure :title "|Disclosure and hints") (ComponentGroup :id |feedback :title |Feedback) (ComponentGroup :id |data :title "|Data display") (ComponentGroup :id |utilities :title "|Code and utilities")
           :examples $ []
           :schema $ :: 'List 'respo-ui.comp.sidebar/ComponentGroup
         'component-path $ %{} 'CodeEntry (:doc "|Router path of one component page.")
@@ -4236,18 +4230,19 @@
         'design-sections $ %{} 'CodeEntry
           :doc "|Sections of the design system page, linked from the side navigation."
           :code $ quote $ def design-sections
-            []
-              ComponentGroup :id |color :title |Color :items $ []
-              ComponentGroup :id |typography :title |Typography :items $ []
-              ComponentGroup :id |spacing :title |Spacing :items $ []
-              ComponentGroup :id |shape :title |Shape :items $ []
-              ComponentGroup :id |sizing :title "|Control sizing" :items $ []
-              ComponentGroup :id |elevation :title |Elevation :items $ []
-              ComponentGroup :id |motion :title "|Motion and layers" :items $ []
-              ComponentGroup :id |conventions :title |Conventions :items $ []
-              ComponentGroup :id |usage :title "|Using tokens" :items $ []
+            [] (ComponentGroup :id |color :title |Color) (ComponentGroup :id |typography :title |Typography) (ComponentGroup :id |spacing :title |Spacing) (ComponentGroup :id |shape :title |Shape) (ComponentGroup :id |sizing :title "|Control sizing") (ComponentGroup :id |elevation :title |Elevation) (ComponentGroup :id |motion :title "|Motion and layers") (ComponentGroup :id |conventions :title |Conventions) (ComponentGroup :id |usage :title "|Using tokens")
           :examples $ []
           :schema $ :: 'List 'respo-ui.comp.sidebar/ComponentGroup
+        'group-item-ids $ %{} 'CodeEntry
+          :doc "|Ids of the components in one group, in component-docs order. The sidenav, home cards and pager all read this order."
+          :code $ quote $ defn group-item-ids (group-id)
+            map
+              filter component-docs $ fn (doc) (= doc.:group group-id)
+              fn (doc) doc.:id
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ [] 'String
+            :return $ :: 'List 'String
         'item-title $ %{} 'CodeEntry
           :doc "|Display title of a component id, from component-docs."
           :code $ quote $ defn item-title (id)
@@ -4276,7 +4271,14 @@
             :features $ #{} :js-ffi
         'on-route $ %{} 'CodeEntry
           :doc "|Navigate to a router path and scroll the content area back to the top."
-          :code $ quote $ defn on-route (path-name)
+          :code $ quote $ defn on-route (path-name) (on-route-to path-name |#content-top)
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
+            :args $ [] 'String
+            :features $ #{} :js-ffi
+        'on-route-to $ %{} 'CodeEntry
+          :doc "|Click handler that navigates to path-name, then scrolls the element matching selector into view."
+          :code $ quote $ defn on-route-to (path-name selector)
             fn (e dispatch!)
               hint-fn $ {}
                 :args $ [] (:: 'Map 'Tag 'Dynamic)
@@ -4285,12 +4287,12 @@
                     :return 'Unit
                 :return 'Unit
               dispatch! $ :: :router/nav path-name
-              match (query-selector |#content-top)
+              match (query-selector selector)
                 (:some el) (element-scroll-into-view! el)
                 (:none) &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/EventHandler)
-            :args $ [] 'String
+            :args $ [] 'String 'String
             :features $ #{} :js-ffi
         'render-entry $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-entry (path title selected?)
@@ -4310,12 +4312,13 @@
                 {} $ :class-name style-nav-sub-title
                 <> group.:title
               list-> ({})
-                map group.:items $ fn (item)
-                  [] item $ div
-                    {}
-                      :class-name $ if (= item active-id) css-nav-sub-active css-nav-sub
-                      :on-click $ on-route $ component-path item
-                    <> $ item-title item
+                map (group-item-ids group.:id)
+                  fn (item)
+                    [] item $ div
+                      {}
+                        :class-name $ if (= item active-id) css-nav-sub-active css-nav-sub
+                        :on-click $ on-route $ component-path item
+                      <> $ item-title item
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'respo-ui.comp.sidebar/ComponentGroup 'String
