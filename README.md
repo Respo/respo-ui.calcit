@@ -99,8 +99,9 @@ AST，不再正则解析 Snapshot 序列化文本；示例通过 runtime 的 Cir
 正式配对由 Linux CI 的正常 Caps 安装、不可变 Yarn 锁文件、完整 strict、公开定义、
 示例和原 JS 回归验证。原 CI 还加载已发布 Message 0.0.37 源码，使用隔离模块视图
 验证当前 UI 候选和同一正式底层依赖图：全定义、完整 strict、原 unit 测试及 JS codegen。
-消费者 Snapshot 源码不变；隔离副本显式更新工具链/依赖元数据并正常刷新、安装 lock，
-不绕过 strict 的版本预检。该兼容性检查不是 Message 已发布依赖图或正式迁移完成的声明。
+消费者 Snapshot 源码不变；兼容性测试副本使用 UI 已通过安装验证的 manifest、lock 和
+宿主 runtime，仍执行 strict 版本预检，不修改 Message 自身的包安全策略。
+该检查不验收 Message 自己的 npm 发布图，也不是其正式迁移完成的声明。
 Message 原 JS 渲染回归、完整浏览器交互另行验收，SSR 不代替它们。
 现有开放样式值、状态载荷和 FFI unsafe 边界仍需逐项收窄，本次依赖配对不表示
 类型债务清零。
