@@ -6,7 +6,7 @@
     {} (:description |) (:init-fn 'respo-ui.main/main!) (:mode :js) (:reload-fn 'respo-ui.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo-router.calcit/ |respo.calcit/ |js-ffi/
-      :type-slots $ {}
+      :type-slots $ {} $ :dispatch-op |respo-ui.schema/Op
   :files $ {}
     'respo-ui.comp $ %{} 'FileEntry
       :defs $ {}
@@ -2056,7 +2056,7 @@
               hint-fn $ {}
                 :args $ [] (:: 'Map 'Tag 'Dynamic)
                   :: 'Fn $ {}
-                    :args $ [] 'Dynamic
+                    :args $ [] *dispatch-op
                     :return 'Unit
                 :return 'Unit
               dispatch! $ :: :states ([] :components) |
@@ -4272,7 +4272,7 @@
               hint-fn $ {}
                 :args $ [] (:: 'Map 'Tag 'Dynamic)
                   :: 'Fn $ {}
-                    :args $ [] 'Dynamic
+                    :args $ [] *dispatch-op
                     :return 'Unit
                 :return 'Unit
               match (query-selector selector)
@@ -4296,7 +4296,7 @@
               hint-fn $ {}
                 :args $ [] (:: 'Map 'Tag 'Dynamic)
                   :: 'Fn $ {}
-                    :args $ [] 'Dynamic
+                    :args $ [] *dispatch-op
                     :return 'Unit
                 :return 'Unit
               dispatch! $ :: :router/nav path-name
@@ -5066,7 +5066,7 @@
             , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Dynamic
+            :args $ [] 'respo-ui.schema/Op
             :features $ #{} :js-ffi
         'get-mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn get-mount-target ()
@@ -5368,6 +5368,14 @@
             :style $ :: 'Option $ :: 'Map 'Tag 'Dynamic
           :examples $ []
           :schema $ :: 'StructDef
+        'Op $ %{} 'CodeEntry
+          :doc "|Dispatch Op of the demo app, bound to the :dispatch-op type slot."
+          :code $ quote $ defenum Op
+            :states (:: 'List 'Dynamic) 'Dynamic
+            :router/nav 'String
+            :router/route 'Dynamic
+          :examples $ []
+          :schema $ :: 'EnumDef
         'PageRoute $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:design) (:components) (:component 'String) (:utils) (:not-found 'String)
           :examples $ []
