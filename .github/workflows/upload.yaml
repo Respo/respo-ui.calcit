@@ -107,11 +107,14 @@ jobs:
           assert src.count(old) == 1
           open("calcit.cirru", "w").write(src.replace(old, new))
           PY
+          expected_calcit="${RUNNER_TEMP:-/tmp}/calcit.cirru.expected"
+          cp calcit.cirru "$expected_calcit"
           calcit calcit.cirru --check-only --all-defs
           calcit fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status == "passed" and .diagnostics == [] then true else ., false end'
           calcit calcit.cirru test --tag unit --require-match --summary-only --format json
           calcit calcit.cirru js
           git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock' ':!calcit.cirru'
+          cmp -- "$expected_calcit" calcit.cirru
 
       - name: Select CDN asset prefix
         id: asset-path
