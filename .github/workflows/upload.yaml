@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Respo/respo-message.calcit
-          ref: 0.0.37
+          ref: 0.1.0-alpha.1
           path: .calcit/message-consumer
           persist-credentials: false
 
@@ -81,40 +81,11 @@ jobs:
             ln -s "$GITHUB_WORKSPACE/.calcit/modules/$module" ".calcit/modules/$module"
           done
           ln -s "$GITHUB_WORKSPACE" .calcit/modules/respo-ui.calcit
-          # Message 0.0.37 predates Calcit 0.31 and Respo 0.17: it binds no dispatch-op slot
-          # and its create-with-payload test calls .unwrap on a Result from get-in.
-          calcit config set-type-slot dispatch-op :dynamic
-          python3 - <<'PY'
-          src = open("calcit.cirru").read()
-          old = (
-              "              :code $ quote $ assert= |Hello\n"
-              "                .unwrap $ get-in\n"
-              "                  next-store-of\n"
-              "                    :: action/create $ {} $ :text |Hello\n"
-              "                    , |id-1 123\n"
-              "                  [] :messages |id-1 :text\n"
-          )
-          new = (
-              "              :code $ quote $ assert= |Hello\n"
-              "                .unwrap-or\n"
-              "                  get-in\n"
-              "                    next-store-of\n"
-              "                      :: action/create $ {} $ :text |Hello\n"
-              "                      , |id-1 123\n"
-              "                    [] :messages |id-1 :text\n"
-              "                  , nil\n"
-          )
-          assert src.count(old) == 1
-          open("calcit.cirru", "w").write(src.replace(old, new))
-          PY
-          expected_calcit="${RUNNER_TEMP:-/tmp}/calcit.cirru.expected"
-          cp calcit.cirru "$expected_calcit"
           calcit calcit.cirru --check-only --all-defs
           calcit fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status == "passed" and .diagnostics == [] then true else ., false end'
           calcit calcit.cirru test --tag unit --require-match --summary-only --format json
           calcit calcit.cirru js
-          git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock' ':!calcit.cirru'
-          cmp -- "$expected_calcit" calcit.cirru
+          git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock'
 
       - name: Select CDN asset prefix
         id: asset-path
