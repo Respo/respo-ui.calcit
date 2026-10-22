@@ -81,11 +81,37 @@ jobs:
             ln -s "$GITHUB_WORKSPACE/.calcit/modules/$module" ".calcit/modules/$module"
           done
           ln -s "$GITHUB_WORKSPACE" .calcit/modules/respo-ui.calcit
+          # Message 0.0.37 predates Calcit 0.31 and Respo 0.17: it binds no dispatch-op slot
+          # and its create-with-payload test calls .unwrap on a Result from get-in.
+          calcit config set-type-slot dispatch-op :dynamic
+          python3 - <<'PY'
+          src = open("calcit.cirru").read()
+          old = (
+              "              :code $ quote $ assert= |Hello\n"
+              "                .unwrap $ get-in\n"
+              "                  next-store-of\n"
+              "                    :: action/create $ {} $ :text |Hello\n"
+              "                    , |id-1 123\n"
+              "                  [] :messages |id-1 :text\n"
+          )
+          new = (
+              "              :code $ quote $ assert= |Hello\n"
+              "                .unwrap-or\n"
+              "                  get-in\n"
+              "                    next-store-of\n"
+              "                      :: action/create $ {} $ :text |Hello\n"
+              "                      , |id-1 123\n"
+              "                    [] :messages |id-1 :text\n"
+              "                  , nil\n"
+          )
+          assert src.count(old) == 1
+          open("calcit.cirru", "w").write(src.replace(old, new))
+          PY
           calcit calcit.cirru --check-only --all-defs
           calcit fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status == "passed" and .diagnostics == [] then true else ., false end'
           calcit calcit.cirru test --tag unit --require-match --summary-only --format json
           calcit calcit.cirru js
-          git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock'
+          git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock' ':!calcit.cirru'
 
       - name: Select CDN asset prefix
         id: asset-path
