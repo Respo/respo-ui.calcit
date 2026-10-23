@@ -2407,7 +2407,7 @@
         'component-demo $ %{} 'CodeEntry
           :doc "|Live examples for one component page, keyed by component id. Each branch renders the component and the Cirru code that produced it."
           :code $ quote $ defn component-demo (id)
-            case-default id (<> |)
+            match id
               |cirru-snippet $ demo-example $ comp-cirru-snippet "|defn f (a b)\n  + a b" (Option :none)
               |snippet $ demo-example $ comp-snippet "|@import url(cirru-color/assets/cirru.css);" (Option :none)
               |copy $ demo-example (<> "|demo text") (comp-copy "|DEMO TO COPY")
@@ -2544,6 +2544,7 @@
                     StepItem :title "|Add members" :description $ Option :some "|Invite people."
                     StepItem :title |Deploy :description $ Option :some "|Ship the build."
                   Option :some $ StepsOptions :vertical? $ Option :some true
+              _ $ <> |
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String
@@ -3100,10 +3101,7 @@
           :code $ quote $ defn render-sample (kind token)
             let
                 css-ref $ token-var token.:name
-              case-default kind
-                div
-                  {} $ :class-name style-sample-plain
-                  <> token.:value
+              match kind
                 :swatch $ div $ {} (:class-name style-sample-swatch)
                   :style $ {} $ :background-color css-ref
                 :font $ div
@@ -3130,6 +3128,9 @@
                   <> |Button
                 :shadow $ div $ {} (:class-name style-sample-shadow)
                   :style $ {} $ :box-shadow css-ref
+                _ $ div
+                  {} $ :class-name style-sample-plain
+                  <> token.:value
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'Tag 'respo-ui.tokens/DesignToken
