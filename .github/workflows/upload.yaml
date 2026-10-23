@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - maintenance/0.30.1
+      - prepare/ui081-consumer031
   pull_request: {}
 
 permissions:
@@ -58,6 +59,34 @@ jobs:
           calcit calcit.cirru analyze weak-types --only dynamic-method --format json | jq -e '.data.summary.findings == 0'
           calcit docs check-md README.md --dep ./ --failures-only
           calcit calcit.cirru js
+
+      - name: Check out released Message source fixture
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Respo/respo-message.calcit
+          ref: 0.0.38
+          path: .calcit/message-consumer
+          persist-credentials: false
+
+      - name: Check original Message tests and renderer against candidate
+        working-directory: .calcit/message-consumer
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          # Source compatibility fixture using UI's verified host graph.
+          # Not Message's own npm/dependency migration or deployment.
+          cp "$GITHUB_WORKSPACE/deps.cirru" "$GITHUB_WORKSPACE/package.json" "$GITHUB_WORKSPACE/yarn.lock" .
+          ln -s "$GITHUB_WORKSPACE/node_modules" node_modules
+          mkdir -p .calcit/modules
+          for module in respo.calcit respo-router.calcit js-ffi; do
+            ln -s "$GITHUB_WORKSPACE/.calcit/modules/$module" ".calcit/modules/$module"
+          done
+          ln -s "$GITHUB_WORKSPACE" .calcit/modules/respo-ui.calcit
+          calcit calcit.cirru --check-only --all-defs
+          calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status == "passed" and .diagnostics == []'
+          calcit calcit.cirru test --tag unit --require-match --summary-only --format json
+          node check-message-render.mjs
+          git diff --quiet -- . ':!deps.cirru' ':!package.json' ':!yarn.lock'
 
       - name: Select CDN asset prefix
         id: asset-path
