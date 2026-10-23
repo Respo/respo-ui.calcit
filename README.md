@@ -139,6 +139,20 @@ dynamic-method 零命中、文档、构建及浏览器交互验收继续保留�
 Dynamic、nil 等出现次数替代类型安全，不提高预算或放宽类型。历史记录中的旧预算
 只表示当时的验证方式。新正式配对 CLI/runtime 与依赖图验收完成前不发布本次迁移。
 
+### 条件样式、属性与子节点
+
+条件 class 在两个分支分别组合完整字符串，不把无 else 的 `if` 结果传给
+`str-spaced`；保留原有空白，不能用空字符串代替缺失项。可选 DOM 属性通过
+条件 Map 合并表达，不生成空属性。可选子节点通过现有 `create-list-element`
+组合带 key 的子列表；关闭条件时使用空列表，不生成占位节点。
+
+数字 key 必须沿用原来的参数位置，例如 card 缺失标题时正文仍为 `1`，不能在
+过滤后重新编号。组件 `:tests` 对照正式 alpha.1 配对观察到的精确 SSR，覆盖
+条件开关、class 空白和属性缺失；card/badge、侧栏和展示站布局另断言子节点 key。
+本轮保留原 27 项附带测试并新增 14 项，原 16 项 native 测试不变。这些测试由原
+`yarn test:js` 重放，不新增平行检测入口，也不代替新版工具链的完整 strict、
+浏览器交互和发布配对验收。
+
 ### Typed tab callbacks / 带类型的 tab 回调
 
 `comp-tabs` preserves the caller's operation type in its `on-route` callback:
