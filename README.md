@@ -10,6 +10,14 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
+### 主线的 Store 类型合同
+
+文档站的 `Store` 定义使用 `StructDef` 元数据，初始值保留名义 `Store` 类型；
+`calcit query type respo-ui.schema/Store` 因而展示真实 Struct 的方法，而非 Enum 方法。
+Store 字段更新和 CSS token Map 写入使用已有 `.assoc`，由编译器完成字段与容器 lowering。
+状态 updater 位于 `respo-ui.updater/updater`，与浏览器启动代码分开，便于独立回放状态行为。
+组件接口、样式、依赖与版本声明不变；状态 payload 和路由 Map 的内部值仍保留原开放边界。
+
 ### 0.8.0
 
 New components: `comp-radio-group`, `comp-field`, `comp-badge`, `comp-breadcrumb`,

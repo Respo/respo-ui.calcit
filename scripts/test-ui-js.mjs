@@ -11,6 +11,9 @@ const run = (...args) => execFileSync(cli, args, {
   cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
 });
 const queryDef = (target) => JSON.parse(run("query", "def", target, "--format", "json")).data;
+// Runtime values alone cannot catch stale source metadata exposed to agents.
+assert.equal(queryDef("respo-ui.schema/Store").schema, "'StructDef");
+assert.equal(queryDef("respo-ui.schema/store").schema, "'respo-ui.schema/Store");
 const literalList = (code) => {
   assert.equal(code[0], "[]", "Expected a literal metadata list");
   return code.slice(1);
