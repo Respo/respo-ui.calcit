@@ -2,6 +2,17 @@
 Respo UI for calcit-js
 ----
 
+使用者影响：`0.8.1` 维护候选配对已发布 Router `0.8.38`、Respo `0.16.126` 与
+JS-FFI `0.2.6`，CLI/runtime 保持正式 `0.30.1`。应用的直接与传递依赖需选择同图，
+不要只提高根 pin 或放宽 Caps strict。保留 `0.8.0` 的全部组件和泛型回调 API；
+本轮仅迁移旧 Option helper 为同实现的方法，保留 fallback、短路、popup 缺失分支、
+事件与错误传播，不扩张 Dynamic/unsafe 或质量预算。
+
+补丁来自正式 `0.8.0` 的独立 `maintenance/0.30.1`，不回退较新 main。
+维护线只检查和构建，PR 保存相对路径 artifact 用于实际浏览器验收，不上传 COS 或 rsync，
+不部署 Demo、不发布 npm。原 22 项附带测试、57 个示例和既有 JS/SSR/事件回归保留；
+未完成原门禁、消费者与实际浏览器验收前，不将候选当作已发布依赖。
+
 ### Usages
 
 Find details in https://ui.respo-mvc.org/ .

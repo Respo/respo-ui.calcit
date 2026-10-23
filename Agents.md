@@ -33,7 +33,7 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
   `ButtonOptions :kind (Option :some :primary)`.
 - Read a field with `respo-ui.schema/read-field options :field`, which returns
   the value or `nil`. When the value feeds arithmetic or a typed call, `match`
-  on `options` and use `option:unwrap-or` instead, because `either` on a
+  on `options` and use `.unwrap-or` instead, because `either` on a
   `read-field` result stays an Option to the checker.
 - Callbacks that dispatch take the value and `d!`, and the struct carries an
   `Op` generic: `:on-change (Fn (String, Fn (Op) -> Unit) -> Unit)`. Inside
