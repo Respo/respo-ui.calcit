@@ -5057,7 +5057,7 @@
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *store
-            assoc schema/store :router $ initial-router
+            .assoc schema/store :router $ initial-router
           :examples $ []
           :schema $ :: 'Ref 'respo-ui.schema/Store
         'dispatch! $ %{} 'CodeEntry (:doc |)
@@ -5156,39 +5156,10 @@
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
-        'updater $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn updater (store op)
-            match op
-              (:states cursor s)
-                match
-                  try-decode-map-as cursor $ :: 'List 'Dynamic
-                  (:ok checked-cursor)
-                    match
-                      try-decode-map-as
-                        update-state-tree (:states store) checked-cursor s
-                        :: 'Map 'Tag 'Dynamic
-                      (:ok states) (assoc store :states states)
-                      (:err error) (raise error)
-                  (:err error) (raise error)
-              (:router/nav t)
-                match (try-decode-map-as t 'String)
-                  (:ok path)
-                    assoc store :router $ parse-address path router/dict
-                  (:err error) (raise error)
-              (:router/route r)
-                match
-                  try-decode-map-as r $ :: 'Map 'Tag 'Dynamic
-                  (:ok route) (assoc store :router route)
-                  (:err error) (raise error)
-              _ $ do (eprintln "|Unknown op:" op) store
-          :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'respo-ui.schema/Store)
-            :args $ [] 'respo-ui.schema/Store 'Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.main
           :require
             respo.core :refer $ render! clear-cache!
-            respo.cursor :refer $ update-state-tree
             respo-ui.comp.container :refer $ comp-container
             respo-ui.router :as router
             respo-ui.schema :as schema
@@ -5200,6 +5171,7 @@
             |bottom-tip :default hud!
             js-ffi.browser :as browser
             js-ffi.shared :as shared
+            respo-ui.updater :refer $ updater
     'respo-ui.router $ %{} 'FileEntry
       :defs $ {}
         'dict $ %{} 'CodeEntry (:doc |)
@@ -5488,7 +5460,14 @@
             :router $ :: 'Map 'Tag 'Dynamic
             :states $ :: 'Map 'Tag 'Dynamic
           :examples $ []
-          :schema $ :: 'Enum
+          :schema $ :: 'StructDef
+          :tests $ [] $ %{} 'TestEntry (:name |nominal-store-metadata)
+            :code $ quote $ do (assert-type Store 'StructDef) (assert-type store 'respo-ui.schema/Store)
+              assert= :struct-def $ type-of Store
+              assert=
+                Store :router ({}) :states $ {}
+                , store
+            :tags $ #{} :regression :unit
         'SwitchOptions $ %{} 'CodeEntry
           :doc "|Typed options shared by comp-switch and comp-checkbox. The Op generic preserves the dispatched operation type."
           :code $ quote $ defstruct SwitchOptions
@@ -5709,7 +5688,7 @@
           :code $ quote $ def store
             Store :router ({}) :states $ {}
           :examples $ []
-          :schema $ :: 'Struct
+          :schema $ :: 'respo-ui.schema/Store
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.schema
           :require
@@ -5964,11 +5943,25 @@
           :code $ quote $ defn css-variables (tokens)
             foldl tokens ({})
               fn (acc token)
-                assoc acc (str |--rui- token.:name) token.:value
+                .assoc acc (str |--rui- token.:name) token.:value
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] $ :: 'List 'respo-ui.tokens/DesignToken
             :return $ :: 'Map 'String 'String
+          :tests $ [] $ %{} 'TestEntry (:name |typed-token-map-empty-duplicate-unicode-once)
+            :code $ quote $ let
+                calls $ ref 0
+                first-token $ DesignToken :group |test :name |tone :value |black :note |first
+                next-token $ DesignToken :group |test :name |tone :value "|蓝色" :note |last
+                spacing-token $ DesignToken :group |test :name |spacing :value |0 :note |zero
+                converted $ css-variables $ do (swap! calls inc) ([] first-token next-token spacing-token)
+              assert= ({})
+                css-variables $ []
+              assert=
+                {} (|--rui-tone "|蓝色") (|--rui-spacing |0)
+                , converted
+              assert= 1 @calls
+            :tags $ #{} :regression :unit
         'design-tokens $ %{} 'CodeEntry
           :doc "|Every token with its default value. The theme style and the design system page are both generated from this list."
           :code $ quote $ def design-tokens
@@ -6377,6 +6370,76 @@
         :doc "|Design tokens as CSS custom properties. Components read tokens through these defs so a theme can override --rui-* variables."
         :code $ quote $ ns respo-ui.tokens
           :require $ respo.css :refer $ defstyle
+    'respo-ui.updater $ %{} 'FileEntry
+      :defs $ {} $ 'updater
+        %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn updater (store op)
+            match op
+              (:states cursor s)
+                match
+                  try-decode-map-as cursor $ :: 'List 'Dynamic
+                  (:ok checked-cursor)
+                    match
+                      try-decode-map-as
+                        update-state-tree (:states store) checked-cursor s
+                        :: 'Map 'Tag 'Dynamic
+                      (:ok states) (.assoc store :states states)
+                      (:err error) (raise error)
+                  (:err error) (raise error)
+              (:router/nav t)
+                match (try-decode-map-as t 'String)
+                  (:ok path)
+                    .assoc store :router $ parse-address path router/dict
+                  (:err error) (raise error)
+              (:router/route r)
+                match
+                  try-decode-map-as r $ :: 'Map 'Tag 'Dynamic
+                  (:ok route) (.assoc store :router route)
+                  (:err error) (raise error)
+              _ $ do (eprintln "|Unknown op:" op) store
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'respo-ui.schema/Store)
+            :args $ [] 'respo-ui.schema/Store 'Dynamic
+          :tests $ []
+            %{} 'TestEntry (:name |typed-store-updates-preserve-input)
+              :code $ quote $ let
+                  route $ {} (:name :old) (:data nil)
+                  states $ {} $ :data false
+                  original $ schema/Store :router route :states states
+                  next-route $ {} (:name :new) (:data 0)
+                  routed $ updater original $ :: :router/route next-route
+                  edited $ updater original $ :: :states ([]) |new-state
+                  navigated $ updater original $ :: :router/nav |/
+                assert= (schema/Store :router next-route :states states) routed
+                assert=
+                  schema/Store :router route :states $ {} $ :data |new-state
+                  , edited
+                assert= states $ :states navigated
+                assert= (parse-address |/ router/dict) (:router navigated)
+                assert= (schema/Store :router route :states states) original
+              :tags $ #{} :regression :unit
+            %{} 'TestEntry (:name |invalid-route-and-cursor-remain-rejected)
+              :code $ quote $ let
+                  original $ schema/Store :router ({}) :states $ {}
+                assert= true $ try
+                  do
+                    updater original $ :: :router/route 1
+                    , false
+                  fn (message) true
+                assert= true $ try
+                  do
+                    updater original $ :: :states 1 |bad-cursor
+                    , false
+                  fn (message) true
+                assert=
+                  schema/Store :router ({}) :states $ {}
+                  , original
+              :tags $ #{} :regression :unit
+      :ns $ %{} 'NsEntry (:doc |)
+        :code $ quote $ ns respo-ui.updater
+          :require (respo-ui.schema :as schema) (respo-ui.router :as router)
+            respo.cursor :refer $ update-state-tree
+            respo-router.parser :refer $ parse-address
     'respo-ui.util $ %{} 'FileEntry
       :defs $ {}
         'santinize-html-text $ %{} 'CodeEntry (:doc |)
