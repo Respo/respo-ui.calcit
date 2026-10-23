@@ -10,6 +10,20 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
+### 主线的 Calcit 0.31 预发布配对
+
+当前主线将 Calcit CLI 与 `@calcit/procs` 成对固定为已发布的
+`0.31.0-alpha.2`，依赖 Respo `0.17.0-alpha.2`、Router `0.9.0-alpha.1`
+和 JS-FFI `0.2.5`。安装 CLI 后先用 `calcit --version` 与
+`caps deps.cirru verify --toolchain` 核对实际配对，再执行下文的全定义、完整 strict、
+附带测试、示例和 JS 构建命令；不要以本地同名候选代替已发布的编译器。
+
+这次配对不改变组件源码、样式、事件合同或模块版本号；无隐式 nil 的条件组合见
+下文“条件样式、属性与子节点”。UI 后续模块 alpha 尚未发布，不能把主线验证
+当作已发布模块的升级承诺。首页 Quick start 对应已发布的 UI `0.9.0-alpha.1`
+与 Calcit `0.31.0-alpha.1`，不混用旧的 `0.30.1` 编译器；下文 `0.8.0` 的说明
+仅对应历史稳定配对。
+
 ### 主线的 Store 类型合同
 
 文档站的 `Store` 定义使用 `StructDef` 元数据，初始值保留名义 `Store` 类型；
