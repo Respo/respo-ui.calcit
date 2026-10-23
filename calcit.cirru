@@ -62,7 +62,7 @@
                       {} (:display :grid)
                         :grid-template-columns $ str "|repeat(auto-fit, minmax(" item-width "|px,1fr))"
                         :gap tokens/space-2
-                      if (option:some? options.:style) (option:unwrap options.:style) ({})
+                      if (.some? options.:style) (.unwrap options.:style) ({})
                   -> items $ map-indexed $ fn (idx info)
                     [] idx $ let
                         item $ cond
@@ -98,14 +98,14 @@
                                 <> $ if (nil? v) | $ respo.util.format/scalar-attribute-text v
                                 , v
                             (:none) nil
-              if (option:some? title)
+              if (.some? title)
                 div ({})
                   div
                     {} $ :class-name $ str-spaced style-attributes-title
                       .unwrap-or (:css-title options) |
                     <> $ if
-                      nil? $ option:unwrap-or title |
-                      , | $ respo.util.format/scalar-attribute-text (option:unwrap-or title |)
+                      nil? $ .unwrap-or title |
+                      , | $ respo.util.format/scalar-attribute-text (.unwrap-or title |)
                   , ret
                 , ret
           :examples $ [] $ quote
@@ -555,7 +555,7 @@
                 total $ &max 0 total
                 page $ &max 1 $ &min page (&max 1 total)
                 siblings $ &max 0 $ match options
-                  (:some o) (option:unwrap-or o.:siblings 1)
+                  (:some o) (.unwrap-or o.:siblings 1)
                   (:none) 1
               create-list-element :nav
                 {} (:aria-label |Pagination)
@@ -636,7 +636,7 @@
               -> items $ map $ fn (item)
                 let
                     item-value item.:value
-                    disabled? $ or (respo-ui.schema/read-field options :disabled) (option:unwrap-or item.:disabled false)
+                    disabled? $ or (respo-ui.schema/read-field options :disabled) (.unwrap-or item.:disabled false)
                   [] item-value $ create-element :label
                     {} $ :class-name $ str-spaced style-radio-item (if disabled? style-control-disabled)
                     input $ {} (:type |radio) (:value item-value)
@@ -714,7 +714,7 @@
                     option-value item.:value
                   [] option-value $ option $ {} (:value option-value)
                     :selected $ = value option-value
-                    :disabled $ option:unwrap-or item.:disabled false
+                    :disabled $ .unwrap-or item.:disabled false
                     :inner-text item.:label
           :examples $ [] $ quote
             comp-select |calcit
@@ -875,16 +875,16 @@
           :code $ quote $ defcomp comp-tabs (options tabs on-route)
             let
                 selected options.:selected
-                vertical? $ option:unwrap-or options.:vertical? false
+                vertical? $ .unwrap-or options.:vertical? false
               [] (effect-tab-highlight selected vertical?)
                 div
                   {}
-                    :class-name $ str-spaced style-tabs (if vertical? css/column css/row) (option:unwrap-or options.:class-name |)
+                    :class-name $ str-spaced style-tabs (if vertical? css/column css/row) (.unwrap-or options.:class-name |)
                     :style $ ui/merge-styles
-                      if (option:some? options.:width)
-                        {} $ :width $ option:unwrap-or options.:width 0
+                      if (.some? options.:width)
+                        {} $ :width $ .unwrap-or options.:width 0
                         {}
-                      if (option:some? options.:style) (option:unwrap options.:style) ({})
+                      if (.some? options.:style) (.unwrap options.:style) ({})
                   div $ {} $ :class-name
                     str-spaced style-tab-highlight $ if vertical? style-tab-vertical-highlight
                   , & $ -> tabs $ map
@@ -895,15 +895,15 @@
                       match item $
                         :tab value display
                         let
-                            selected? $ and (option:some? selected)
-                              = (option:unwrap selected) value
+                            selected? $ and (.some? selected)
+                              = (.unwrap selected) value
                           div
                             {}
-                              :class-name $ str-spaced css-tab (option:unwrap-or options.:tab-class-name |) (if selected? style-selected-tab)
+                              :class-name $ str-spaced css-tab (.unwrap-or options.:tab-class-name |) (if selected? style-selected-tab)
                               :style $ ui/merge-styles
-                                if (option:some? options.:tab-style) (option:unwrap options.:tab-style) ({})
+                                if (.some? options.:tab-style) (.unwrap options.:tab-style) ({})
                                 if selected?
-                                  if (option:some? options.:selected-tab-style) (option:unwrap options.:selected-tab-style) ({})
+                                  if (.some? options.:selected-tab-style) (.unwrap options.:selected-tab-style) ({})
                                   {}
                               :on-click $ fn (e d!)
                                 hint-fn $ {}
@@ -1064,10 +1064,10 @@
                   target $ browser/element-query-selector root $ str |. style-selected-tab
                   cursor $ browser/element-query-selector root $ str |. style-tab-highlight
                 if
-                  and (option:some? target) (option:some? cursor)
+                  and (.some? target) (.some? cursor)
                   let
-                      target $ option:unwrap target
-                      cursor $ option:unwrap cursor
+                      target $ .unwrap target
+                      cursor $ .unwrap cursor
                     if vertical?
                       do
                         browser/element-set-style! cursor |top $ str (target :offset-top) |px
@@ -1077,8 +1077,8 @@
                         browser/element-set-style! cursor |left $ str (target :offset-left) |px
                         browser/element-set-style! cursor |width $ str (target :client-width) |px
                   when (not vertical?)
-                    if (option:some? cursor)
-                      browser/element-set-style! (option:unwrap cursor) |width |0px
+                    if (.some? cursor)
+                      browser/element-set-style! (.unwrap cursor) |width |0px
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Effect)
             :args $ [] 'Value 'Bool
@@ -4530,7 +4530,7 @@
       :defs $ {}
         'dev? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dev?
-            &= |dev $ option:unwrap-or (get-env |mode) |release
+            &= |dev $ .unwrap-or (get-env |mode) |release
           :examples $ []
           :schema $ :: 'Bool
         'site $ %{} 'CodeEntry (:doc |)
@@ -4539,7 +4539,7 @@
           :examples $ []
           :schema $ :: 'Map 'Tag 'String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.8.0
+          :code $ quote $ def version |0.8.1
           :examples $ []
           :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
@@ -5079,7 +5079,7 @@
         'get-mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn get-mount-target ()
             unsafe-coerce
-              option:unwrap $ browser/query-selector |.app
+              .unwrap $ browser/query-selector |.app
               , 'respo.dom/DomElement
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.dom/DomElement)
@@ -6332,10 +6332,10 @@
               :code $ quote $ assert= |&amp;#60;script&amp;#62; (santinize-html-text |&#60;script&#62;)
         'tab-echo! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn tab-echo! (data format)
-            match (option:unwrap-or format :viewer)
+            match (.unwrap-or format :viewer)
               :json $ let
                   content $ js-ffi.contract/expect-string |JSON.stringify $ js/JSON.stringify (to-js-data data) js/undefined 2
-                option:fold (browser/window-open |about:blank)
+                .fold (browser/window-open |about:blank)
                   fn () &unit
                   fn (window)
                     let
@@ -6345,7 +6345,7 @@
                     , &unit
               :edn $ let
                   content $ format-cirru-edn data
-                option:fold (browser/window-open |about:blank)
+                .fold (browser/window-open |about:blank)
                   fn () &unit
                   fn (window)
                     let
@@ -6356,7 +6356,7 @@
               _ $ let
                   content $ format-cirru-edn $ :: :tab-echo data
                   app |https://r.tiye.me/Memkits/edn-tree-viewer/?mode=dev
-                option:fold (browser/window-open app)
+                .fold (browser/window-open app)
                   fn () &unit
                   fn (window)
                     browser/set-timeout!
