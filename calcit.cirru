@@ -161,35 +161,60 @@
           :code $ quote $ defcomp comp-badge (content options)
             let
                 dot? $ respo-ui.schema/field-or options :dot? false
-              span
-                {}
-                  :class-name $ str-spaced style-badge
-                    match (respo-ui.schema/field-or options :kind :neutral) (:info style-badge-info) (:success style-badge-success) (:warning style-badge-warning) (:error style-badge-error) (_ |)
-                    if dot? style-badge-dot
-                    respo-ui.schema/read-field options :class-name
-                  :role $ if dot? |img
-                  :aria-label $ if dot? content
-                  :style $ respo-ui.schema/read-field options :style
-                if dot? nil $ <> content
+                kind-class $ match (respo-ui.schema/field-or options :kind :neutral) (:info style-badge-info) (:success style-badge-success) (:warning style-badge-warning) (:error style-badge-error) (_ |)
+              create-list-element :span
+                .merge
+                  {}
+                    :class-name $ if dot?
+                      str-spaced style-badge kind-class style-badge-dot $ respo-ui.schema/read-field options :class-name
+                      str-spaced style-badge kind-class $ respo-ui.schema/read-field options :class-name
+                    :style $ respo-ui.schema/read-field options :style
+                  if dot?
+                    {} (:role |img) (:aria-label content)
+                    {}
+                if dot? ([])
+                  [] $ [] 0 $ <> content
           :examples $ [] $ quote
             comp-badge |12 $ respo-ui.schema/opts respo-ui.schema/BadgeOptions :kind :error
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/BadgeOptions
-          :tests $ [] $ %{} 'TestEntry (:name |render-options)
-            :code $ quote $ let
-                count-html $ respo.render.html/make-string $ comp-badge |12
-                  Option :some $ respo-ui.schema/BadgeOptions :kind $ Option :some :success
-                dot-html $ respo.render.html/make-string $ comp-badge "|3 unread"
-                  Option :some $ respo-ui.schema/BadgeOptions :dot? $ Option :some true
-                plain-html $ respo.render.html/make-string $ comp-badge |new (Option :none)
-              assert= true $ .includes? count-html |>12<
-              assert= true $ .includes? count-html |style-badge-success
-              assert= true $ .includes? dot-html |style-badge-dot
-              assert= true $ .includes? dot-html "|aria-label=\"3 unread\""
-              assert= true $ .includes? dot-html "|role=\"img\""
-              assert= false $ .includes? dot-html "|>3 unread<"
-              assert= true $ .includes? plain-html |>new<
-            :tags $ #{} :js-only
+          :tests $ []
+            %{} 'TestEntry (:name |render-options)
+              :code $ quote $ let
+                  count-html $ respo.render.html/make-string $ comp-badge |12
+                    Option :some $ respo-ui.schema/BadgeOptions :kind $ Option :some :success
+                  dot-html $ respo.render.html/make-string $ comp-badge "|3 unread"
+                    Option :some $ respo-ui.schema/BadgeOptions :dot? $ Option :some true
+                  plain-html $ respo.render.html/make-string $ comp-badge |new (Option :none)
+                assert= true $ .includes? count-html |>12<
+                assert= true $ .includes? count-html |style-badge-success
+                assert= true $ .includes? dot-html |style-badge-dot
+                assert= true $ .includes? dot-html "|aria-label=\"3 unread\""
+                assert= true $ .includes? dot-html "|role=\"img\""
+                assert= false $ .includes? dot-html "|>3 unread<"
+                assert= true $ .includes? plain-html |>new<
+              :tags $ #{} :js-only
+            %{} 'TestEntry (:name |conditional-absence)
+              :code $ quote $ let
+                  plain $ comp-badge |Notify $ Option :some
+                    respo-ui.schema/BadgeOptions :dot? $ Option :some false
+                  dot $ comp-badge |Notify $ Option :some
+                    respo-ui.schema/BadgeOptions :dot? $ Option :some true
+                assert= "|<span class=\"style-badge__respo-ui_comp \" data-comp=\"comp-badge\"><span>Notify</span></span>" $ respo.render.html/make-string plain
+                assert= "|<span aria-label=\"Notify\" class=\"style-badge__respo-ui_comp  style-badge-dot__respo-ui_comp\" data-comp=\"comp-badge\" role=\"img\"></span>" $ respo.render.html/make-string dot
+                let
+                    plain-children $ match
+                      .unwrap $ :tree plain
+                      (:element element) (:children element)
+                      (:component _) (raise |expected-element-root)
+                    dot-children $ match
+                      .unwrap $ :tree dot
+                      (:element element) (:children element)
+                      (:component _) (raise |expected-element-root)
+                  assert= 1 $ count plain-children
+                  assert= 0 $ :key $ .unwrap (.get plain-children 0)
+                  assert= 0 $ count dot-children
+              :tags $ #{} :js-only
         'comp-breadcrumb $ %{} 'CodeEntry
           :doc "|Render a breadcrumb trail. Items with :href render links; the last item is marked aria-current=page. Options: :separator (default /), :class-name, and :style."
           :code $ quote $ defcomp comp-breadcrumb (items options)
@@ -204,17 +229,20 @@
                   {} $ :class-name style-breadcrumb-list
                   -> items $ map-indexed $ fn (idx item)
                     [] (str idx)
-                      create-element :li
+                      create-list-element :li
                         {} $ :class-name style-breadcrumb-item
-                        if (= idx last-idx)
-                          span $ {} (:aria-current |page) (:class-name style-breadcrumb-current) (:inner-text item.:label)
-                          match item.:href
-                            (:some href)
-                              a $ {} (:href href) (:class-name style-breadcrumb-link) (:inner-text item.:label)
-                            (:none)
-                              span $ {} $ :inner-text item.:label
-                        if (< idx last-idx)
-                          span $ {} (:class-name style-breadcrumb-separator) (:aria-hidden |true) (:inner-text separator)
+                        concat
+                          [] $ [] 0 $ if (= idx last-idx)
+                            span $ {} (:aria-current |page) (:class-name style-breadcrumb-current) (:inner-text item.:label)
+                            match item.:href
+                              (:some href)
+                                a $ {} (:href href) (:class-name style-breadcrumb-link) (:inner-text item.:label)
+                              (:none)
+                                span $ {} $ :inner-text item.:label
+                          if (< idx last-idx)
+                            [] $ [] 1 $ span
+                              {} (:class-name style-breadcrumb-separator) (:aria-hidden |true) (:inner-text separator)
+                            []
           :examples $ [] $ quote
             comp-breadcrumb
               []
@@ -223,20 +251,27 @@
               Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] (:: 'List 'respo-ui.schema/BreadcrumbItem) (:: 'calcit.core/Option 'respo-ui.schema/BreadcrumbOptions)
-          :tests $ [] $ %{} 'TestEntry (:name |render-links)
-            :code $ quote $ let
-                html $ respo.render.html/make-string $ comp-breadcrumb
-                  []
-                    respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/
-                    respo-ui.schema/BreadcrumbItem :label |Docs
-                    respo-ui.schema/BreadcrumbItem :label |Badge :href $ Option :some |#/badge
-                  Option :some $ respo-ui.schema/BreadcrumbOptions :separator $ Option :some "|›"
-              assert= true $ .includes? html "|href=\"#/\""
-              assert= true $ .includes? html |>Docs<
-              assert= false $ .includes? html "|href=\"#/badge\""
-              assert= true $ .includes? html "|aria-current=\"page\""
-              assert= true $ .includes? html "|>›<"
-            :tags $ #{} :js-only
+          :tests $ []
+            %{} 'TestEntry (:name |render-links)
+              :code $ quote $ let
+                  html $ respo.render.html/make-string $ comp-breadcrumb
+                    []
+                      respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/
+                      respo-ui.schema/BreadcrumbItem :label |Docs
+                      respo-ui.schema/BreadcrumbItem :label |Badge :href $ Option :some |#/badge
+                    Option :some $ respo-ui.schema/BreadcrumbOptions :separator $ Option :some "|›"
+                assert= true $ .includes? html "|href=\"#/\""
+                assert= true $ .includes? html |>Docs<
+                assert= false $ .includes? html "|href=\"#/badge\""
+                assert= true $ .includes? html "|aria-current=\"page\""
+                assert= true $ .includes? html "|>›<"
+              :tags $ #{} :js-only
+            %{} 'TestEntry (:name |conditional-absence)
+              :code $ quote $ assert= "|<nav aria-label=\"Breadcrumb\" class=\"style-breadcrumb__respo-ui_comp\" data-comp=\"comp-breadcrumb\"><ol class=\"style-breadcrumb-list__respo-ui_comp\"><li class=\"style-breadcrumb-item__respo-ui_comp\"><span>A</span><span aria-hidden=\"true\" class=\"style-breadcrumb-separator__respo-ui_comp\">/</span></li><li class=\"style-breadcrumb-item__respo-ui_comp\"><span aria-current=\"page\" class=\"style-breadcrumb-current__respo-ui_comp\">B</span></li></ol></nav>"
+                respo.render.html/make-string $ comp-breadcrumb
+                  [] (respo-ui.schema/BreadcrumbItem :label |A) (respo-ui.schema/BreadcrumbItem :label |B)
+                  Option :none
+              :tags $ #{} :js-only
         'comp-button $ %{} 'CodeEntry
           :doc "|Render a native button with Respo UI variants. Options: :kind (:primary, :danger, :danger-outline), :type, :disabled, :on-click, :class-name, :style."
           :code $ quote $ defcomp comp-button (content options)
@@ -260,32 +295,57 @@
         'comp-card $ %{} 'CodeEntry
           :doc "|Render a composable card. Content may be text or a Respo node; options support :title, :footer, :class-name, and :style."
           :code $ quote $ defcomp comp-card (content options)
-            div
+            create-list-element :div
               {}
                 :class-name $ str-spaced style-card $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-              when
-                .some? $ respo-ui.schema/option-field options :title
-                div
-                  {} $ :class-name style-card-title
-                  <> $ if
-                    nil? $ respo-ui.schema/field-or options :title |
-                    , | $ respo.util.format/scalar-attribute-text (respo-ui.schema/field-or options :title |)
-              div
-                {} $ :class-name style-card-body
-                if (literal? content)
-                  <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-                  , content
-              when
-                .some? $ respo-ui.schema/option-field options :footer
-                div
-                  {} $ :class-name style-card-footer
-                  respo-ui.schema/read-field options :footer
+              concat
+                if
+                  .some? $ respo-ui.schema/option-field options :title
+                  [] $ [] 0 $ div
+                    {} $ :class-name style-card-title
+                    <> $ if
+                      nil? $ respo-ui.schema/field-or options :title |
+                      , | $ respo.util.format/scalar-attribute-text (respo-ui.schema/field-or options :title |)
+                  []
+                [] $ [] 1 $ div
+                  {} $ :class-name style-card-body
+                  if (literal? content)
+                    <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
+                    , content
+                if
+                  .some? $ respo-ui.schema/option-field options :footer
+                  [] $ [] 2 $ div
+                    {} $ :class-name style-card-footer
+                    respo-ui.schema/read-field options :footer
+                  []
           :examples $ [] $ quote
             comp-card |Content $ respo-ui.schema/opts respo-ui.schema/CardOptions :title |Summary
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Content $ :: 'calcit.core/Option 'respo-ui.schema/CardOptions
             :generics $ [] 'Content
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
+            :code $ quote $ let
+                plain $ comp-card |Body $ Option :none
+                titled $ comp-card |Body $ Option :some
+                  respo-ui.schema/CardOptions :title $ Option :some |Title
+              assert= "|<div class=\"style-card__respo-ui_comp\" data-comp=\"comp-card\"><div class=\"style-card-body__respo-ui_comp\"><span>Body</span></div></div>" $ respo.render.html/make-string plain
+              assert= "|<div class=\"style-card__respo-ui_comp\" data-comp=\"comp-card\"><div class=\"style-card-title__respo-ui_comp\"><span>Title</span></div><div class=\"style-card-body__respo-ui_comp\"><span>Body</span></div></div>" $ respo.render.html/make-string titled
+              let
+                  plain-children $ match
+                    .unwrap $ :tree plain
+                    (:element element) (:children element)
+                    (:component _) (raise |expected-element-root)
+                  titled-children $ match
+                    .unwrap $ :tree titled
+                    (:element element) (:children element)
+                    (:component _) (raise |expected-element-root)
+                assert= 1 $ count plain-children
+                assert= 1 $ :key $ .unwrap (.get plain-children 0)
+                assert= 2 $ count titled-children
+                assert= 0 $ :key $ .unwrap (.get titled-children 0)
+                assert= 1 $ :key $ .unwrap (.get titled-children 1)
+            :tags $ #{} :js-only
         'comp-catoptric-text $ %{} 'CodeEntry
           :doc "|by \"catoptric text\" I mean text added with CSS content, thus unsearchable from browser search or select. The text can still be grabbed from DOM tree though."
           :code $ quote $ defcomp comp-catoptric-text (text options)
@@ -300,42 +360,52 @@
         'comp-checkbox $ %{} 'CodeEntry
           :doc "|Render a controlled native checkbox. Shares SwitchOptions with comp-switch: :label, :disabled, :on-change (receives the next Bool and d!), :class-name, and :style."
           :code $ quote $ defcomp comp-checkbox (checked options) (assert-type checked 'Bool)
-            create-element :label
+            create-list-element :label
               {}
                 :class-name $ str-spaced css/checkbox-label $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-              input $ {} (:type |checkbox) (:class-name css/checkbox) (:checked checked)
-                :disabled $ respo-ui.schema/field-or options :disabled false
-                :on $ {} $ :input
-                  fn (e d!)
-                    hint-fn $ {}
-                      :args $ [] (:: 'Map 'Tag 'Dynamic)
-                        :: 'Fn $ {}
-                          :args $ [] 'Op
+              concat
+                [] $ [] 0 $ input
+                  {} (:type |checkbox) (:class-name css/checkbox) (:checked checked)
+                    :disabled $ respo-ui.schema/field-or options :disabled false
+                    :on $ {} $ :input
+                      fn (e d!)
+                        hint-fn $ {}
+                          :args $ [] (:: 'Map 'Tag 'Dynamic)
+                            :: 'Fn $ {}
+                              :args $ [] 'Op
+                              :return 'Unit
                           :return 'Unit
-                      :return 'Unit
-                    let
-                        on-change $ respo-ui.schema/read-field options :on-change
-                      when (non-nil? on-change)
-                        on-change
-                          match
-                            try-decode-map-as
-                              match (get e :checked)
-                                (:some checked-value) (or checked-value false)
-                                (:none) false
-                              , 'Bool
-                            (:ok checked-value) checked-value
-                            (:err message) (raise message)
-                          , d!
-                    , &unit
-              if
-                .some? $ respo-ui.schema/option-field options :label
-                <> $ str $ respo-ui.schema/read-field options :label
+                        let
+                            on-change $ respo-ui.schema/read-field options :on-change
+                          when (non-nil? on-change)
+                            on-change
+                              match
+                                try-decode-map-as
+                                  match (get e :checked)
+                                    (:some checked-value) (or checked-value false)
+                                    (:none) false
+                                  , 'Bool
+                                (:ok checked-value) checked-value
+                                (:err message) (raise message)
+                              , d!
+                        , &unit
+                if
+                  .some? $ respo-ui.schema/option-field options :label
+                  [] $ [] 1 $ <>
+                    str $ respo-ui.schema/read-field options :label
+                  []
           :examples $ [] $ quote
             comp-checkbox true $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Remember me"
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Bool $ :: 'calcit.core/Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
+            :code $ quote $ do
+              assert= "|<label class=\"checkbox-label__respo-ui_css\" data-comp=\"comp-checkbox\"><input class=\"checkbox__respo-ui_css\" type=\"checkbox\" ></label>" $ respo.render.html/make-string $ comp-checkbox false (Option :none)
+              assert= "|<label class=\"checkbox-label__respo-ui_css\" data-comp=\"comp-checkbox\"><input checked=\"true\" class=\"checkbox__respo-ui_css\" type=\"checkbox\" ><span>Label</span></label>" $ respo.render.html/make-string $ comp-checkbox true
+                Option :some $ respo-ui.schema/SwitchOptions :label $ Option :some |Label
+            :tags $ #{} :js-only
         'comp-cirru-snippet $ %{} 'CodeEntry
           :doc "|Render Cirru code with syntax highlighting. Options: :class-name and :style."
           :code $ quote $ defcomp comp-cirru-snippet (text options)
@@ -428,55 +498,70 @@
         'comp-empty $ %{} 'CodeEntry
           :doc "|Render a richer empty state with optional :icon, :description, :action, :class-name, and :style."
           :code $ quote $ defcomp comp-empty (title options)
-            div
+            create-list-element :div
               {}
                 :class-name $ str-spaced style-empty $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-              div
-                {} $ :class-name style-empty-icon
+              concat
+                [] $ [] 0 $ div
+                  {} $ :class-name style-empty-icon
+                  if
+                    .some? $ respo-ui.schema/option-field options :icon
+                    respo-ui.schema/read-field options :icon
+                    <> "|◇"
+                [] $ [] 1 $ div
+                  {} $ :class-name style-empty-title
+                  <> title
                 if
-                  .some? $ respo-ui.schema/option-field options :icon
-                  respo-ui.schema/read-field options :icon
-                  <> "|◇"
-              div
-                {} $ :class-name style-empty-title
-                <> title
-              when
-                .some? $ respo-ui.schema/option-field options :description
-                div
-                  {} $ :class-name style-empty-description
-                  <> $ respo-ui.schema/field-or options :description |
-              when
-                .some? $ respo-ui.schema/option-field options :action
-                div ({}) (respo-ui.schema/read-field options :action)
+                  .some? $ respo-ui.schema/option-field options :description
+                  [] $ [] 2 $ div
+                    {} $ :class-name style-empty-description
+                    <> $ respo-ui.schema/field-or options :description |
+                  []
+                if
+                  .some? $ respo-ui.schema/option-field options :action
+                  [] $ [] 3 $ div ({}) (respo-ui.schema/read-field options :action)
+                  []
           :examples $ [] $ quote
             comp-empty "|No results" $ respo-ui.schema/opts respo-ui.schema/EmptyOptions :description "|Try another search term."
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String $ :: 'calcit.core/Option 'respo-ui.schema/EmptyOptions
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
+            :code $ quote $ do
+              assert= "|<div class=\"style-empty__respo-ui_comp\" data-comp=\"comp-empty\"><div class=\"style-empty-icon__respo-ui_comp\"><span>◇</span></div><div class=\"style-empty-title__respo-ui_comp\"><span>Empty</span></div></div>" $ respo.render.html/make-string $ comp-empty |Empty (Option :none)
+              assert= "|<div class=\"style-empty__respo-ui_comp\" data-comp=\"comp-empty\"><div class=\"style-empty-icon__respo-ui_comp\"><span>◇</span></div><div class=\"style-empty-title__respo-ui_comp\"><span>Empty</span></div><div class=\"style-empty-description__respo-ui_comp\"><span>Description</span></div><div><span>Control</span></div></div>" $ respo.render.html/make-string $ comp-empty |Empty
+                Option :some $ respo-ui.schema/EmptyOptions :description (Option :some |Description) :action $ Option :some (<> |Control)
+            :tags $ #{} :js-only
         'comp-field $ %{} 'CodeEntry
           :doc "|Wrap a form control with a label, optional description, and error message. Options: :for (id of the labelled control), :description, :error (rendered with role=alert), :required?, :class-name, and :style."
           :code $ quote $ defcomp comp-field (label control options)
-            div
+            create-list-element :div
               {}
                 :class-name $ str-spaced style-field $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-              create-element :label
-                {} (:class-name style-field-label)
-                  :for $ respo-ui.schema/read-field options :for
-                <> label
-                if (respo-ui.schema/field-or options :required? false)
-                  span $ {} (:class-name style-field-required) (:aria-hidden |true) (:inner-text |*)
-              , control
-                when
+              concat
+                [] $ [] 0 $ create-list-element :label
+                  {} (:class-name style-field-label)
+                    :for $ respo-ui.schema/read-field options :for
+                  concat
+                    [] $ [] 0 $ <> label
+                    if (respo-ui.schema/field-or options :required? false)
+                      [] $ [] 1 $ span
+                        {} (:class-name style-field-required) (:aria-hidden |true) (:inner-text |*)
+                      []
+                [] $ [] 1 control
+                if
                   .some? $ respo-ui.schema/option-field options :description
-                  div
+                  [] $ [] 2 $ div
                     {} $ :class-name style-field-description
                     <> $ respo-ui.schema/field-or options :description |
-                when
+                  []
+                if
                   .some? $ respo-ui.schema/option-field options :error
-                  div
+                  [] $ [] 3 $ div
                     {} (:class-name style-field-error) (:role |alert)
                     <> $ respo-ui.schema/field-or options :error |
+                  []
           :examples $ [] $ quote
             comp-field |Email
               comp-input | $ respo-ui.schema/opts respo-ui.schema/InputOptions :placeholder |you@example.com
@@ -484,21 +569,28 @@
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'String 'Control $ :: 'calcit.core/Option 'respo-ui.schema/FieldOptions
             :generics $ [] 'Control
-          :tests $ [] $ %{} 'TestEntry (:name |render-options)
-            :code $ quote $ let
-                control $ comp-input | $ Option :none
-                html $ respo.render.html/make-string $ comp-field |Email control
-                  Option :some $ respo-ui.schema/FieldOptions :for (Option :some |email) :description (Option :some |Hint) :error (Option :some |Invalid) :required? $ Option :some true
-                plain $ respo.render.html/make-string $ comp-field |Name control (Option :none)
-              assert= true $ .includes? html "|for=\"email\""
-              assert= true $ .includes? html |>Hint<
-              assert= true $ .includes? html "|role=\"alert\""
-              assert= true $ .includes? html |>Invalid<
-              assert= true $ .includes? html |style-field-required
-              assert= true $ .includes? plain |>Name<
-              assert= false $ .includes? plain "|role=\"alert\""
-              assert= false $ .includes? plain |style-field-required
-            :tags $ #{} :js-only
+          :tests $ []
+            %{} 'TestEntry (:name |render-options)
+              :code $ quote $ let
+                  control $ comp-input | $ Option :none
+                  html $ respo.render.html/make-string $ comp-field |Email control
+                    Option :some $ respo-ui.schema/FieldOptions :for (Option :some |email) :description (Option :some |Hint) :error (Option :some |Invalid) :required? $ Option :some true
+                  plain $ respo.render.html/make-string $ comp-field |Name control (Option :none)
+                assert= true $ .includes? html "|for=\"email\""
+                assert= true $ .includes? html |>Hint<
+                assert= true $ .includes? html "|role=\"alert\""
+                assert= true $ .includes? html |>Invalid<
+                assert= true $ .includes? html |style-field-required
+                assert= true $ .includes? plain |>Name<
+                assert= false $ .includes? plain "|role=\"alert\""
+                assert= false $ .includes? plain |style-field-required
+              :tags $ #{} :js-only
+            %{} 'TestEntry (:name |conditional-absence)
+              :code $ quote $ do
+                assert= "|<div class=\"style-field__respo-ui_comp\" data-comp=\"comp-field\"><label class=\"style-field-label__respo-ui_comp\"><span>Field</span></label><span>Control</span></div>" $ respo.render.html/make-string $ comp-field |Field (<> |Control) (Option :none)
+                assert= "|<div class=\"style-field__respo-ui_comp\" data-comp=\"comp-field\"><label class=\"style-field-label__respo-ui_comp\"><span>Field</span><span aria-hidden=\"true\" class=\"style-field-required__respo-ui_comp\">*</span></label><span>Control</span><div class=\"style-field-description__respo-ui_comp\"><span>Description</span></div><div class=\"style-field-error__respo-ui_comp\" role=\"alert\"><span>Error</span></div></div>" $ respo.render.html/make-string $ comp-field |Field (<> |Control)
+                  Option :some $ respo-ui.schema/FieldOptions :required? (Option :some true) :description (Option :some |Description) :error $ Option :some |Error
+              :tags $ #{} :js-only
         'comp-input $ %{} 'CodeEntry
           :doc "|Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-input (value options)
@@ -622,16 +714,16 @@
             create-list-element :div
               {} (:role |radiogroup)
                 :aria-label $ respo-ui.schema/read-field options :label
-                :class-name $ str-spaced style-radio-group
-                  if (respo-ui.schema/field-or options :vertical? false) style-radio-group-vertical
-                  respo-ui.schema/read-field options :class-name
+                :class-name $ if (respo-ui.schema/field-or options :vertical? false)
+                  str-spaced style-radio-group style-radio-group-vertical $ respo-ui.schema/read-field options :class-name
+                  str-spaced style-radio-group $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               -> items $ map $ fn (item)
                 let
                     item-value item.:value
                     disabled? $ or (respo-ui.schema/read-field options :disabled) (option:unwrap-or item.:disabled false)
                   [] item-value $ create-element :label
-                    {} $ :class-name $ str-spaced style-radio-item (if disabled? style-control-disabled)
+                    {} $ :class-name $ if disabled? (str-spaced style-radio-item style-control-disabled) (str-spaced style-radio-item)
                     input $ {} (:type |radio) (:value item-value)
                       :name $ respo-ui.schema/read-field options :name
                       :checked $ = value item-value
@@ -657,22 +749,32 @@
             :args $ [] 'String (:: 'List 'respo-ui.schema/SelectOption)
               :: 'calcit.core/Option $ :: 'respo-ui.schema/RadioGroupOptions 'Op
             :generics $ [] 'Op
-          :tests $ [] $ %{} 'TestEntry (:name |render-options)
-            :code $ quote $ let
-                items $ [] (respo-ui.schema/SelectOption :value |a :label |Alpha)
-                  respo-ui.schema/SelectOption :value |b :label |Beta :disabled $ Option :some true
-                html $ respo.render.html/make-string $ comp-radio-group |a items
-                  Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |pick) :label (Option :some "|Pick one") :vertical? $ Option :some true
-                plain $ respo.render.html/make-string $ comp-radio-group |b items (Option :none)
-              assert= true $ .includes? html "|role=\"radiogroup\""
-              assert= true $ .includes? html "|aria-label=\"Pick one\""
-              assert= true $ .includes? html "|name=\"pick\""
-              assert= true $ .includes? html |style-radio-group-vertical
-              assert= true $ .includes? html |>Alpha<
-              assert= true $ .includes? html |style-control-disabled
-              assert= false $ .includes? plain |style-radio-group-vertical
-              assert= false $ .includes? plain |name=
-            :tags $ #{} :js-only
+          :tests $ []
+            %{} 'TestEntry (:name |render-options)
+              :code $ quote $ let
+                  items $ [] (respo-ui.schema/SelectOption :value |a :label |Alpha)
+                    respo-ui.schema/SelectOption :value |b :label |Beta :disabled $ Option :some true
+                  html $ respo.render.html/make-string $ comp-radio-group |a items
+                    Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |pick) :label (Option :some "|Pick one") :vertical? $ Option :some true
+                  plain $ respo.render.html/make-string $ comp-radio-group |b items (Option :none)
+                assert= true $ .includes? html "|role=\"radiogroup\""
+                assert= true $ .includes? html "|aria-label=\"Pick one\""
+                assert= true $ .includes? html "|name=\"pick\""
+                assert= true $ .includes? html |style-radio-group-vertical
+                assert= true $ .includes? html |>Alpha<
+                assert= true $ .includes? html |style-control-disabled
+                assert= false $ .includes? plain |style-radio-group-vertical
+                assert= false $ .includes? plain |name=
+              :tags $ #{} :js-only
+            %{} 'TestEntry (:name |conditional-absence)
+              :code $ quote $ do
+                assert= "|<div class=\"style-radio-group__respo-ui_comp\" data-comp=\"comp-radio-group\" role=\"radiogroup\"><label class=\"style-radio-item__respo-ui_comp\"><input checked=\"true\" class=\"style-radio-input__respo-ui_comp\" type=\"radio\" value=\"a\" ><span><span>Alpha</span></span></label></div>" $ respo.render.html/make-string $ comp-radio-group |a
+                  [] $ respo-ui.schema/SelectOption :value |a :label |Alpha
+                  Option :none
+                assert= "|<div class=\"style-radio-group__respo-ui_comp style-radio-group-vertical__respo-ui_comp\" data-comp=\"comp-radio-group\" role=\"radiogroup\"><label class=\"style-radio-item__respo-ui_comp style-control-disabled__respo-ui_comp\"><input checked=\"true\" class=\"style-radio-input__respo-ui_comp\" disabled=\"true\" type=\"radio\" value=\"a\" ><span><span>Alpha</span></span></label></div>" $ respo.render.html/make-string $ comp-radio-group |a
+                  [] $ respo-ui.schema/SelectOption :value |a :label |Alpha
+                  Option :some $ respo-ui.schema/RadioGroupOptions :vertical? (Option :some true) :disabled $ Option :some true
+              :tags $ #{} :js-only
         'comp-select $ %{} 'CodeEntry
           :doc "|Render a controlled native select from SelectOption items, each with :value, :label, and optional :disabled. Options: :disabled, :on-change (receives the next value and d!), :class-name, and :style."
           :code $ quote $ defcomp comp-select (value items options)
@@ -771,16 +873,18 @@
           :code $ quote $ defcomp comp-steps (current items options)
             create-list-element :ol
               {}
-                :class-name $ str-spaced style-steps
-                  if (respo-ui.schema/field-or options :vertical? false) style-steps-vertical
-                  respo-ui.schema/read-field options :class-name
+                :class-name $ if (respo-ui.schema/field-or options :vertical? false)
+                  str-spaced style-steps style-steps-vertical $ respo-ui.schema/read-field options :class-name
+                  str-spaced style-steps $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
               -> items $ map-indexed $ fn (idx item)
                 [] (str idx)
                   create-element :li
-                    {}
-                      :class-name $ str-spaced style-step $ if (= idx current) style-step-current
-                      :aria-current $ if (= idx current) |step
+                    .merge
+                      {} $ :class-name $ if (= idx current) (str-spaced style-step style-step-current) (str-spaced style-step)
+                      if (= idx current)
+                        {} $ :aria-current |step
+                        {}
                     span $ {}
                       :class-name $ str-spaced style-step-marker $ cond
                           < idx current
@@ -800,69 +904,88 @@
               Option :none
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Number (:: 'List 'respo-ui.schema/StepItem) (:: 'calcit.core/Option 'respo-ui.schema/StepsOptions)
-          :tests $ [] $ %{} 'TestEntry (:name |render-status)
-            :code $ quote $ let
-                html $ respo.render.html/make-string $ comp-steps 1
-                  [] (respo-ui.schema/StepItem :title |Account)
-                    respo-ui.schema/StepItem :title |Profile :description $ Option :some |About
-                    respo-ui.schema/StepItem :title |Done
+          :tests $ []
+            %{} 'TestEntry (:name |render-status)
+              :code $ quote $ let
+                  html $ respo.render.html/make-string $ comp-steps 1
+                    [] (respo-ui.schema/StepItem :title |Account)
+                      respo-ui.schema/StepItem :title |Profile :description $ Option :some |About
+                      respo-ui.schema/StepItem :title |Done
+                    Option :some $ respo-ui.schema/StepsOptions :vertical? $ Option :some true
+                assert= true $ .includes? html |style-step-marker-done
+                assert= true $ .includes? html "|>✓<"
+                assert= true $ .includes? html "|aria-current=\"step\""
+                assert= true $ .includes? html |>About<
+                assert= true $ .includes? html |>3<
+                assert= true $ .includes? html |style-steps-vertical
+              :tags $ #{} :js-only
+            %{} 'TestEntry (:name |conditional-absence)
+              :code $ quote $ do
+                assert= "|<ol class=\"style-steps__respo-ui_comp\" data-comp=\"comp-steps\"><li aria-current=\"step\" class=\"style-step__respo-ui_comp style-step-current__respo-ui_comp\"><span class=\"style-step-marker__respo-ui_comp style-step-marker-current__respo-ui_comp\">1</span><div><div class=\"style-step-title__respo-ui_comp\">A</div></div></li><li class=\"style-step__respo-ui_comp\"><span class=\"style-step-marker__respo-ui_comp \">2</span><div><div class=\"style-step-title__respo-ui_comp\">B</div></div></li></ol>" $ respo.render.html/make-string $ comp-steps 0
+                  [] (respo-ui.schema/StepItem :title |A) (respo-ui.schema/StepItem :title |B)
+                  Option :none
+                assert= "|<ol class=\"style-steps__respo-ui_comp style-steps-vertical__respo-ui_comp\" data-comp=\"comp-steps\"><li aria-current=\"step\" class=\"style-step__respo-ui_comp style-step-current__respo-ui_comp\"><span class=\"style-step-marker__respo-ui_comp style-step-marker-current__respo-ui_comp\">1</span><div><div class=\"style-step-title__respo-ui_comp\">A</div></div></li><li class=\"style-step__respo-ui_comp\"><span class=\"style-step-marker__respo-ui_comp \">2</span><div><div class=\"style-step-title__respo-ui_comp\">B</div></div></li></ol>" $ respo.render.html/make-string $ comp-steps 0
+                  [] (respo-ui.schema/StepItem :title |A) (respo-ui.schema/StepItem :title |B)
                   Option :some $ respo-ui.schema/StepsOptions :vertical? $ Option :some true
-              assert= true $ .includes? html |style-step-marker-done
-              assert= true $ .includes? html "|>✓<"
-              assert= true $ .includes? html "|aria-current=\"step\""
-              assert= true $ .includes? html |>About<
-              assert= true $ .includes? html |>3<
-              assert= true $ .includes? html |style-steps-vertical
-            :tags $ #{} :js-only
+              :tags $ #{} :js-only
         'comp-switch $ %{} 'CodeEntry
           :doc "|Render a controlled accessible switch backed by a native checkbox. Options: :label, :disabled, :on-change, :class-name, and :style."
           :code $ quote $ defcomp comp-switch (checked options)
-            create-element :label
+            create-list-element :label
               {}
-                :class-name $ str-spaced style-switch-label
-                  if (respo-ui.schema/field-or options :disabled false) style-control-disabled
-                  respo-ui.schema/read-field options :class-name
+                :class-name $ if (respo-ui.schema/field-or options :disabled false)
+                  str-spaced style-switch-label style-control-disabled $ respo-ui.schema/read-field options :class-name
+                  str-spaced style-switch-label $ respo-ui.schema/read-field options :class-name
                 :style $ respo-ui.schema/read-field options :style
-              input $ {} (:type |checkbox) (:checked checked)
-                :disabled $ respo-ui.schema/field-or options :disabled false
-                :aria-label $ respo-ui.schema/read-field options :label
-                :class-name style-switch-input
-                :on-input $ fn (e d!)
-                  hint-fn $ {}
-                    :args $ [] (:: 'Map 'Tag 'Dynamic)
-                      :: 'Fn $ {}
-                        :args $ [] 'Op
-                        :return 'Unit
-                    :return 'Unit
-                  let
-                      on-change $ respo-ui.schema/read-field options :on-change
-                    when (non-nil? on-change)
-                      on-change
-                        match
-                          try-decode-map-as
-                            match (get e :checked)
-                              (:some checked-value) (or checked-value false)
-                              (:none) false
-                            , 'Bool
-                          (:ok checked-value) checked-value
-                          (:err message) (raise message)
-                        fn (op)
-                          hint-fn $ {}
+              concat
+                [] $ [] 0 $ input
+                  {} (:type |checkbox) (:checked checked)
+                    :disabled $ respo-ui.schema/field-or options :disabled false
+                    :aria-label $ respo-ui.schema/read-field options :label
+                    :class-name style-switch-input
+                    :on-input $ fn (e d!)
+                      hint-fn $ {}
+                        :args $ [] (:: 'Map 'Tag 'Dynamic)
+                          :: 'Fn $ {}
                             :args $ [] 'Op
                             :return 'Unit
-                          d! op
-                  , &unit
-              span $ {} $ :class-name
-                str-spaced style-switch-track $ if checked style-switch-track-checked
-              when
-                .some? $ respo-ui.schema/option-field options :label
-                span ({})
-                  <> $ respo-ui.schema/field-or options :label |
+                        :return 'Unit
+                      let
+                          on-change $ respo-ui.schema/read-field options :on-change
+                        when (non-nil? on-change)
+                          on-change
+                            match
+                              try-decode-map-as
+                                match (get e :checked)
+                                  (:some checked-value) (or checked-value false)
+                                  (:none) false
+                                , 'Bool
+                              (:ok checked-value) checked-value
+                              (:err message) (raise message)
+                            fn (op)
+                              hint-fn $ {}
+                                :args $ [] 'Op
+                                :return 'Unit
+                              d! op
+                      , &unit
+                [] $ [] 1 $ span
+                  {} $ :class-name $ if checked (str-spaced style-switch-track style-switch-track-checked) (str-spaced style-switch-track)
+                if
+                  .some? $ respo-ui.schema/option-field options :label
+                  [] $ [] 2 $ span ({})
+                    <> $ respo-ui.schema/field-or options :label |
+                  []
           :examples $ [] $ quote
             comp-switch false $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Compact mode"
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Bool $ :: 'calcit.core/Option (:: 'respo-ui.schema/SwitchOptions 'Op)
             :generics $ [] 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
+            :code $ quote $ do
+              assert= "|<label class=\"style-switch-label__respo-ui_comp\" data-comp=\"comp-switch\"><input class=\"style-switch-input__respo-ui_comp\" type=\"checkbox\" ><span class=\"style-switch-track__respo-ui_comp\"></span></label>" $ respo.render.html/make-string $ comp-switch false (Option :none)
+              assert= "|<label class=\"style-switch-label__respo-ui_comp style-control-disabled__respo-ui_comp\" data-comp=\"comp-switch\"><input aria-label=\"Label\" checked=\"true\" class=\"style-switch-input__respo-ui_comp\" disabled=\"true\" type=\"checkbox\" ><span class=\"style-switch-track__respo-ui_comp style-switch-track-checked__respo-ui_comp\"></span><span><span>Label</span></span></label>" $ respo.render.html/make-string $ comp-switch true
+                Option :some $ respo-ui.schema/SwitchOptions :label (Option :some |Label) :disabled $ Option :some true
+            :tags $ #{} :js-only
         'comp-tabs $ %{} 'CodeEntry
           :doc "|Render horizontal or vertical tabs from TabRoute items. TabsOptions sets :selected, :vertical?, :width, and styles; on-route receives the clicked TabRoute."
           :code $ quote $ defcomp comp-tabs (options tabs on-route)
@@ -879,7 +1002,7 @@
                         {}
                       if (option:some? options.:style) (option:unwrap options.:style) ({})
                   div $ {} $ :class-name
-                    str-spaced style-tab-highlight $ if vertical? style-tab-vertical-highlight
+                    if vertical? (str-spaced style-tab-highlight style-tab-vertical-highlight) (str-spaced style-tab-highlight)
                   , & $ -> tabs $ map
                     fn (item)
                       hint-fn $ {}
@@ -892,7 +1015,9 @@
                               = (option:unwrap selected) value
                           div
                             {}
-                              :class-name $ str-spaced css-tab (option:unwrap-or options.:tab-class-name |) (if selected? style-selected-tab)
+                              :class-name $ if selected?
+                                str-spaced css-tab (option:unwrap-or options.:tab-class-name |) style-selected-tab
+                                str-spaced css-tab $ option:unwrap-or options.:tab-class-name |
                               :style $ ui/merge-styles
                                 if (option:some? options.:tab-style) (option:unwrap options.:tab-style) ({})
                                 if selected?
@@ -932,6 +1057,27 @@
                   :: 'Fn $ {} (:return 'Unit)
                     :args $ [] 'Op
             :generics $ [] 'Value 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
+            :code $ quote $ let
+                callback $ fn (route d!)
+                  hint-fn $ {}
+                    :args $ [] (:: 'respo-ui.schema/TabRoute 'Tag)
+                      :: 'Fn $ {}
+                        :args $ [] 'Tag
+                        :return 'Unit
+                    :return 'Unit
+                  , &unit
+              assert= "|<div class=\"style-tabs__respo-ui_comp row__respo-ui_css \" data-comp=\"comp-tabs\"><div class=\"style-tab-highlight__respo-ui_comp\"></div><div class=\"css-tab__respo-ui_comp \"><span>Alpha</span></div></div>" $ respo.render.html/make-string $ comp-tabs
+                assert-type (respo-ui.schema/TabsOptions) (:: 'respo-ui.schema/TabsOptions 'Tag)
+                [] $ respo-ui.schema/TabRoute :tab :a |Alpha
+                , callback
+              assert= "|<div class=\"style-tabs__respo-ui_comp column__respo-ui_css \" data-comp=\"comp-tabs\"><div class=\"style-tab-highlight__respo-ui_comp style-tab-vertical-highlight__respo-ui_comp\"></div><div class=\"css-tab__respo-ui_comp  style-selected-tab__respo-ui_comp\"><span>Alpha</span></div></div>" $ respo.render.html/make-string $ comp-tabs
+                assert-type
+                  respo-ui.schema/TabsOptions :vertical? (Option :some true) :selected $ Option :some :a
+                  :: 'respo-ui.schema/TabsOptions 'Tag
+                [] $ respo-ui.schema/TabRoute :tab :a |Alpha
+                , callback
+            :tags $ #{} :js-only
         'comp-tag $ %{} 'CodeEntry
           :doc "|Render a small semantic tag. Kinds are :info, :success, :warning, and :error; any other tag uses the neutral style. ButtonOptions :on-click, :class-name, and :style apply."
           :code $ quote $ defcomp comp-tag (kind content options)
@@ -1169,26 +1315,34 @@
                 current? $ and (= target page)
                   = text $ str target
                 disabled? $ or (< target 1) (> target total)
-              button $ {} (:type |button) (:inner-text text) (:aria-label label) (:disabled disabled?)
-                :aria-current $ if current? |page
-                :class-name $ str-spaced style-pagination-item $ if current? style-pagination-current
-                :on-click $ fn (e d!)
-                  hint-fn $ {}
-                    :args $ [] (:: 'Map 'Tag 'Dynamic)
-                      :: 'Fn $ {}
-                        :args $ [] 'Op
-                        :return 'Unit
-                    :return 'Unit
-                  let
-                      on-change $ respo-ui.schema/read-field options :on-change
-                    when
-                      and (non-nil? on-change) (not current?) (not disabled?)
-                      on-change target d!
-                  , &unit
+              button $ .merge
+                {} (:type |button) (:inner-text text) (:aria-label label) (:disabled disabled?)
+                  :class-name $ if current? (str-spaced style-pagination-item style-pagination-current) (str-spaced style-pagination-item)
+                  :on-click $ fn (e d!)
+                    hint-fn $ {}
+                      :args $ [] (:: 'Map 'Tag 'Dynamic)
+                        :: 'Fn $ {}
+                          :args $ [] 'Op
+                          :return 'Unit
+                      :return 'Unit
+                    let
+                        on-change $ respo-ui.schema/read-field options :on-change
+                      when
+                        and (non-nil? on-change) (not current?) (not disabled?)
+                        on-change target d!
+                    , &unit
+                if current?
+                  {} $ :aria-current |page
+                  {}
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'Number 'Number 'Number 'String 'String $ :: 'calcit.core/Option (:: 'respo-ui.schema/PaginationOptions 'Op)
             :generics $ [] 'Op
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
+            :code $ quote $ do
+              assert= "|<button aria-label=\"Two\" class=\"style-pagination-item__respo-ui_comp\" type=\"button\">2</button>" $ respo.render.html/make-string $ render-page-button 1 3 2 |2 |Two (Option :none)
+              assert= "|<button aria-current=\"page\" aria-label=\"Two\" class=\"style-pagination-item__respo-ui_comp style-pagination-current__respo-ui_comp\" type=\"button\">2</button>" $ respo.render.html/make-string $ render-page-button 2 3 2 |2 |Two (Option :none)
+            :tags $ #{} :js-only
         'style-alert $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-alert
             {} $ |& $ {} (:padding "|10px 12px") (:border "|1px solid transparent") (:border-radius tokens/radius-lg) (:font-size tokens/text-md) (:line-height tokens/leading-normal)
@@ -2797,37 +2951,81 @@
                   (:utils) :utils
                   (:not-found _) :not-found
                   _ :index
-              div
+              respo.core/create-list-element :div
                 {}
                   :class-name $ str-spaced css/preset css/global css/fullscreen css/column
                   :style $ {} $ :overflow :hidden
-                comp-topbar route-name
-                div
-                  {} $ :class-name style-shell-body
-                  when (not= route-name :index)
-                    comp-sidenav route-name $ match router
-                      (:component id) id
-                      _ |
-                  div
-                    {} $ :class-name $ if (= route-name :index) css-content-home css-content
-                    div $ {} $ :id |content-top
-                    match router
-                      (:index) (comp-home)
-                      (:widgets) (comp-widgets-page)
-                      (:layouts) (comp-layouts-page)
-                      (:fonts) (comp-fonts-page)
-                      (:design) (comp-design-page)
-                      (:components)
-                        comp-components-page $ >> states :components
-                      (:component id) (comp-component-page id)
-                      (:utils) (comp-utils-page)
-                      (:not-found pp)
-                        <> $ to-lispy-string router
-                      _ $ do (eprintln |unknown-router router) (comp-home)
-                if dev? $ comp-inspect |Store store $ {} (:bottom 0)
+                concat
+                  [] $ [] 0 $ comp-topbar route-name
+                  [] $ [] 1 $ respo.core/create-list-element :div
+                    {} $ :class-name style-shell-body
+                    concat
+                      if (not= route-name :index)
+                        [] $ [] 0 $ comp-sidenav route-name
+                          match router
+                            (:component id) id
+                            _ |
+                        []
+                      [] $ [] 1 $ div
+                        {} $ :class-name $ if (= route-name :index) css-content-home css-content
+                        div $ {} $ :id |content-top
+                        match router
+                          (:index) (comp-home)
+                          (:widgets) (comp-widgets-page)
+                          (:layouts) (comp-layouts-page)
+                          (:fonts) (comp-fonts-page)
+                          (:design) (comp-design-page)
+                          (:components)
+                            comp-components-page $ >> states :components
+                          (:component id) (comp-component-page id)
+                          (:utils) (comp-utils-page)
+                          (:not-found pp)
+                            <> $ to-lispy-string router
+                          _ $ do (eprintln |unknown-router router) (comp-home)
+                  if dev?
+                    [] $ [] 2 $ comp-inspect |Store store
+                      {} $ :bottom 0
+                    []
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'respo-ui.schema/Store
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-child-keys)
+            :code $ quote $ do
+              let
+                  home $ comp-container $ respo-ui.schema/Store :states ({}) :router (respo-router.parser/parse-address |/index.html respo-ui.router/dict)
+                  home-root $ match
+                    .unwrap $ :tree home
+                    (:element element) element
+                    (:component _) (raise |expected-element-root)
+                  body-node $ .unwrap $ :node
+                    .unwrap $ .get (:children home-root) 1
+                  body $ match body-node
+                    (:element element) element
+                    (:component _) (raise |expected-element-shell)
+                assert= 0 $ :key $ .unwrap
+                  .get (:children home-root) 0
+                assert= 1 $ :key $ .unwrap
+                  .get (:children home-root) 1
+                assert= 1 $ count $ :children body
+                assert= 1 $ :key $ .unwrap
+                  .get (:children body) 0
+              let
+                  design $ comp-container $ respo-ui.schema/Store :states ({}) :router (respo-router.parser/parse-address |/design.html respo-ui.router/dict)
+                  design-root $ match
+                    .unwrap $ :tree design
+                    (:element element) element
+                    (:component _) (raise |expected-element-root)
+                  body-node $ .unwrap $ :node
+                    .unwrap $ .get (:children design-root) 1
+                  body $ match body-node
+                    (:element element) element
+                    (:component _) (raise |expected-element-shell)
+                assert= 2 $ count $ :children body
+                assert= 0 $ :key $ .unwrap
+                  .get (:children body) 0
+                assert= 1 $ :key $ .unwrap
+                  .get (:children body) 1
+            :tags $ #{} :js-only
         'comp-utils-page $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-utils-page ()
             div ({})
@@ -4118,40 +4316,59 @@
         'comp-sidenav $ %{} 'CodeEntry
           :doc "|Left navigation. On component routes it lists every component, highlighting active-id."
           :code $ quote $ defcomp comp-sidenav (route-name active-id)
-            div
+            respo.core/create-list-element :div
               {} $ :class-name style-sidenav
-              div
-                {} $ :class-name style-nav-title
-                <> |Overview
-              render-nav-item |index.html |Introduction $ = route-name :index
-              div
-                {} $ :class-name style-nav-title
-                <> |Foundations
-              render-nav-item |design.html "|Design system" $ = route-name :design
-              when (= route-name :design)
-                list-> ({})
-                  map design-sections $ fn (section)
-                    [] section.:id $ div
-                      {} (:class-name css-nav-sub)
-                        :on-click $ on-jump $ str |#design- section.:id
-                      <> section.:title
-              render-nav-item |layouts.html |Layouts $ = route-name :layouts
-              render-nav-item |fonts.html |Fonts $ = route-name :fonts
-              div
-                {} $ :class-name style-nav-title
-                <> |Components
-              render-nav-item |components.html |Overview $ = route-name :components
-              list-> ({})
-                map component-groups $ fn (group)
-                  [] group.:id $ render-nav-group group active-id
-              div
-                {} $ :class-name style-nav-title
-                <> |More
-              render-nav-item |widgets.html |Widgets $ = route-name :widgets
-              render-nav-item |utils.html |Utils $ = route-name :utils
+              concat
+                [] $ [] 0 $ div
+                  {} $ :class-name style-nav-title
+                  <> |Overview
+                [] $ [] 1 $ render-nav-item |index.html |Introduction (= route-name :index)
+                [] $ [] 2 $ div
+                  {} $ :class-name style-nav-title
+                  <> |Foundations
+                [] $ [] 3 $ render-nav-item |design.html "|Design system" (= route-name :design)
+                if (= route-name :design)
+                  [] $ [] 4 $ list-> ({})
+                    map design-sections $ fn (section)
+                      [] section.:id $ div
+                        {} (:class-name css-nav-sub)
+                          :on-click $ on-jump $ str |#design- section.:id
+                        <> section.:title
+                  []
+                [] $ [] 5 $ render-nav-item |layouts.html |Layouts (= route-name :layouts)
+                [] $ [] 6 $ render-nav-item |fonts.html |Fonts (= route-name :fonts)
+                [] $ [] 7 $ div
+                  {} $ :class-name style-nav-title
+                  <> |Components
+                [] $ [] 8 $ render-nav-item |components.html |Overview (= route-name :components)
+                [] $ [] 9 $ list-> ({})
+                  map component-groups $ fn (group)
+                    [] group.:id $ render-nav-group group active-id
+                [] $ [] 10 $ div
+                  {} $ :class-name style-nav-title
+                  <> |More
+                [] $ [] 11 $ render-nav-item |widgets.html |Widgets (= route-name :widgets)
+                [] $ [] 12 $ render-nav-item |utils.html |Utils (= route-name :utils)
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Component)
             :args $ [] 'Tag 'String
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-child-keys)
+            :code $ quote $ let
+                index-children $ match
+                  .unwrap $ :tree $ comp-sidenav :index |
+                  (:element element) (:children element)
+                  (:component _) (raise |expected-element-root)
+                design-children $ match
+                  .unwrap $ :tree $ comp-sidenav :design |
+                  (:element element) (:children element)
+                  (:component _) (raise |expected-element-root)
+              assert= 12 $ count index-children
+              assert= 5 $ :key $ .unwrap (.get index-children 4)
+              assert= 12 $ :key $ .unwrap (.get index-children 11)
+              assert= 13 $ count design-children
+              assert= 4 $ :key $ .unwrap (.get design-children 4)
+              assert= 5 $ :key $ .unwrap (.get design-children 5)
+            :tags $ #{} :js-only
         'comp-topbar $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-topbar (route-name)
             div
@@ -4312,13 +4529,19 @@
           :code $ quote $ defn render-entry (path title selected?)
             div
               {} (:class-name css-sidebar-entry)
-                :style $ if selected? $ {}
-                  :background-color $ hsl 0 0 50 0.1
+                :style $ if selected?
+                  {} $ :background-color $ hsl 0 0 50 0.1
+                  {}
                 :on-click $ on-route path
               <> title
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'respo.schema/Element)
             :args $ [] 'String 'String 'Bool
+          :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
+            :code $ quote $ do
+              assert= "|<div class=\"css-sidebar-entry__respo-ui_comp_sidebar\"><span>Components</span></div>" $ respo.render.html/make-string $ render-entry |components |Components false
+              assert= "|<div class=\"css-sidebar-entry__respo-ui_comp_sidebar\" style=\"background-color:hsl(0,0%,50%,0.1);\"><span>Components</span></div>" $ respo.render.html/make-string $ render-entry |components |Components true
+            :tags $ #{} :js-only
         'render-nav-group $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-nav-group (group active-id)
             div ({})
