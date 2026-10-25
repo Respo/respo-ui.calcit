@@ -13,7 +13,7 @@ Find details in https://ui.respo-mvc.org/ .
 ### 主线的 Calcit 0.31 预发布配对
 
 当前主线将 Calcit CLI 与 `@calcit/procs` 成对固定为已发布的
-`0.31.0-alpha.2`，依赖 Respo `0.17.0-alpha.2`、Router `0.9.0-alpha.1`
+`0.31.0-alpha.4`，依赖 Respo `0.17.0-alpha.2`、Router `0.9.0-alpha.1`
 和 JS-FFI `0.2.5`。安装 CLI 后先用 `calcit --version` 与
 `caps deps.cirru verify --toolchain` 核对实际配对，再执行下文的全定义、完整 strict、
 附带测试、示例和 JS 构建命令；不要以本地同名候选代替已发布的编译器。
