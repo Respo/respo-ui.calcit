@@ -3795,7 +3795,7 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.31.0-alpha.1)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.31.0-alpha.6)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     Option :none
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
                   div
@@ -4755,7 +4755,7 @@
           :examples $ []
           :schema $ :: 'Map 'Tag 'String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.9.0-alpha.1
+          :code $ quote $ def version |0.9.0-alpha.2
           :examples $ []
           :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)
