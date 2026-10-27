@@ -4,7 +4,7 @@
     "test:js": "node scripts/test-ui-js.mjs"
   },
   "dependencies": {
-    "@calcit/procs": "0.31.0-alpha.6",
+    "@calcit/procs": "0.31.0-alpha.7",
     "copy-text-to-clipboard": "^3.2.0",
     "dayjs": "^1.11.13"
   },

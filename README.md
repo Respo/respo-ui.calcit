@@ -13,7 +13,7 @@ Find details in https://ui.respo-mvc.org/ .
 ### 0.9.0-alpha.2 候选：Calcit 0.31 预发布配对
 
 当前主线将 Calcit CLI 与 `@calcit/procs` 成对固定为已发布的
-`0.31.0-alpha.6`，依赖 Respo `0.17.0-alpha.2`、Router `0.9.0-alpha.1`
+`0.31.0-alpha.7`，依赖 Respo `0.17.0-alpha.2`、Router `0.9.0-alpha.1`
 和 JS-FFI `0.2.5`。安装 CLI 后先用 `calcit --version` 与
 `caps deps.cirru verify --toolchain` 核对实际配对，再执行下文的全定义、完整 strict、
 附带测试、示例和 JS 构建命令；不要以本地同名候选代替已发布的编译器。
@@ -23,9 +23,9 @@ Find details in https://ui.respo-mvc.org/ .
 选项字段及事件合同不变，具体缺失值、class 空白和子节点 key 的语义见下文。
 直接引用原内部 `respo-ui.main/updater` 的代码需改为 `respo-ui.updater/updater`。
 
-模块版本和首页 Quick start 同步为 UI `0.9.0-alpha.2` / Calcit `0.31.0-alpha.6`。
+模块版本和首页 Quick start 同步为 UI `0.9.0-alpha.2` / Calcit `0.31.0-alpha.7`。
 正式 tag 发布前，候选验收不能视为已发布依赖；下文 `0.8.0` 仅对应历史稳定配对。
-主线已有的 `@calcit/procs` alpha.6 Yarn 免隔离例外保持不变，本次不新增安装策略例外。
+Yarn 保留一小时新包隔离，移除旧 runtime 的免隔离例外，不为 alpha.7 新增豁免。
 
 ### 主线的 Store 类型合同
 
