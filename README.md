@@ -10,22 +10,23 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.9.0-alpha.2 候选：Calcit 0.31.0 正式版配对
+### 0.9.0-alpha.3 候选：已发布的 0.31 依赖图
 
-当前主线将 Calcit CLI 与 `@calcit/procs` 成对固定为已发布的
-`0.31.0`，依赖 Respo `0.17.0-alpha.2`、Router `0.9.0-alpha.1`
-和 JS-FFI `0.2.5`。安装 CLI 后先用 `calcit --version` 与
-`caps deps.cirru verify --toolchain` 核对实际配对，再执行下文的全定义、完整 strict、
-附带测试、示例和 JS 构建命令；不要以本地同名候选代替已发布的编译器。
+Calcit CLI 与 `@calcit/procs` 成对固定为已发布的 `0.31.0`，使用已发布的
+Respo `0.17.0-alpha.3`、Router `0.9.0-alpha.2` 和 JS-FFI `0.2.6`。
+消费者需与 Reel 等模块协调同一精确依赖图，重新安装并生成 JS；不混入 0.30 维护线。
+先用 `calcit --version` 与 `caps deps.cirru verify --toolchain` 核对实际配对，
+再执行下文的全定义、完整 strict、附带测试、示例和 JS 构建命令。
 
-相对已发布的 `0.9.0-alpha.1`，这个候选包含无隐式 nil 的条件样式、属性与子节点修复，
-以及下文的 Store 元数据和 updater 分离；不是只有版本配对。33 个公开组件的签名、
-选项字段及事件合同不变，具体缺失值、class 空白和子节点 key 的语义见下文。
+本轮调整依赖/版本元数据、首页版本提示和配对文档，组件实现、33 个公开组件的
+签名、选项字段、事件合同、原断言和上传路径不变。此前无隐式 nil 的条件样式、
+属性与子节点修复，以及 Store 元数据和 updater 分离均保留；具体语义见下文。
 直接引用原内部 `respo-ui.main/updater` 的代码需改为 `respo-ui.updater/updater`。
+默认 proof audit、完整 strict 与原行为测试保留，开放宿主/状态边界不宣称已经闭合。
 
-模块版本和首页 Quick start 同步为 UI `0.9.0-alpha.2` / Calcit `0.31.0`。
-正式 tag 发布前，候选验收不能视为已发布依赖；下文 `0.8.0` 仅对应历史稳定配对。
-Yarn 保留一小时新包隔离，移除旧 runtime 的免隔离例外，不为 alpha.7 新增豁免。
+模块版本和首页 Quick start 同步为 UI `0.9.0-alpha.3` / Calcit `0.31.0`。
+正式 tag 发布前，本候选不能替代已发布依赖，main 或 commit 也不是发布证据；
+下文 `0.8.0` 对应历史稳定配对。Yarn 保留一小时新包隔离，不增加逐版本豁免。
 
 ### 主线的 Store 类型合同
 
