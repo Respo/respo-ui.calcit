@@ -10,7 +10,7 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.9.0-alpha.2 候选：Calcit 0.31 预发布配对
+### 0.9.0-alpha.2 候选：Calcit 0.31.0 正式版配对
 
 当前主线将 Calcit CLI 与 `@calcit/procs` 成对固定为已发布的
 `0.31.0`，依赖 Respo `0.17.0-alpha.2`、Router `0.9.0-alpha.1`
