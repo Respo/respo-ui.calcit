@@ -4755,7 +4755,7 @@
           :examples $ []
           :schema $ :: 'Map 'Tag 'String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.9.0-alpha.3
+          :code $ quote $ def version |0.9.0-alpha.4
           :examples $ []
           :schema $ :: 'String
       :ns $ %{} 'NsEntry (:doc |)

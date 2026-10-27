@@ -10,10 +10,10 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.9.0-alpha.3 候选：已发布的 0.31 依赖图
+### 0.9.0-alpha.4 候选：0.31 依赖图配对修正
 
-Calcit CLI 与 `@calcit/procs` 成对固定为已发布的 `0.31.0`，使用已发布的
-Respo `0.17.0-alpha.3`、Router `0.9.0-alpha.2` 和 JS-FFI `0.2.6`。
+Calcit CLI 与 `@calcit/procs` 成对固定为已发布的 `0.31.0`，使用
+Respo `0.17.0-alpha.4`、Router `0.9.0-alpha.3` 和 JS-FFI `0.2.7`。
 消费者需与 Reel 等模块协调同一精确依赖图，重新安装并生成 JS；不混入 0.30 维护线。
 先用 `calcit --version` 与 `caps deps.cirru verify --toolchain` 核对实际配对，
 再执行下文的全定义、完整 strict、附带测试、示例和 JS 构建命令。
@@ -24,9 +24,11 @@ Respo `0.17.0-alpha.3`、Router `0.9.0-alpha.2` 和 JS-FFI `0.2.6`。
 直接引用原内部 `respo-ui.main/updater` 的代码需改为 `respo-ui.updater/updater`。
 默认 proof audit、完整 strict 与原行为测试保留，开放宿主/状态边界不宣称已经闭合。
 
-模块版本和首页 Quick start 同步为 UI `0.9.0-alpha.3` / Calcit `0.31.0`。
+模块版本和首页 Quick start 同步为 UI `0.9.0-alpha.4` / Calcit `0.31.0`。
 正式 tag 发布前，本候选不能替代已发布依赖，main 或 commit 也不是发布证据；
 下文 `0.8.0` 对应历史稳定配对。Yarn 保留一小时新包隔离，不增加逐版本豁免。
+
+JS-FFI 旧 0.2.6 tag 实际声明 0.30.1，本次改为真正配对 0.31 的已发布 0.2.7；详见 [发布配对问题](https://github.com/calcit-lang/js-ffi/issues/195)。Respo alpha.4 已发布，Router alpha.3 也已完成原 CI 与 Demo 部署并发版，本候选仍需执行全部原门禁及独立消费者验收。只同步首页版本提示，不更改组件接口或类型预算。
 
 ### 主线的 Store 类型合同
 
