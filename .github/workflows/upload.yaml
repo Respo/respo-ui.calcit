@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Respo/respo-message.calcit
-          ref: 9a6201dab17891b9185e7e0a3e0f97186eb68e13 # Message 0.1.0-alpha.4 candidate (Calcit 0.32.1 syntax)
+          ref: 0.1.0-alpha.4
           path: .calcit/message-consumer
           persist-credentials: false
 

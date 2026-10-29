@@ -133,7 +133,7 @@ Snapshot 只修正主页 Quick start 中过期的 alpha 编译器版本示例，
 AST，不再正则解析 Snapshot 序列化文本；示例通过 runtime 的 Cirru formatter
 生成，排版变化不改变表达式。原测试断言保留，不新增上传校验或另一套质量脚本。
 正式配对由 Linux CI 的正常 Caps 安装、不可变 Yarn 锁文件、完整 strict、公开定义、
-示例和原 JS 回归验证。原 CI 还加载已发布 Message 0.1.0-alpha.1 源码，使用隔离模块视图
+示例和原 JS 回归验证。原 CI 还加载已发布 Message 0.1.0-alpha.4 源码，使用隔离模块视图
 验证当前 UI 候选和同一正式底层依赖图：全定义、完整 strict、原 unit 测试及 JS codegen。
 消费者 Snapshot 源码不变；兼容性测试副本使用 UI 已通过安装验证的 manifest、lock 和
 宿主 runtime，仍执行 strict 版本预检，不修改 Message 自身的包安全策略。
