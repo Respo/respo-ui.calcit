@@ -10,6 +10,10 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
+### 0.9.0：Calcit 0.32.1 配对
+
+使用者影响：Calcit CLI 与 `@calcit/procs` 成对升级到 `0.32.1`，依赖 Respo `0.17.1`、Router `0.9.0-alpha.4`，并通过它们解析 JS-FFI `0.2.9`。0.32 拒绝旧的 `:: 'Fn` 类型写法，Snapshot 已用 `calcit edit format` 迁移；组件接口不变。消费者须同步工具链并重新生成 JS，不要与 0.31 的库混装。以下历史记录仅供参考。
+
 ### 0.9.0-alpha.4 候选：0.31 依赖图配对修正
 
 Calcit CLI 与 `@calcit/procs` 成对固定为已发布的 `0.31.0`，使用

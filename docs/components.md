@@ -110,11 +110,9 @@ comp-tabs
   respo-ui.schema/TabsOptions :selected $ Option :some :book
   [] (respo-ui.schema/TabRoute :tab :book |Book) (respo-ui.schema/TabRoute :tab :card |Card)
   fn (route d!)
-    hint-fn $ {} (:return 'Unit)
-      :args $ [] (:: 'respo-ui.schema/TabRoute 'Tag)
-        :: 'Fn $ {}
-          :args $ [] 'Dynamic
-          :return 'Unit
+    hint-fn $ Fn (respo-ui.schema/TabRoute Tag)
+      Fn Dynamic $ -> Unit
+      -> Unit
     match route $
       :tab value _title
       d! $ :: :select-tab value
