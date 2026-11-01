@@ -38,8 +38,8 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
   turn the Option back into nil.
 - Callbacks that dispatch take the value and `d!`, and the struct carries an
   `Op` generic: `:on-change (Fn (String, Fn (Op) -> Unit) -> Unit)`. Inside
-  the DOM handler, give the `fn (e d!)` a `hint-fn` with
-  `(quote $ Map Tag Dynamic)` and `(quote $ Fn Op (-> Unit))`, decode the event field
+  the DOM handler, give the `fn (e d!)` a single `hint-fn` contract,
+  `hint-fn $ Fn (Map Tag Dynamic) (Fn Op (-> Unit)) (-> Unit)`, decode the event field
   with `match (get e :value) ...`, and pass `d!` straight to the callback.
 - Callers' inline callbacks also need a `hint-fn`; the strict workflow rejects
   an unannotated `fn` in a typed options field. When constructor pairs continue
