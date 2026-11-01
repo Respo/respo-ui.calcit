@@ -31,10 +31,11 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
   `Option`. Callers write only the fields they use; the constructor fills the
   rest with `Option :none`:
   `ButtonOptions :kind (Option :some :primary)`.
-- Read a field with `respo-ui.schema/read-field options :field`, which returns
-  the value or `nil`. When the value feeds arithmetic or a typed call, `match`
-  on `options` and use `option:unwrap-or` instead, because `either` on a
-  `read-field` result stays an Option to the checker.
+- Read a field with `respo-ui.schema/field-or options :field default`, or keep
+  it as an Option with `respo-ui.schema/option-field options :field`. DOM props
+  take that Option directly (none leaves the attribute out), and
+  `respo-ui.schema/with-class-name` appends an optional `:class-name`. Do not
+  turn the Option back into nil.
 - Callbacks that dispatch take the value and `d!`, and the struct carries an
   `Op` generic: `:on-change (Fn (String, Fn (Op) -> Unit) -> Unit)`. Inside
   the DOM handler, give the `fn (e d!)` a `hint-fn` with

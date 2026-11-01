@@ -10,6 +10,20 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
+### 0.10.0 候选：保留 Option 的组件选项
+
+使用者影响：CLI / `@calcit/procs` 继续配对正式 **0.32.1**，需要统一使用
+Respo **0.18.0**、Router **0.9.0**、JS-FFI **0.2.9** 的精确依赖图再重新生成 JS。
+`respo-ui.schema/read-field` 已移除；下游如直接调用此 helper，需按用途改用
+`respo-ui.schema/option-field`、`field-or` 或 `with-class-name`（同属 respo-ui.schema），不要把 Option 擦回 nil。
+组件已有选项、缺省样式及渲染行为保持；Respo 的具名 DomProps 字段则须按上游 Option 合同迁移。
+
+属性和可选子节点直接传 Option，可选回调通过 if-let 消费，class-name 仍保留原有组合。
+首页版本提示同步为 0.10.0。原完整 strict、native/JS、示例/文档及真实 Message 源码夹具门禁保留。
+候选不是已发布依赖，最终验收须使用正式 tag 的 Caps 严格安装；不能用本地链接冒称公开图已通过。
+Actions 改用已核对指向原提交的精确正式 tag，保留可移动 tag 的维护取舍；
+npm 新候选继续一小时包龄，移除旧单包豁免，COS 只用 action 内置 verify，部署目录不变。
+
 ### 0.9.0：Calcit 0.32.1 配对
 
 使用者影响：Calcit CLI 与 `@calcit/procs` 成对升级到 `0.32.1`，依赖 Respo `0.17.1`、Router `0.9.0-alpha.4`，并通过它们解析 JS-FFI `0.2.9`。0.32 拒绝旧的 `:: 'Fn` 类型写法，Snapshot 已用 `calcit edit format` 迁移；组件接口不变。消费者须同步工具链并重新生成 JS，不要与 0.31 的库混装。以下历史记录仅供参考。
@@ -205,12 +219,16 @@ The component no longer maintains an untyped item-normalization branch.
 `respo-ui.schema/opts` builds a typed options value without repeating
 `Option :some` on every field. Fields you leave out stay `Option :none`.
 Inside components, `field-or` reads a field with a default and `option-field`
-keeps it as an Option; `read-field` still returns nil and is meant for DOM props,
-where nil leaves the attribute out.
+keeps it as an Option. DOM props take the Option directly (Respo 0.18 leaves the
+attribute out for none), and `with-class-name` appends an optional `:class-name`.
+`read-field`, which returned nil, has been removed: use `option-field` for DOM
+props and `field-or` or `option-field` elsewhere.
 
 `opts` 用于构造组件选项，省去每个字段的 `Option :some`，未写的字段保持
 `Option :none`。组件内部用 `field-or` 读取带缺省值的字段，用 `option-field`
-保留 Option；`read-field` 仍返回 nil，只用于 DOM 属性。
+保留 Option。DOM 属性直接接收 Option（Respo 0.18 起 none 不写该属性），
+`with-class-name` 用来追加可选的 `:class-name`。原先返回 nil 的 `read-field`
+已移除：DOM 属性改用 `option-field`，其他位置用 `field-or` 或 `option-field`。
 
 ```cirru
 ns app.demo $ :require

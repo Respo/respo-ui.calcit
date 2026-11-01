@@ -30,10 +30,10 @@
           :code $ quote $ defcomp comp-alert (kind content options)
             div
               {} (:role |alert)
-                :class-name $ str-spaced style-alert
-                  match kind (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error) (_ style-alert-info)
-                  respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name
+                  str-spaced style-alert $ match kind (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error) (_ style-alert-info)
+                  respo-ui.schema/option-field options :class-name
+                :style $ respo-ui.schema/option-field options :style
               if (literal? content)
                 <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
                 , content
@@ -86,10 +86,10 @@
                           {} $ :class-name $ .unwrap-or (:css-value options) |
                           match (get item :value)
                             (:some v)
-                              if (literal? v)
+                              Option :some $ if (literal? v)
                                 <> $ if (nil? v) | $ respo.util.format/scalar-attribute-text v
                                 , v
-                            (:none) nil
+                            (:none) (Option :none)
               if (option:some? title)
                 div ({})
                   div
@@ -127,15 +127,15 @@
           :code $ quote $ defcomp comp-avatar (text options)
             div
               {}
-                :title $ respo-ui.schema/read-field options :title
-                :class-name $ str-spaced style-avatar
-                  match (respo-ui.schema/read-field options :size) (:small style-avatar-small) (:large style-avatar-large) (_ |)
-                  respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :title $ respo-ui.schema/option-field options :title
+                :class-name $ respo-ui.schema/with-class-name
+                  str-spaced style-avatar $ match (respo-ui.schema/field-or options :size :medium) (:small style-avatar-small) (:large style-avatar-large) (_ |)
+                  respo-ui.schema/option-field options :class-name
+                :style $ respo-ui.schema/option-field options :style
               if
                 .some? $ respo-ui.schema/option-field options :src
                 create-element :img $ {}
-                  :src $ respo-ui.schema/read-field options :src
+                  :src $ respo-ui.schema/option-field options :src
                   :alt $ respo-ui.schema/field-or options :alt $ str text
                   :class-name style-avatar-image
                 <> text
@@ -152,9 +152,9 @@
                 .merge
                   {}
                     :class-name $ if dot?
-                      str-spaced style-badge kind-class style-badge-dot $ respo-ui.schema/read-field options :class-name
-                      str-spaced style-badge kind-class $ respo-ui.schema/read-field options :class-name
-                    :style $ respo-ui.schema/read-field options :style
+                      respo-ui.schema/with-class-name (str-spaced style-badge kind-class style-badge-dot) (respo-ui.schema/option-field options :class-name)
+                      respo-ui.schema/with-class-name (str-spaced style-badge kind-class) (respo-ui.schema/option-field options :class-name)
+                    :style $ respo-ui.schema/option-field options :style
                   if dot?
                     {} (:role |img) (:aria-label content)
                     {}
@@ -208,8 +208,8 @@
                 last-idx $ dec $ count items
               create-element :nav
                 {} (:aria-label |Breadcrumb)
-                  :class-name $ str-spaced style-breadcrumb $ respo-ui.schema/read-field options :class-name
-                  :style $ respo-ui.schema/read-field options :style
+                  :class-name $ respo-ui.schema/with-class-name (str-spaced style-breadcrumb) (respo-ui.schema/option-field options :class-name)
+                  :style $ respo-ui.schema/option-field options :style
                 create-list-element :ol
                   {} $ :class-name style-breadcrumb-list
                   -> items $ map-indexed $ fn (idx item)
@@ -263,11 +263,11 @@
               {}
                 :type $ respo-ui.schema/field-or options :type |button
                 :disabled $ respo-ui.schema/field-or options :disabled false
-                :class-name $ str-spaced
-                  match (respo-ui.schema/read-field options :kind) (:primary css/button-primary) (:danger css/button-danger) (:danger-outline css/button-danger-outline) (_ css/button)
-                  respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
-                :on-click $ respo-ui.schema/read-field options :on-click
+                :class-name $ respo-ui.schema/with-class-name
+                  str-spaced $ match (respo-ui.schema/field-or options :kind :default) (:primary css/button-primary) (:danger css/button-danger) (:danger-outline css/button-danger-outline) (_ css/button)
+                  respo-ui.schema/option-field options :class-name
+                :style $ respo-ui.schema/option-field options :style
+                :on-click $ respo-ui.schema/option-field options :on-click
               if (literal? content)
                 <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
                 , content
@@ -279,8 +279,8 @@
           :code $ quote $ defcomp comp-card (content options)
             create-list-element :div
               {}
-                :class-name $ str-spaced style-card $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced style-card) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               concat
                 if
                   .some? $ respo-ui.schema/option-field options :title
@@ -299,7 +299,7 @@
                   .some? $ respo-ui.schema/option-field options :footer
                   [] $ [] 2 $ div
                     {} $ :class-name style-card-footer
-                    respo-ui.schema/read-field options :footer
+                    .unwrap $ respo-ui.schema/option-field options :footer
                   []
           :examples $ [] $ quote
             comp-card |Content $ respo-ui.schema/opts respo-ui.schema/CardOptions :title |Summary
@@ -331,8 +331,8 @@
           :code $ quote $ defcomp comp-catoptric-text (text options)
             [] (effect-dataset-text text)
               span $ {}
-                :class-name $ str-spaced style-catoptric $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced style-catoptric) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
           :examples $ [] $ quote
             comp-catoptric-text |Respo $ Option :none
           :schema $ quote $ Fn String (calcit.core/Option respo-ui.schema/PresentationOptions) (-> respo.schema/Component)
@@ -341,8 +341,8 @@
           :code $ quote $ defcomp comp-checkbox (checked options) (assert-type checked 'Bool)
             create-list-element :label
               {}
-                :class-name $ str-spaced css/checkbox-label $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced css/checkbox-label) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               concat
                 [] $ [] 0 $ input
                   {} (:type |checkbox) (:class-name css/checkbox) (:checked checked)
@@ -352,24 +352,24 @@
                         hint-fn $ Fn (Map Tag Dynamic)
                           Fn Op $ -> Unit
                           -> Unit
-                        let
-                            on-change $ respo-ui.schema/read-field options :on-change
-                          when (non-nil? on-change)
-                            on-change
-                              match
-                                try-decode-map-as
-                                  match (get e :checked)
-                                    (:some checked-value) (or checked-value false)
-                                    (:none) false
-                                  , 'Bool
-                                (:ok checked-value) checked-value
-                                (:err message) (raise message)
-                              , d!
+                        if-let
+                          on-change $ respo-ui.schema/option-field options :on-change
+                          on-change
+                            match
+                              try-decode-map-as
+                                match (get e :checked)
+                                  (:some checked-value) (or checked-value false)
+                                  (:none) false
+                                , 'Bool
+                              (:ok checked-value) checked-value
+                              (:err message) (raise message)
+                            , d!
+                          , &unit
                         , &unit
                 if
                   .some? $ respo-ui.schema/option-field options :label
                   [] $ [] 1 $ <>
-                    str $ respo-ui.schema/read-field options :label
+                    str $ .unwrap $ respo-ui.schema/option-field options :label
                   []
           :examples $ [] $ quote
             comp-checkbox true $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Remember me"
@@ -388,8 +388,8 @@
           :code $ quote $ defcomp comp-cirru-snippet (text options)
             div
               {}
-                :class-name $ str-spaced css/row css-snippet $ schema/read-field options :class-name
-                :style $ schema/read-field options :style
+                :class-name $ schema/with-class-name (str-spaced css/row css-snippet) (schema/option-field options :class-name)
+                :style $ schema/option-field options :style
               pre $ {} (:class-name css/expand)
                 :innerHTML $ generateHtml text
               span
@@ -402,9 +402,9 @@
           :doc "|Render a clickable close (✕) mark. ButtonOptions :on-click handles the click; :class-name and :style adjust presentation."
           :code $ quote $ defcomp comp-close (options)
             span $ {} (:inner-text "|✕")
-              :style $ respo-ui.schema/read-field options :style
-              :class-name $ str-spaced style-close $ respo-ui.schema/read-field options :class-name
-              :on-click $ respo-ui.schema/read-field options :on-click
+              :style $ respo-ui.schema/option-field options :style
+              :class-name $ respo-ui.schema/with-class-name (str-spaced style-close) (respo-ui.schema/option-field options :class-name)
+              :on-click $ respo-ui.schema/option-field options :on-click
           :examples $ [] $ quote
             comp-close $ Option :none
           :schema $ quote $ Fn (calcit.core/Option respo-ui.schema/ButtonOptions) (-> respo.schema/Component)
@@ -413,10 +413,10 @@
           :code $ quote $ defcomp comp-collapse (title content options)
             create-element :details
               {}
-                :open $ respo-ui.schema/read-field options :open?
-                :name $ respo-ui.schema/read-field options :name
-                :class-name $ str-spaced style-collapse $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :open $ respo-ui.schema/option-field options :open?
+                :name $ respo-ui.schema/option-field options :name
+                :class-name $ respo-ui.schema/with-class-name (str-spaced style-collapse) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               create-element :summary
                 {} $ :class-name style-collapse-summary
                 <> title
@@ -459,10 +459,10 @@
           :doc "|Render a horizontal divider, or a vertical divider with :vertical? true."
           :code $ quote $ defcomp comp-divider (options)
             div $ {} (:role |separator)
-              :class-name $ str-spaced
-                if (respo-ui.schema/field-or options :vertical? false) style-divider-vertical style-divider
-                respo-ui.schema/read-field options :class-name
-              :style $ respo-ui.schema/read-field options :style
+              :class-name $ respo-ui.schema/with-class-name
+                str-spaced $ if (respo-ui.schema/field-or options :vertical? false) style-divider-vertical style-divider
+                respo-ui.schema/option-field options :class-name
+              :style $ respo-ui.schema/option-field options :style
           :examples $ [] $ quote
             comp-divider $ respo-ui.schema/opts respo-ui.schema/DividerOptions :vertical? true
           :schema $ quote $ Fn (calcit.core/Option respo-ui.schema/DividerOptions) (-> respo.schema/Component)
@@ -471,14 +471,14 @@
           :code $ quote $ defcomp comp-empty (title options)
             create-list-element :div
               {}
-                :class-name $ str-spaced style-empty $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced style-empty) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               concat
                 [] $ [] 0 $ div
                   {} $ :class-name style-empty-icon
                   if
                     .some? $ respo-ui.schema/option-field options :icon
-                    respo-ui.schema/read-field options :icon
+                    .unwrap $ respo-ui.schema/option-field options :icon
                     <> "|◇"
                 [] $ [] 1 $ div
                   {} $ :class-name style-empty-title
@@ -491,7 +491,8 @@
                   []
                 if
                   .some? $ respo-ui.schema/option-field options :action
-                  [] $ [] 3 $ div ({}) (respo-ui.schema/read-field options :action)
+                  [] $ [] 3 $ div ({})
+                    .unwrap $ respo-ui.schema/option-field options :action
                   []
           :examples $ [] $ quote
             comp-empty "|No results" $ respo-ui.schema/opts respo-ui.schema/EmptyOptions :description "|Try another search term."
@@ -507,12 +508,12 @@
           :code $ quote $ defcomp comp-field (label control options)
             create-list-element :div
               {}
-                :class-name $ str-spaced style-field $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced style-field) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               concat
                 [] $ [] 0 $ create-list-element :label
                   {} (:class-name style-field-label)
-                    :for $ respo-ui.schema/read-field options :for
+                    :for $ respo-ui.schema/option-field options :for
                   concat
                     [] $ [] 0 $ <> label
                     if (respo-ui.schema/field-or options :required? false)
@@ -563,13 +564,13 @@
           :doc "|Render a controlled text input. Pass the current value and optional :type, :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-input (value options)
             input $ {}
-              :id $ respo-ui.schema/read-field options :id
+              :id $ respo-ui.schema/option-field options :id
               :type $ respo-ui.schema/field-or options :type |text
               :value value
-              :placeholder $ respo-ui.schema/read-field options :placeholder
+              :placeholder $ respo-ui.schema/option-field options :placeholder
               :disabled $ respo-ui.schema/field-or options :disabled false
-              :class-name $ str-spaced css/input $ respo-ui.schema/read-field options :class-name
-              :style $ respo-ui.schema/read-field options :style
+              :class-name $ respo-ui.schema/with-class-name (str-spaced css/input) (respo-ui.schema/option-field options :class-name)
+              :style $ respo-ui.schema/option-field options :style
               :on-input $ input-handler options
           :examples $ [] $ quote
             comp-input |query $ respo-ui.schema/opts respo-ui.schema/InputOptions :placeholder |Search
@@ -582,8 +583,8 @@
           :code $ quote $ defcomp comp-kbd (key-names options)
             create-list-element :span
               {}
-                :class-name $ str-spaced style-kbd-group $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced style-kbd-group) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               -> key-names $ map-indexed $ fn (idx key)
                 [] (str idx)
                   if (= idx 0)
@@ -612,8 +613,8 @@
                   (:none) 1
               create-list-element :nav
                 {} (:aria-label |Pagination)
-                  :class-name $ str-spaced style-pagination $ respo-ui.schema/read-field options :class-name
-                  :style $ respo-ui.schema/read-field options :style
+                  :class-name $ respo-ui.schema/with-class-name (str-spaced style-pagination) (respo-ui.schema/option-field options :class-name)
+                  :style $ respo-ui.schema/option-field options :style
                 concat
                   [] $ [] |prev $ render-page-button page total (dec page) "|‹" "|Previous page" options
                   -> (pagination-pages page total siblings)
@@ -666,8 +667,8 @@
           :code $ quote $ defcomp comp-progress (value options)
             div
               {} (:role |progressbar)
-                :class-name $ str-spaced style-progress $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced style-progress) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               div $ {} (:class-name style-progress-value)
                 :style $ {} $ :width
                   str
@@ -680,19 +681,19 @@
           :code $ quote $ defcomp comp-radio-group (value items options)
             create-list-element :div
               {} (:role |radiogroup)
-                :aria-label $ respo-ui.schema/read-field options :label
+                :aria-label $ respo-ui.schema/option-field options :label
                 :class-name $ if (respo-ui.schema/field-or options :vertical? false)
-                  str-spaced style-radio-group style-radio-group-vertical $ respo-ui.schema/read-field options :class-name
-                  str-spaced style-radio-group $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                  respo-ui.schema/with-class-name (str-spaced style-radio-group style-radio-group-vertical) (respo-ui.schema/option-field options :class-name)
+                  respo-ui.schema/with-class-name (str-spaced style-radio-group) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               -> items $ map $ fn (item)
                 let
                     item-value item.:value
-                    disabled? $ or (respo-ui.schema/read-field options :disabled) (option:unwrap-or item.:disabled false)
+                    disabled? $ or (respo-ui.schema/field-or options :disabled false) (option:unwrap-or item.:disabled false)
                   [] item-value $ create-element :label
                     {} $ :class-name $ if disabled? (str-spaced style-radio-item style-control-disabled) (str-spaced style-radio-item)
                     input $ {} (:type |radio) (:value item-value)
-                      :name $ respo-ui.schema/read-field options :name
+                      :name $ respo-ui.schema/option-field options :name
                       :checked $ = value item-value
                       :disabled disabled?
                       :class-name style-radio-input
@@ -700,9 +701,10 @@
                         hint-fn $ Fn (Map Tag Dynamic)
                           Fn Op $ -> Unit
                           -> Unit
-                        let
-                            on-change $ respo-ui.schema/read-field options :on-change
-                          when (non-nil? on-change) (on-change item-value d!)
+                        if-let
+                          on-change $ respo-ui.schema/option-field options :on-change
+                          on-change item-value d!
+                          , &unit
                         , &unit
                     span ({}) (<> item.:label)
           :examples $ [] $ quote
@@ -744,24 +746,24 @@
           :code $ quote $ defcomp comp-select (value items options)
             create-list-element :select
               {} (:value value)
-                :id $ respo-ui.schema/read-field options :id
+                :id $ respo-ui.schema/option-field options :id
                 :disabled $ respo-ui.schema/field-or options :disabled false
-                :class-name $ str-spaced css/select $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name (str-spaced css/select) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
                 :on-change $ fn (e d!)
                   hint-fn $ Fn (Map Tag Dynamic)
                     Fn Op $ -> Unit
                     -> Unit
-                  let
-                      on-change $ respo-ui.schema/read-field options :on-change
-                    when (non-nil? on-change)
-                      on-change
-                        match (get e :value)
-                          (:some event-value) (str event-value)
-                          (:none) |
-                        fn (op)
-                          hint-fn $ Fn Op $ -> Unit
-                          d! op
+                  if-let
+                    on-change $ respo-ui.schema/option-field options :on-change
+                    on-change
+                      match (get e :value)
+                        (:some event-value) (str event-value)
+                        (:none) |
+                      fn (op)
+                        hint-fn $ Fn Op $ -> Unit
+                        d! op
+                    , &unit
                   , &unit
               -> items $ map $ fn (item)
                 let
@@ -785,17 +787,17 @@
               :role $ if
                 .some? $ respo-ui.schema/option-field options :label
                 , |status |
-              :aria-label $ respo-ui.schema/read-field options :label
+              :aria-label $ respo-ui.schema/option-field options :label
               :aria-hidden $ .none? $ respo-ui.schema/option-field options :label
-              :class-name $ str-spaced style-skeleton
-                if
+              :class-name $ respo-ui.schema/with-class-name
+                str-spaced style-skeleton $ if
                   = :circle $ respo-ui.schema/field-or options :kind :text
                   , style-skeleton-circle style-skeleton-text
-                respo-ui.schema/read-field options :class-name
+                respo-ui.schema/option-field options :class-name
               :style $ ui/merge-styles
                 {}
-                  :width $ respo-ui.schema/read-field options :width
-                  :height $ respo-ui.schema/read-field options :height
+                  :width $ respo-ui.schema/option-field options :width
+                  :height $ respo-ui.schema/option-field options :height
                 respo-ui.schema/field-or options :style $ {}
           :examples $ [] $ quote
             comp-skeleton $ respo-ui.schema/opts respo-ui.schema/SkeletonOptions :label "|Loading title" :width |60%
@@ -804,9 +806,9 @@
           :doc "|Render plain preformatted code. Options: :class-name and :style."
           :code $ quote $ defcomp comp-snippet (code options)
             div
-              {} $ :class-name $ str-spaced css/row css-snippet (respo-ui.schema/read-field options :class-name)
+              {} $ :class-name $ respo-ui.schema/with-class-name (str-spaced css/row css-snippet) (respo-ui.schema/option-field options :class-name)
               pre $ {} (:class-name css/expand)
-                :style $ respo-ui.schema/read-field options :style
+                :style $ respo-ui.schema/option-field options :style
                 :inner-text code
               span
                 {} $ :class-name style-copy-wrapper
@@ -819,8 +821,8 @@
           :code $ quote $ defcomp comp-spinner (options)
             span $ {} (:role |status)
               :aria-label $ respo-ui.schema/field-or options :label |Loading
-              :class-name $ str-spaced style-spinner $ respo-ui.schema/read-field options :class-name
-              :style $ respo-ui.schema/read-field options :style
+              :class-name $ respo-ui.schema/with-class-name (str-spaced style-spinner) (respo-ui.schema/option-field options :class-name)
+              :style $ respo-ui.schema/option-field options :style
           :examples $ [] $ quote
             comp-spinner $ respo-ui.schema/opts respo-ui.schema/SpinnerOptions :label "|Loading results"
           :schema $ quote $ Fn (calcit.core/Option respo-ui.schema/SpinnerOptions) (-> respo.schema/Component)
@@ -830,9 +832,9 @@
             create-list-element :ol
               {}
                 :class-name $ if (respo-ui.schema/field-or options :vertical? false)
-                  str-spaced style-steps style-steps-vertical $ respo-ui.schema/read-field options :class-name
-                  str-spaced style-steps $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                  respo-ui.schema/with-class-name (str-spaced style-steps style-steps-vertical) (respo-ui.schema/option-field options :class-name)
+                  respo-ui.schema/with-class-name (str-spaced style-steps) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               -> items $ map-indexed $ fn (idx item)
                 [] (str idx)
                   create-element :li
@@ -850,10 +852,8 @@
                       :inner-text $ if (< idx current) "|✓" $ str (inc idx)
                     div ({})
                       div $ {} (:class-name style-step-title) (:inner-text item.:title)
-                      match item.:description
-                        (:some description)
-                          div $ {} (:class-name style-step-description) (:inner-text description)
-                        (:none) nil
+                      .map item.:description $ fn (description)
+                        div $ {} (:class-name style-step-description) (:inner-text description)
           :examples $ [] $ quote
             comp-steps 1
               [] (respo-ui.schema/StepItem :title |Account) (respo-ui.schema/StepItem :title |Profile) (respo-ui.schema/StepItem :title |Done)
@@ -889,34 +889,34 @@
             create-list-element :label
               {}
                 :class-name $ if (respo-ui.schema/field-or options :disabled false)
-                  str-spaced style-switch-label style-control-disabled $ respo-ui.schema/read-field options :class-name
-                  str-spaced style-switch-label $ respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                  respo-ui.schema/with-class-name (str-spaced style-switch-label style-control-disabled) (respo-ui.schema/option-field options :class-name)
+                  respo-ui.schema/with-class-name (str-spaced style-switch-label) (respo-ui.schema/option-field options :class-name)
+                :style $ respo-ui.schema/option-field options :style
               concat
                 [] $ [] 0 $ input
                   {} (:type |checkbox) (:checked checked)
                     :disabled $ respo-ui.schema/field-or options :disabled false
-                    :aria-label $ respo-ui.schema/read-field options :label
+                    :aria-label $ respo-ui.schema/option-field options :label
                     :class-name style-switch-input
                     :on-input $ fn (e d!)
                       hint-fn $ Fn (Map Tag Dynamic)
                         Fn Op $ -> Unit
                         -> Unit
-                      let
-                          on-change $ respo-ui.schema/read-field options :on-change
-                        when (non-nil? on-change)
-                          on-change
-                            match
-                              try-decode-map-as
-                                match (get e :checked)
-                                  (:some checked-value) (or checked-value false)
-                                  (:none) false
-                                , 'Bool
-                              (:ok checked-value) checked-value
-                              (:err message) (raise message)
-                            fn (op)
-                              hint-fn $ Fn Op $ -> Unit
-                              d! op
+                      if-let
+                        on-change $ respo-ui.schema/option-field options :on-change
+                        on-change
+                          match
+                            try-decode-map-as
+                              match (get e :checked)
+                                (:some checked-value) (or checked-value false)
+                                (:none) false
+                              , 'Bool
+                            (:ok checked-value) checked-value
+                            (:err message) (raise message)
+                          fn (op)
+                            hint-fn $ Fn Op $ -> Unit
+                            d! op
+                        , &unit
                       , &unit
                 [] $ [] 1 $ span
                   {} $ :class-name $ if checked (str-spaced style-switch-track style-switch-track-checked) (str-spaced style-switch-track)
@@ -1022,10 +1022,10 @@
           :code $ quote $ defcomp comp-tag (kind content options)
             div
               {}
-                :class-name $ str-spaced style-tag
-                  match kind (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error) (_ |)
-                  respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name
+                  str-spaced style-tag $ match kind (:info style-tag-info) (:success style-tag-success) (:warning style-tag-warning) (:error style-tag-error) (_ |)
+                  respo-ui.schema/option-field options :class-name
+                :style $ respo-ui.schema/option-field options :style
                 :on-click $ respo-ui.schema/field-or options :on-click $ fn (e d!)
               <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
           :examples $ [] $ quote
@@ -1035,11 +1035,11 @@
           :doc "|Render a controlled textarea. Pass the current value and optional :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-textarea (value options)
             textarea $ {} (:value value)
-              :id $ respo-ui.schema/read-field options :id
-              :placeholder $ respo-ui.schema/read-field options :placeholder
+              :id $ respo-ui.schema/option-field options :id
+              :placeholder $ respo-ui.schema/option-field options :placeholder
               :disabled $ respo-ui.schema/field-or options :disabled false
-              :class-name $ str-spaced css/textarea $ respo-ui.schema/read-field options :class-name
-              :style $ respo-ui.schema/read-field options :style
+              :class-name $ respo-ui.schema/with-class-name (str-spaced css/textarea) (respo-ui.schema/option-field options :class-name)
+              :style $ respo-ui.schema/option-field options :style
               :on-input $ input-handler options
           :examples $ [] $ quote
             comp-textarea |notes $ respo-ui.schema/opts respo-ui.schema/InputOptions :placeholder |Notes
@@ -1061,10 +1061,10 @@
           :code $ quote $ defcomp comp-tooltip (content tip options)
             span
               {}
-                :class-name $ str-spaced style-tooltip
-                  match (respo-ui.schema/read-field options :placement) (:bottom style-tooltip-bottom) (_ |)
-                  respo-ui.schema/read-field options :class-name
-                :style $ respo-ui.schema/read-field options :style
+                :class-name $ respo-ui.schema/with-class-name
+                  str-spaced style-tooltip $ match (respo-ui.schema/field-or options :placement :top) (:bottom style-tooltip-bottom) (_ |)
+                  respo-ui.schema/option-field options :class-name
+                :style $ respo-ui.schema/option-field options :style
               if (literal? content)
                 <> $ respo.util.format/scalar-attribute-text content
                 , content
@@ -1162,13 +1162,13 @@
           :examples $ []
           :schema $ quote $ Fn String (-> String) (:features :js-ffi)
         'input-handler $ %{} 'CodeEntry
-          :doc "|Event handler for comp-input and comp-textarea: :on-change gets the text value, otherwise the raw :on-input handler is used."
+          :doc "|Optional event handler for comp-input and comp-textarea: :on-change gets the text value, otherwise the raw :on-input handler is used; none when neither is set."
           :code $ quote $ defn input-handler (options)
             match options
               (:some o)
                 match o.:on-change
                   (:some on-change)
-                    fn (e d!)
+                    Option :some $ fn (e d!)
                       hint-fn $ Fn (Map Tag Dynamic)
                         Fn Op $ -> Unit
                         -> Unit
@@ -1177,12 +1177,12 @@
                           (:some event-value) (str event-value)
                           (:none) |
                         , d!
-                  (:none) (respo-ui.schema/read-field options :on-input)
-              (:none) nil
+                  (:none) o.:on-input
+              (:none) (Option :none)
           :examples $ []
           :schema $ quote $ Fn
             calcit.core/Option $ respo-ui.schema/InputOptions Op
-            -> Dynamic
+            -> $ Option Dynamic
             :generics Op
         'literal? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn literal? (v)
@@ -1242,11 +1242,13 @@
                     hint-fn $ Fn (Map Tag Dynamic)
                       Fn Op $ -> Unit
                       -> Unit
-                    let
-                        on-change $ respo-ui.schema/read-field options :on-change
-                      when
-                        and (non-nil? on-change) (not current?) (not disabled?)
+                    if-let
+                      on-change $ respo-ui.schema/option-field options :on-change
+                      if
+                        and (not current?) (not disabled?)
                         on-change target d!
+                        , &unit
+                      , &unit
                     , &unit
                 if current?
                   {} $ :aria-current |page
@@ -2407,14 +2409,15 @@
           :code $ quote $ defcomp comp-components-page (states)
             let
                 cursor $ decode-map-as
-                  either
-                    .unwrap-or (calcit.core/get states :cursor) nil
-                    []
-                  :: 'List 'Dynamic
+                  match (calcit.core/get states :cursor)
+                    (:some value)
+                      either value $ []
+                    (:none) ([])
+                  quote $ List Dynamic
                 query $ decode-map-as
-                  either
-                    .unwrap-or (calcit.core/get states :data) nil
-                    , |
+                  match (calcit.core/get states :data)
+                    (:some value) (either value |)
+                    (:none) |
                   , 'String
                 matched $ filter component-docs $ fn (doc) (doc-matches? doc query)
               div
@@ -3669,7 +3672,7 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.31.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.32.1)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     Option :none
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
                   div
@@ -4598,7 +4601,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.9.0-alpha.4
+          :code $ quote $ def version |0.10.0
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
@@ -5604,26 +5607,6 @@
               assert= |none $ field-or (respo-ui.schema/opts PresentationOptions) :class-name |none
               assert= (calcit.core/Option :some |status) (option-field options :class-name)
               assert= true $ .none? $ option-field (respo-ui.schema/opts PresentationOptions) :style
-        'read-field $ %{} 'CodeEntry
-          :doc "|Read an optional field from optional options and return nil when absent. Use it for DOM props, where nil means the attribute is left out; prefer `field-or` or `option-field` everywhere else."
-          :code $ quote $ defmacro read-field (value field)
-            let
-                option-value $ gensym |option-value
-                field-value $ gensym |field-value
-              quasiquote $ match ~value
-                (:some ~option-value)
-                  match (~field ~option-value)
-                    (:some ~field-value) ~field-value
-                    (:none) nil
-                (:none) nil
-          :examples $ [] $ quote
-            let
-                option-value |outer
-              assert= |status $ read-field
-                Option :some $ PresentationOptions :class-name $ Option :some |status
-                , :class-name
-          :schema $ quote $ Macro Syntax Syntax
-            -> $ Expr Dynamic
         'route-from-router $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn route-from-router (store)
             let
@@ -5724,6 +5707,14 @@
             Store :router ({}) :states $ {}
           :examples $ []
           :schema $ quote respo-ui.schema/Store
+        'with-class-name $ %{} 'CodeEntry
+          :doc "|Append the caller's optional :class-name to a component's own classes; without one the classes stay as they are."
+          :code $ quote $ defn with-class-name (base class-name)
+            match class-name
+              (:some extra) (str-spaced base extra)
+              (:none) base
+          :examples $ []
+          :schema $ quote $ Fn String (Option String) (-> String)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.schema
           :require
@@ -6411,12 +6402,12 @@
             match op
               (:states cursor s)
                 match
-                  try-decode-map-as cursor $ :: 'List 'Dynamic
+                  try-decode-map-as cursor $ quote $ List Dynamic
                   (:ok checked-cursor)
                     match
                       try-decode-map-as
                         update-state-tree (:states store) checked-cursor s
-                        :: 'Map 'Tag 'Dynamic
+                        quote $ Map Tag Dynamic
                       (:ok states) (.assoc store :states states)
                       (:err error) (raise error)
                   (:err error) (raise error)
@@ -6427,7 +6418,7 @@
                   (:err error) (raise error)
               (:router/route r)
                 match
-                  try-decode-map-as r $ :: 'Map 'Tag 'Dynamic
+                  try-decode-map-as r $ quote $ Map Tag Dynamic
                   (:ok route) (.assoc store :router route)
                   (:err error) (raise error)
               _ $ do (eprintln "|Unknown op:" op) store
