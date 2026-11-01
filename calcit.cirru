@@ -1788,25 +1788,25 @@
     'respo-ui.comp.component-docs $ %{} 'FileEntry
       :defs $ {}
         'ArgDoc $ %{} 'CodeEntry (:doc "|One positional argument of a component.")
-          :code $ quote $ defstruct ArgDoc (:name 'String) (:note 'String)
+          :code $ quote $ defstruct ArgDoc (:name String) (:note String)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'ComponentDoc $ %{} 'CodeEntry
           :doc "|Page data for one component: title, group, summary, positional arguments and the structs shown in its API tables."
-          :code $ quote $ defstruct ComponentDoc (:id 'String) (:title 'String) (:group 'String) (:signature 'String) (:summary 'String)
+          :code $ quote $ defstruct ComponentDoc (:id String) (:title String) (:group String) (:signature String) (:summary String)
             :args $ quote $ List respo-ui.comp.component-docs/ArgDoc
             :structs $ quote $ List String
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'FieldDoc $ %{} 'CodeEntry (:doc "|One field of an options struct.")
-          :code $ quote $ defstruct FieldDoc (:name 'String) (:type 'String) (:optional? 'Bool) (:note 'String)
+          :code $ quote $ defstruct FieldDoc (:name String) (:type String) (:optional? Bool) (:note String)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'StructDoc $ %{} 'CodeEntry (:doc "|An options or item struct and its fields.")
-          :code $ quote $ defstruct StructDoc (:name 'String) (:note 'String)
+          :code $ quote $ defstruct StructDoc (:name String) (:note String)
             :fields $ quote $ List respo-ui.comp.component-docs/FieldDoc
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'component-docs $ %{} 'CodeEntry (:doc "|Every component page, in sidebar order.")
           :code $ quote $ def component-docs
             []
@@ -2007,9 +2007,9 @@
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |EmptyOptions :note "|Options for comp-empty." :fields $ []
-                FieldDoc :name |:icon :type |Dynamic :optional? true :note "|Element shown above the title."
+                FieldDoc :name |:icon :type |UiNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:description :type |String :optional? true :note "|Text under the title."
-                FieldDoc :name |:action :type |Dynamic :optional? true :note "|Element shown below, such as a button."
+                FieldDoc :name |:action :type |UiNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |BadgeOptions :note "|Options for comp-badge." :fields $ []
@@ -2019,7 +2019,7 @@
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |CardOptions :note "|Options for comp-card." :fields $ []
                 FieldDoc :name |:title :type |String :optional? true :note "|Header text."
-                FieldDoc :name |:footer :type |Dynamic :optional? true :note "|Element rendered in the footer."
+                FieldDoc :name |:footer :type |UiNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |AvatarOptions :note "|Options for comp-avatar." :fields $ []
@@ -3008,11 +3008,11 @@
     'respo-ui.comp.design-page $ %{} 'FileEntry
       :defs $ {}
         'DesignNote $ %{} 'CodeEntry (:doc "|A titled paragraph on the design system page.")
-          :code $ quote $ defstruct DesignNote (:title 'String) (:body 'String)
+          :code $ quote $ defstruct DesignNote (:title String) (:body String)
           :examples $ []
           :schema $ quote StructDef
         'TokenGroup $ %{} 'CodeEntry (:doc "|A titled set of token names shown together.")
-          :code $ quote $ defstruct TokenGroup (:title 'String)
+          :code $ quote $ defstruct TokenGroup (:title String)
             :names $ quote $ List String
           :examples $ []
           :schema $ quote StructDef
@@ -4163,7 +4163,7 @@
     'respo-ui.comp.sidebar $ %{} 'FileEntry
       :defs $ {}
         'ComponentGroup $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct ComponentGroup (:id 'String) (:title 'String)
+          :code $ quote $ defstruct ComponentGroup (:id String) (:title String)
           :examples $ []
           :schema $ quote StructDef
         'comp-sidebar $ %{} 'CodeEntry (:doc |)
@@ -4601,7 +4601,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.10.0
+          :code $ quote $ def version |0.11.0
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
@@ -5269,7 +5269,7 @@
             :css-title $ quote $ Option String
           :examples $ [] $ quote
             AttributesOptions :items $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'AvatarOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-avatar image metadata, size, class name, and style."
           :code $ quote $ defstruct AvatarOptions
@@ -5281,7 +5281,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             AvatarOptions :title (Option :some "|Chen Yong") :size $ Option :some :large
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'BadgeOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct BadgeOptions
             :kind $ quote $ Option Tag
@@ -5290,20 +5290,20 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             BadgeOptions :dot? $ Option :some true
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'BreadcrumbItem $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct BreadcrumbItem (:label 'String)
+          :code $ quote $ defstruct BreadcrumbItem (:label String)
             :href $ quote $ Option String
           :examples $ [] $ quote
             BreadcrumbItem :label |Home :href $ Option :some |#/
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'BreadcrumbOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct BreadcrumbOptions
             :separator $ quote $ Option String
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'ButtonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style."
           :code $ quote $ defstruct ButtonOptions
@@ -5315,17 +5315,17 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             ButtonOptions :kind $ Option :some :primary
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'CardOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-card with a string title and generic footer content."
           :code $ quote $ defstruct CardOptions
             :title $ quote $ Option String
-            :footer $ quote $ Option Dynamic
+            :footer $ quote $ Option respo-ui.schema/UiNode
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             CardOptions :title $ Option :some |Summary
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'CollapseOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct CollapseOptions
             :open? $ quote $ Option Bool
@@ -5334,7 +5334,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             CollapseOptions :name $ Option :some |faq
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'DividerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-divider, including vertical orientation."
           :code $ quote $ defstruct DividerOptions
@@ -5343,18 +5343,18 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             DividerOptions :vertical? $ Option :some true
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'EmptyOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-empty with generic icon and action slots."
           :code $ quote $ defstruct EmptyOptions
-            :icon $ quote $ Option Dynamic
+            :icon $ quote $ Option respo-ui.schema/UiNode
             :description $ quote $ Option String
-            :action $ quote $ Option Dynamic
+            :action $ quote $ Option respo-ui.schema/UiNode
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             EmptyOptions :description $ Option :some "|Try another search term."
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'FieldOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct FieldOptions
             :for $ quote $ Option String
@@ -5365,7 +5365,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             FieldOptions :error $ Option :some "|Required field"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'InputOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-input and comp-textarea. :on-change receives the current text and d!; :on-input still receives the raw event map."
           :code $ quote $ defstruct InputOptions
@@ -5391,13 +5391,13 @@
           :code $ quote $ defenum Op
             :states
               quote $ List Dynamic
-              , 'Dynamic
-            :router/nav 'String
-            :router/route 'Dynamic
+              , Dynamic
+            :router/nav String
+            :router/route Dynamic
           :examples $ []
           :schema $ quote EnumDef
         'PageRoute $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:design) (:components) (:component 'String) (:utils) (:not-found 'String)
+          :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:design) (:components) (:component String) (:utils) (:not-found String)
           :examples $ []
           :schema $ quote EnumDef
         'PaginationOptions $ %{} 'CodeEntry (:doc |)
@@ -5415,7 +5415,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             PaginationOptions :siblings $ Option :some 2
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'PresentationOptions $ %{} 'CodeEntry
           :doc "|Shared typed class-name and style options for presentation-only components."
           :code $ quote $ defstruct PresentationOptions
@@ -5423,7 +5423,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             PresentationOptions :class-name $ Option :some |status
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'RadioGroupOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct RadioGroupOptions
             [] $ quote Op
@@ -5442,13 +5442,13 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             RadioGroupOptions :name $ Option :some |language
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SelectOption $ %{} 'CodeEntry
           :doc "|A typed native select item with string value and label plus optional disabled state."
-          :code $ quote $ defstruct SelectOption (:value 'String) (:label 'String)
+          :code $ quote $ defstruct SelectOption (:value String) (:label String)
             :disabled $ quote $ Option Bool
           :examples $ [] $ quote (SelectOption :value |calcit :label |Calcit)
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SelectOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-select. The Op generic preserves the operation accepted by the dispatcher passed to on-change."
           :code $ quote $ defstruct SelectOptions
@@ -5466,7 +5466,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SelectOptions :disabled $ Option :some false
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SkeletonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-skeleton: label, kind, dimensions, class name, and style."
           :code $ quote $ defstruct SkeletonOptions
@@ -5478,7 +5478,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SkeletonOptions :kind (Option :some :text) :width $ Option :some |60%
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SpinnerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-spinner, including its accessible label."
           :code $ quote $ defstruct SpinnerOptions
@@ -5487,20 +5487,20 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SpinnerOptions :label $ Option :some "|Loading results"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'StepItem $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct StepItem (:title 'String)
+          :code $ quote $ defstruct StepItem (:title String)
             :description $ quote $ Option String
           :examples $ [] $ quote
             StepItem :title |Profile :description $ Option :some "|Tell us about you"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'StepsOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct StepsOptions
             :vertical? $ quote $ Option Bool
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
           :code $ quote $ defstruct Store
@@ -5532,14 +5532,14 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SwitchOptions :label $ Option :some "|Compact mode"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'TabRoute $ %{} 'CodeEntry
           :doc "|Normalized typed tab route carrying a generic value and string display label."
           :code $ quote $ defenum TabRoute
             [] $ quote Value
-            :tab (quote Value) 'String
+            :tab Value String
           :examples $ [] $ quote (%:: TabRoute :tab :book |Book)
-          :schema $ quote Enum
+          :schema $ quote EnumDef
         'TabsOptions $ %{} 'CodeEntry
           :doc "|Typed visual and selection options for comp-tabs with a generic selected value."
           :code $ quote $ defstruct TabsOptions
@@ -5554,7 +5554,7 @@
             :selected-tab-style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             TabsOptions :selected $ Option :some :book
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'TooltipOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct TooltipOptions
             :placement $ quote $ Option Tag
@@ -5562,7 +5562,35 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             TooltipOptions :placement $ Option :some :bottom
-          :schema $ quote Enum
+          :schema $ quote StructDef
+        'UiNode $ %{} 'CodeEntry
+          :doc "|An unwrapped Element or Component for optional UI slots. Use Option :none for no content; scalar values and Some nil are not nodes."
+          :code $ quote $ defunion UiNode respo.schema/Element respo.schema/Component
+          :examples $ []
+          :schema $ quote UnionDef
+          :tests $ [] $ %{} 'TestEntry (:name |preserves-element-component-and-absence)
+            :code $ quote $ let
+                element $ respo.core/<> "|union element slot"
+                component $ respo.comp.space/comp-space 1 1
+                empty-options $ EmptyOptions :icon (Option :some element) :action $ Option :some component
+                card $ CardOptions :footer $ Option :some component
+              match
+                option:unwrap $ :icon empty-options
+                (Element node)
+                  assert= true $ identical? element node
+                (Component node) (raise "|Unexpected UI slot node kind")
+              match
+                option:unwrap $ :action empty-options
+                (Element node) (raise "|Unexpected UI slot node kind")
+                (Component node)
+                  assert= true $ identical? component node
+              match
+                option:unwrap $ :footer card
+                (Element node) (raise "|Unexpected UI slot node kind")
+                (Component node)
+                  assert= true $ identical? component node
+              assert= true $ option:none? $ :footer (CardOptions)
+            :tags $ #{} :js-only :unit
         'field-or $ %{} 'CodeEntry
           :doc "|Read an optional field from optional options, falling back to `default` when either the options or the field is none: `field-or options :disabled false`."
           :code $ quote $ defmacro field-or (value field default)
@@ -5724,7 +5752,7 @@
       :defs $ {}
         'DesignToken $ %{} 'CodeEntry
           :doc "|One design token: its group, CSS variable name without the --rui- prefix, default value and usage note."
-          :code $ quote $ defstruct DesignToken (:group 'String) (:name 'String) (:value 'String) (:note 'String)
+          :code $ quote $ defstruct DesignToken (:group String) (:name String) (:value String) (:note String)
           :examples $ []
           :schema $ quote StructDef
         'amber-200 $ %{} 'CodeEntry (:doc "|Default: hsl(42 80% 76%)")

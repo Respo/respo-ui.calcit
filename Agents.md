@@ -39,7 +39,7 @@ calcit docs remote-libs readme respo.calcit --file docs/Respo-Agent.md --full
 - Callbacks that dispatch take the value and `d!`, and the struct carries an
   `Op` generic: `:on-change (Fn (String, Fn (Op) -> Unit) -> Unit)`. Inside
   the DOM handler, give the `fn (e d!)` a `hint-fn` with
-  `(:: 'Map 'Tag 'Dynamic)` and `(:: 'Fn {:args ['Op]})`, decode the event field
+  `(quote $ Map Tag Dynamic)` and `(quote $ Fn Op (-> Unit))`, decode the event field
   with `match (get e :value) ...`, and pass `d!` straight to the callback.
 - Callers' inline callbacks also need a `hint-fn`; the strict workflow rejects
   an unannotated `fn` in a typed options field. When constructor pairs continue
