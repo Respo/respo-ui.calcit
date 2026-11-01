@@ -20,7 +20,11 @@ Component 仍直接放入 `Option :some`，无需增加节点包装；空内容�
 
 组件正文参数使用 `Content` union：String、Number、Tag、Bool 按文本渲染，
 Element/Component 原样插入；没有正文时传空字符串。nil 和未收窄的 Dynamic
-不再作为正文。DOM 数据和样式合同保持。声明采用 0.34.0 的类型名写法，prototype 的
+不再作为正文。DOM 数据合同保持。31 个静态样式常量使用
+`Map Tag respo-ui.schema/StyleValue`，其中 `StyleValue` 是 `String | Number | Tag`；
+样式值和生成的 CSS 不变，读取这些常量的代码可保留具体类型。
+`merge-styles` 仍接受调用方的开放样式 Map，保留 Option 尺寸和不同值类型合并的原合同；
+静态常量的 union 不替代调用方样式边界校验。声明采用 0.34.0 的类型名写法，prototype 的
 schema 按实际定义使用 `StructDef` / `EnumDef`。此处是候选说明，发布前仍需完整原门禁和评审；
 不把仅加载成功或局部类型检查当作渲染验收。
 

@@ -3636,7 +3636,7 @@
           :code $ quote $ def style-section
             {} (:font-size 24) (:font-family ui/font-fancy) (:line-height |60px)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.fonts-page
           :require
@@ -4503,7 +4503,7 @@
               :display :inline-block
               :vertical-align :text-bottom
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'style-nav-sub-title $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-nav-sub-title
             {} $ |& $ {} (:margin "|12px 0 2px") (:padding "|0 10px 0 12px") (:font-size tokens/text-xs) (:font-weight tokens/weight-semibold) (:letter-spacing |0.02em) (:color tokens/color-text-muted)
@@ -4665,57 +4665,57 @@
               :background-color tokens/color-surface
               :transition tokens/transition-colors
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'button-danger $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def button-danger
             merge-styles button $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-danger) (:border-color tokens/color-danger)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'button-primary $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def button-primary
             merge-styles button $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-primary) (:border-color tokens/color-primary)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'card $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def card
             {} $ :padding tokens/space-4
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'center $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def center
             {} (:display |flex) (:flex-direction |column) (:justify-content |center) (:align-items |center)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'checkbox $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def checkbox
             {} (:accent-color tokens/color-primary) (:width tokens/space-4) (:height tokens/space-4) (:margin 0) (:cursor :pointer) (:vertical-align :middle)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'checkbox-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def checkbox-label
             {} (:display :inline-flex) (:align-items :center) (:gap tokens/space-2) (:line-height tokens/leading-tight) (:cursor :pointer) (:user-select :none)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column
             {} (:display |flex) (:align-items |stretch) (:flex-direction |column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column-dispersive $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column-dispersive
             {} (:display |flex) (:align-items |center) (:justify-content |space-around) (:flex-direction |column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column-evenly $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column-evenly
             {} (:display |flex) (:align-items |center) (:justify-content |space-evenly) (:flex-direction |column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column-parted $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column-parted
             {} (:display :flex) (:align-items :stretch) (:justify-content :space-between) (:flex-direction :column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'default-fonts $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def default-fonts "|Hind,Verdana,'Hiragino Sans GB','WenQuanYi Micro Hei','Microsoft Yahei',sans-serif"
           :examples $ []
@@ -4724,12 +4724,12 @@
           :code $ quote $ def expand
             {} (:flex |1) (:overflow :auto)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'flex $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def flex
             {} $ :flex 1
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'font-code $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def font-code "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace"
           :examples $ []
@@ -4746,12 +4746,12 @@
           :code $ quote $ def fullscreen
             {} (:position |absolute) (:left 0) (:top 0) (:width |100%) (:height |100%) (:overflow :auto)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'global $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def global
             {} (:line-height tokens/leading-normal) (:font-size tokens/text-md) (:font-family tokens/font-sans) (:color tokens/color-text)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'hsl $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn hsl (h s l a)
             match a
@@ -4768,12 +4768,12 @@
               :background-color tokens/color-surface
               :transition tokens/transition-colors
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def link
             {} (:display :inline-block) (:height tokens/control-sm) (:line-height tokens/control-sm) (:margin tokens/space-1) (:color tokens/color-primary) (:text-decoration :underline) (:text-underline-offset |2px) (:cursor :pointer) (:user-select :none) (:transition tokens/transition-colors)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'merge-styles $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn merge-styles (base overrides) (&merge base overrides)
           :examples $ []
@@ -4783,32 +4783,32 @@
           :code $ quote $ def row
             {} (:display |flex) (:align-items |stretch) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-center $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-center
             {} (:display |flex) (:align-items |center) (:justify-content |center) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-dispersive $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-dispersive
             {} (:display |flex) (:align-items |center) (:justify-content |space-around) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-evenly $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-evenly
             {} (:display |flex) (:align-items |center) (:flex-direction |row) (:justify-content |space-evenly)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-middle $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-middle
             {} (:display :flex) (:align-items :center) (:justify-content :flex-start) (:flex-direction :row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-parted $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-parted
             {} (:display |flex) (:align-items |center) (:justify-content |space-between) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'select $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def select
             {} (:box-sizing :border-box) (:height tokens/control-md) (:min-width |120px) (:padding-inline tokens/control-md-padding) (:border-radius tokens/radius-md) (:outline :none) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:vertical-align :middle) (:cursor :pointer)
@@ -4816,28 +4816,28 @@
               :color tokens/color-text
               :background-color tokens/color-surface
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag
             {} (:display :inline-block) (:padding "|0 8px") (:border-radius tokens/radius-sm) (:font-size tokens/text-sm) (:line-height tokens/space-5) (:color tokens/color-text-inverse) (:background-color tokens/color-primary)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'tag-outline $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag-outline
             merge-styles tag $ {} (:color tokens/color-primary-active) (:background-color tokens/color-surface)
               :border $ str "|1px solid " tokens/color-primary-border
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'tag-stroke $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag-stroke
             merge-styles tag $ {} (:color tokens/color-primary-active) (:background-color tokens/color-primary-soft)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'text-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def text-label
             {} (:display :inline-block) (:line-height tokens/control-md) (:font-size tokens/text-md) (:color tokens/color-text) (:vertical-align :middle)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def textarea
             {} (:box-sizing :border-box) (:min-width |240px) (:padding "|8px 12px") (:border-radius tokens/radius-md) (:outline :none) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:line-height tokens/leading-normal) (:vertical-align :top)
@@ -4846,7 +4846,7 @@
               :background-color tokens/color-surface
               :transition tokens/transition-colors
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.core
           :require $ respo-ui.tokens :as tokens
@@ -5601,6 +5601,11 @@
                 Store :router ({}) :states $ {}
                 , store
             :tags $ #{} :regression :unit
+        'StyleValue $ %{} 'CodeEntry
+          :doc "|Scalar CSS values used by exported static UI styles: String, Number or Tag. This does not describe optional or open caller-provided style maps."
+          :code $ quote $ defunion StyleValue String Number Tag
+          :examples $ []
+          :schema $ quote UnionDef
         'SwitchOptions $ %{} 'CodeEntry
           :doc "|Typed options shared by comp-switch and comp-checkbox. The Op generic preserves the dispatched operation type."
           :code $ quote $ defstruct SwitchOptions

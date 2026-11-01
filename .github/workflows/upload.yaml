@@ -59,7 +59,7 @@ jobs:
           calcit docs check-md README.md --dep ./ --failures-only
           calcit calcit.cirru js
 
-      - name: Check out released Message consumer
+      - name: Check out Message source compatibility fixture
         uses: actions/checkout@v7.0.1
         with:
           repository: Respo/respo-message.calcit
