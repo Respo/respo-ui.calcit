@@ -34,11 +34,9 @@
                   str-spaced style-alert $ match kind (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error) (_ style-alert-info)
                   respo-ui.schema/option-field options :class-name
                 :style $ respo-ui.schema/option-field options :style
-              if (literal? content)
-                <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-                , content
+              render-content content
           :examples $ [] $ quote (comp-alert :success "|Changes saved")
-          :schema $ quote $ Fn Tag Content (calcit.core/Option respo-ui.schema/PresentationOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn Tag respo-ui.schema/Content (calcit.core/Option respo-ui.schema/PresentationOptions) (-> respo.schema/Component)
         'comp-attributes $ %{} 'CodeEntry
           :doc "|Render a responsive label/value grid from AttributesOptions :items. Each item may carry :label, :value (text or a Respo node), and :span; options also set the title, item size, and CSS overrides."
           :code $ quote $ defcomp comp-attributes (options)
@@ -268,12 +266,10 @@
                   respo-ui.schema/option-field options :class-name
                 :style $ respo-ui.schema/option-field options :style
                 :on-click $ respo-ui.schema/option-field options :on-click
-              if (literal? content)
-                <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-                , content
+              render-content content
           :examples $ [] $ quote
             comp-button |Save $ respo-ui.schema/opts respo-ui.schema/ButtonOptions :kind :primary
-          :schema $ quote $ Fn Content (calcit.core/Option respo-ui.schema/ButtonOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn respo-ui.schema/Content (calcit.core/Option respo-ui.schema/ButtonOptions) (-> respo.schema/Component)
         'comp-card $ %{} 'CodeEntry
           :doc "|Render a composable card. Content may be text or a Respo node; options support :title, :footer, :class-name, and :style."
           :code $ quote $ defcomp comp-card (content options)
@@ -292,9 +288,7 @@
                   []
                 [] $ [] 1 $ div
                   {} $ :class-name style-card-body
-                  if (literal? content)
-                    <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-                    , content
+                  render-content content
                 if
                   .some? $ respo-ui.schema/option-field options :footer
                   [] $ [] 2 $ div
@@ -303,7 +297,7 @@
                   []
           :examples $ [] $ quote
             comp-card |Content $ respo-ui.schema/opts respo-ui.schema/CardOptions :title |Summary
-          :schema $ quote $ Fn Content (calcit.core/Option respo-ui.schema/CardOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn respo-ui.schema/Content (calcit.core/Option respo-ui.schema/CardOptions) (-> respo.schema/Component)
           :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
             :code $ quote $ let
                 plain $ comp-card |Body $ Option :none
@@ -422,12 +416,10 @@
                 <> title
               div
                 {} $ :class-name style-collapse-body
-                if (literal? content)
-                  <> $ respo.util.format/scalar-attribute-text content
-                  , content
+                render-content content
           :examples $ [] $ quote
             comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ respo-ui.schema/opts respo-ui.schema/CollapseOptions :open? true
-          :schema $ quote $ Fn String Content (calcit.core/Option respo-ui.schema/CollapseOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn String respo-ui.schema/Content (calcit.core/Option respo-ui.schema/CollapseOptions) (-> respo.schema/Component)
           :tests $ [] $ %{} 'TestEntry (:name |render-disclosure)
             :code $ quote $ let
                 html $ respo.render.html/make-string $ comp-collapse |Title |Body
@@ -1065,13 +1057,11 @@
                   str-spaced style-tooltip $ match (respo-ui.schema/field-or options :placement :top) (:bottom style-tooltip-bottom) (_ |)
                   respo-ui.schema/option-field options :class-name
                 :style $ respo-ui.schema/option-field options :style
-              if (literal? content)
-                <> $ respo.util.format/scalar-attribute-text content
-                , content
+              render-content content
               span $ {} (:role |tooltip) (:class-name style-tooltip-tip) (:inner-text tip)
           :examples $ [] $ quote
             comp-tooltip |Save "|Saves the draft" $ respo-ui.schema/opts respo-ui.schema/TooltipOptions :placement :bottom
-          :schema $ quote $ Fn Content String (calcit.core/Option respo-ui.schema/TooltipOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn respo-ui.schema/Content String (calcit.core/Option respo-ui.schema/TooltipOptions) (-> respo.schema/Component)
           :tests $ [] $ %{} 'TestEntry (:name |render-tip)
             :code $ quote $ let
                 html $ respo.render.html/make-string $ comp-tooltip |Save |Hint
@@ -1229,6 +1219,65 @@
                 [] 1 0 8 9 10 11 12 0 20
                 pagination-pages 10 20 2
             :tags $ #{} :boundary
+        'render-content $ %{} 'CodeEntry
+          :doc "|Render component content: scalars become a text node, Element and Component are returned as they are."
+          :code $ quote $ defn render-content (content)
+            match content
+              (String s) (<> s)
+              (Number n)
+                <> $ str n
+              (Tag t)
+                <> $ to-string t
+              (Bool b)
+                <> $ str b
+              (Element e) e
+              (Component c) c
+          :examples $ []
+          :schema $ quote $ Fn respo-ui.schema/Content (-> respo-ui.schema/ContentNode)
+          :tests $ [] $ %{} 'TestEntry (:name |renders-scalars-and-keeps-nodes)
+            :code $ quote $ let
+                element $ respo.core/div $ {}
+              match (render-content element)
+                (Element actual)
+                  assert |element-identity $ identical? element actual
+                (Component actual) (assert |element-kind false)
+              match (render-content |text)
+                (Element node)
+                  assert=
+                    :attrs $ <> |text
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content 12)
+                (Element node)
+                  assert=
+                    :attrs $ <> |12
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content :tag)
+                (Element node)
+                  assert=
+                    :attrs $ <> |tag
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content true)
+                (Element node)
+                  assert=
+                    :attrs $ <> |true
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content false)
+                (Element node)
+                  assert=
+                    :attrs $ <> |false
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content |)
+                (Element node)
+                  assert=
+                    :attrs $ <> |
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+            :tags $ #{} :unit
         'render-page-button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-page-button (page total target text label options)
             let
@@ -2007,9 +2056,9 @@
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |EmptyOptions :note "|Options for comp-empty." :fields $ []
-                FieldDoc :name |:icon :type |UiNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
+                FieldDoc :name |:icon :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:description :type |String :optional? true :note "|Text under the title."
-                FieldDoc :name |:action :type |UiNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
+                FieldDoc :name |:action :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |BadgeOptions :note "|Options for comp-badge." :fields $ []
@@ -2019,7 +2068,7 @@
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |CardOptions :note "|Options for comp-card." :fields $ []
                 FieldDoc :name |:title :type |String :optional? true :note "|Header text."
-                FieldDoc :name |:footer :type |UiNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
+                FieldDoc :name |:footer :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |AvatarOptions :note "|Options for comp-avatar." :fields $ []
@@ -5320,7 +5369,7 @@
           :doc "|Typed options for comp-card with a string title and generic footer content."
           :code $ quote $ defstruct CardOptions
             :title $ quote $ Option String
-            :footer $ quote $ Option respo-ui.schema/UiNode
+            :footer $ quote $ Option respo-ui.schema/ContentNode
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
@@ -5335,6 +5384,43 @@
           :examples $ [] $ quote
             CollapseOptions :name $ Option :some |faq
           :schema $ quote StructDef
+        'Content $ %{} 'CodeEntry
+          :doc "|Component content: String, Number, Tag and Bool render as text; Element and Component pass through unchanged. Use an empty string for no body."
+          :code $ quote $ defunion Content String Number Tag Bool respo.schema/Element respo.schema/Component
+          :examples $ []
+          :schema $ quote UnionDef
+        'ContentNode $ %{} 'CodeEntry
+          :doc "|An unwrapped Respo Element or Component, returned by render-content and accepted by optional UI node slots. Use Option :none for absence."
+          :code $ quote $ defunion ContentNode respo.schema/Element respo.schema/Component
+          :examples $ []
+          :schema $ quote UnionDef
+          :tests $ [] $ %{} 'TestEntry (:name |preserves-element-component-and-absence)
+            :code $ quote $ let
+                element $ respo.core/<> "|union element slot"
+                component $ respo.comp.space/comp-space 1 1
+                empty-options $ EmptyOptions :icon (Option :some element) :action $ Option :some component
+                card $ CardOptions :footer $ Option :some component
+              match
+                option:unwrap $ :icon empty-options
+                (Element node)
+                  assert= true $ identical? element node
+                (Component node) (raise "|Unexpected UI slot node kind")
+              match
+                option:unwrap $ :action empty-options
+                (Element node) (raise "|Unexpected UI slot node kind")
+                (Component node)
+                  assert= true $ identical? component node
+              match
+                option:unwrap $ :footer card
+                (Element node) (raise "|Unexpected UI slot node kind")
+                (Component node)
+                  assert= true $ identical? component node
+              assert= true $ option:none? $ :footer (CardOptions)
+              match (respo-ui.comp/render-content component)
+                (Component actual)
+                  assert |component-identity $ identical? component actual
+                (Element actual) (assert |component-kind false)
+            :tags $ #{} :js-only :unit
         'DividerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-divider, including vertical orientation."
           :code $ quote $ defstruct DividerOptions
@@ -5347,9 +5433,9 @@
         'EmptyOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-empty with generic icon and action slots."
           :code $ quote $ defstruct EmptyOptions
-            :icon $ quote $ Option respo-ui.schema/UiNode
+            :icon $ quote $ Option respo-ui.schema/ContentNode
             :description $ quote $ Option String
-            :action $ quote $ Option respo-ui.schema/UiNode
+            :action $ quote $ Option respo-ui.schema/ContentNode
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
@@ -5563,34 +5649,6 @@
           :examples $ [] $ quote
             TooltipOptions :placement $ Option :some :bottom
           :schema $ quote StructDef
-        'UiNode $ %{} 'CodeEntry
-          :doc "|An unwrapped Element or Component for optional UI slots. Use Option :none for no content; scalar values and Some nil are not nodes."
-          :code $ quote $ defunion UiNode respo.schema/Element respo.schema/Component
-          :examples $ []
-          :schema $ quote UnionDef
-          :tests $ [] $ %{} 'TestEntry (:name |preserves-element-component-and-absence)
-            :code $ quote $ let
-                element $ respo.core/<> "|union element slot"
-                component $ respo.comp.space/comp-space 1 1
-                empty-options $ EmptyOptions :icon (Option :some element) :action $ Option :some component
-                card $ CardOptions :footer $ Option :some component
-              match
-                option:unwrap $ :icon empty-options
-                (Element node)
-                  assert= true $ identical? element node
-                (Component node) (raise "|Unexpected UI slot node kind")
-              match
-                option:unwrap $ :action empty-options
-                (Element node) (raise "|Unexpected UI slot node kind")
-                (Component node)
-                  assert= true $ identical? component node
-              match
-                option:unwrap $ :footer card
-                (Element node) (raise "|Unexpected UI slot node kind")
-                (Component node)
-                  assert= true $ identical? component node
-              assert= true $ option:none? $ :footer (CardOptions)
-            :tags $ #{} :js-only :unit
         'field-or $ %{} 'CodeEntry
           :doc "|Read an optional field from optional options, falling back to `default` when either the options or the field is none: `field-or options :disabled false`."
           :code $ quote $ defmacro field-or (value field default)
