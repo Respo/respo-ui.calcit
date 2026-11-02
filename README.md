@@ -10,9 +10,9 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.14.0 / Calcit 0.34.2 候选
+### 0.14.0 / Calcit 0.34.2
 
-使用者需同步 Calcit CLI / `@calcit/procs` 0.34.2、Respo 0.19.1、Router 0.11.1 和 JS-FFI 0.2.10 的精确正式依赖图，再生成 JS。0.13 的 RespoEvent、Router struct 和有限内容 union 合同保持，已有控件的 String / Bool 值回调不变；页面错误提示 `hud!` 保留。0.14.0 尚未发布；上述依赖均已正式发布并通过 Caps 严格安装，候选仍须通过原 CI 与评审后再发版。
+使用者需同步 Calcit CLI / `@calcit/procs` 0.34.2、Respo 0.19.1、Router 0.11.1 和 JS-FFI 0.2.10 的精确正式依赖图，再生成 JS。0.13 的 RespoEvent、Router struct 和有限内容 union 合同保持，已有控件的 String / Bool 值回调不变；页面错误提示 `hud!` 保留。上述依赖均已正式发布并通过 Caps 严格安装。UI 0.14.0 的发行状态以正式 Git tag 为准；tag 只在原 CI 通过、评审无阻塞后创建。
 
 公开 Options 的 23 个 `style` / `tab-style` / `selected-tab-style` 字段收紧为 `Option (Map Tag respo-ui.schema/InlineStyleValue)`，`InlineStyleValue` 是现有标量 `respo-ui.schema/StyleValue`（String、Number、Tag）与 `Option StyleValue` 的有限 union。原有效 CSS 值、每个属性的 Option some/none 与外层 Option 缺省行为保持；声明为 `Map Tag Dynamic` 的样式须改用该 union 或在真实外部输入处解码，Bool、集合、函数本就不属于 Respo 支持的 CSS 值，本次提前拒绝；旧 nil 省略值则改为 Option :none。因为公开类型收紧，升级 minor 为 0.14.0。混合标量与 Option 的内联 Map 可能推断为 Dynamic，也需要明确标注；已知字面量可用静态受检的 assert-type，真实外部输入应解码。
 
