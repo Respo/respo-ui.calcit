@@ -5197,9 +5197,7 @@
                 slice (location :hash) 1
                 , router/dict
           :examples $ []
-          :schema $ quote $ Fn
-            -> $ Map Tag Dynamic
-            :features :js-ffi
+          :schema $ quote $ Fn (-> respo-router.schema/Router) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             if config/dev? $ load-console-formatter!
@@ -5479,7 +5477,7 @@
               quote $ List Dynamic
               , Dynamic
             :router/nav String
-            :router/route Dynamic
+            :router/route respo-router.schema/Router
           :examples $ []
           :schema $ quote EnumDef
         'PageRoute $ %{} 'CodeEntry (:doc |)
@@ -5589,8 +5587,7 @@
           :schema $ quote StructDef
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
-          :code $ quote $ defstruct Store
-            :router $ quote $ Map Tag Dynamic
+          :code $ quote $ defstruct Store (:router respo-router.schema/Router)
             :states $ quote $ Map Tag Dynamic
           :examples $ []
           :schema $ quote StructDef
@@ -5598,7 +5595,7 @@
             :code $ quote $ do (assert-type Store 'StructDef) (assert-type store 'respo-ui.schema/Store)
               assert= :struct-def $ type-of Store
               assert=
-                Store :router ({}) :states $ {}
+                Store :router respo-router.schema/router :states $ {}
                 , store
             :tags $ #{} :regression :unit
         'StyleValue $ %{} 'CodeEntry
@@ -5700,42 +5697,31 @@
               assert= true $ .none? $ option-field (respo-ui.schema/opts PresentationOptions) :style
         'route-from-router $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn route-from-router (store)
-            let
-                raw-path $ .unwrap-or
-                  get (:router store) :path
-                  []
-                path $ if (list? raw-path) raw-path $ raise "|Router path must be a List"
-              match (first path)
-                (:none) (PageRoute :index)
-                (:some raw-route)
-                  if (enum? raw-route)
-                    match raw-route
-                      (:index) (PageRoute :index)
-                      (:widgets) (PageRoute :widgets)
-                      (:layouts) (PageRoute :layouts)
-                      (:fonts) (PageRoute :fonts)
-                      (:design) (PageRoute :design)
-                      (:components) (PageRoute :components)
-                      (:component name)
-                        match (try-decode-map-as name 'String)
-                          (:ok id) (PageRoute :component id)
-                          (:err message) (raise message)
-                      (:utils) (PageRoute :utils)
-                      (:404 path)
-                        PageRoute :not-found $ .join-string (respo-router.schema/path-segments path) |/
-                      _ $ PageRoute :index
-                    raise "|Router route must be an Enum"
+            match
+              first $ :path $ :router store
+              (:none) (PageRoute :index)
+              (:some route)
+                match route
+                  (:index) (PageRoute :index)
+                  (:widgets) (PageRoute :widgets)
+                  (:layouts) (PageRoute :layouts)
+                  (:fonts) (PageRoute :fonts)
+                  (:design) (PageRoute :design)
+                  (:components) (PageRoute :components)
+                  (:component name)
+                    match (try-decode-map-as name 'String)
+                      (:ok id) (PageRoute :component id)
+                      (:err message) (raise message)
+                  (:utils) (PageRoute :utils)
+                  (:404 path)
+                    PageRoute :not-found $ .join-string (respo-router.schema/path-segments path) |/
+                  _ $ PageRoute :index
           :examples $ []
           :schema $ quote $ Fn respo-ui.schema/Store (-> respo-ui.schema/PageRoute)
           :tests $ []
-            %{} 'TestEntry (:name |missing-and-empty-path)
-              :code $ quote $ do
-                assert= (PageRoute :index)
-                  route-from-router $ Store :router ({}) :states $ {}
-                assert= (PageRoute :index)
-                  route-from-router $ Store :router
-                    {} $ :path $ []
-                    , :states $ {}
+            %{} 'TestEntry (:name |empty-path)
+              :code $ quote $ assert= (PageRoute :index)
+                route-from-router $ Store :router respo-router.schema/router :states $ {}
               :tags $ #{} :boundary :router
             %{} 'TestEntry (:name |all-published-page-routes)
               :code $ quote $ do
@@ -5760,42 +5746,24 @@
               :code $ quote $ assert= (PageRoute :not-found "|missing/中文😀")
                 route-from-router $ Store :router (parse-address "|/missing/中文😀" dict) :states $ {}
               :tags $ #{} :boundary :router
-            %{} 'TestEntry (:name |reject-wrong-path-container)
-              :code $ quote $ assert= "|Router path must be a List"
-                try
-                  route-from-router $ Store :router
-                    {} $ :path |wrong
-                    , :states $ {}
-                  fn (error) error
-              :tags $ #{} :boundary :router
-            %{} 'TestEntry (:name |reject-non-enum-route)
-              :code $ quote $ assert= "|Router route must be an Enum"
-                try
-                  route-from-router $ Store :router
-                    {} $ :path $ [] |wrong
-                    , :states $ {}
-                  fn (error) error
-              :tags $ #{} :boundary :router
             %{} 'TestEntry (:name |reject-wrong-404-container)
               :code $ quote $ assert= "|[respo-router/path-segments] expected List"
                 try
-                  route-from-router $ Store :router
-                    {} $ :path $ [] (:: :404 |wrong)
-                    , :states $ {}
+                  route-from-router $ Store :states ({}) :router $ respo-router.schema/Router :query ({}) :path
+                    [] $ :: :404 |wrong
                   fn (error) error
               :tags $ #{} :boundary :router
             %{} 'TestEntry (:name |reject-wrong-404-element)
               :code $ quote $ assert= "|[respo-router/path-segments] expected String segment"
                 try
                   route-from-router $ Store :router
-                    {} $ :path $ []
-                      :: :404 $ [] 1
+                    respo-router.schema/Router :query ({}) :path $ [] $ :: :404 ([] 1)
                     , :states $ {}
                   fn (error) error
               :tags $ #{} :boundary :router
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
-            Store :router ({}) :states $ {}
+            Store :router respo-router.schema/router :states $ {}
           :examples $ []
           :schema $ quote respo-ui.schema/Store
         'with-class-name $ %{} 'CodeEntry
@@ -6502,26 +6470,18 @@
                       (:ok states) (.assoc store :states states)
                       (:err error) (raise error)
                   (:err error) (raise error)
-              (:router/nav t)
-                match (try-decode-map-as t 'String)
-                  (:ok path)
-                    .assoc store :router $ parse-address path router/dict
-                  (:err error) (raise error)
-              (:router/route r)
-                match
-                  try-decode-map-as r $ quote $ Map Tag Dynamic
-                  (:ok route) (.assoc store :router route)
-                  (:err error) (raise error)
-              _ $ do (eprintln "|Unknown op:" op) store
+              (:router/nav path)
+                .assoc store :router $ parse-address path router/dict
+              (:router/route route) (.assoc store :router route)
           :examples $ []
-          :schema $ quote $ Fn respo-ui.schema/Store Dynamic (-> respo-ui.schema/Store)
+          :schema $ quote $ Fn respo-ui.schema/Store respo-ui.schema/Op (-> respo-ui.schema/Store)
           :tests $ []
             %{} 'TestEntry (:name |typed-store-updates-preserve-input)
               :code $ quote $ let
-                  route $ {} (:name :old) (:data nil)
+                  route $ parse-address |/widgets.html router/dict
                   states $ {} $ :data false
                   original $ schema/Store :router route :states states
-                  next-route $ {} (:name :new) (:data 0)
+                  next-route $ parse-address |/component/button router/dict
                   routed $ updater original $ :: :router/route next-route
                   edited $ updater original $ :: :states ([]) |new-state
                   navigated $ updater original $ :: :router/nav |/
@@ -6533,21 +6493,16 @@
                 assert= (parse-address |/ router/dict) (:router navigated)
                 assert= (schema/Store :router route :states states) original
               :tags $ #{} :regression :unit
-            %{} 'TestEntry (:name |invalid-route-and-cursor-remain-rejected)
+            %{} 'TestEntry (:name |invalid-cursor-remains-rejected)
               :code $ quote $ let
-                  original $ schema/Store :router ({}) :states $ {}
-                assert= true $ try
-                  do
-                    updater original $ :: :router/route 1
-                    , false
-                  fn (message) true
+                  original $ schema/Store :router respo-router.schema/router :states $ {}
                 assert= true $ try
                   do
                     updater original $ :: :states 1 |bad-cursor
                     , false
                   fn (message) true
                 assert=
-                  schema/Store :router ({}) :states $ {}
+                  schema/Store :router respo-router.schema/router :states $ {}
                   , original
               :tags $ #{} :regression :unit
       :ns $ %{} 'NsEntry (:doc |)
