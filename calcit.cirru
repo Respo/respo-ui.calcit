@@ -1967,7 +1967,7 @@
                 FieldDoc :name |:disabled :type |Bool :optional? true :note "|Disables the button."
                 FieldDoc :name |:on-click :type |EventHandler :optional? true :note "|Click handler (e d!)."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |InputOptions :note "|Options for comp-input and comp-textarea." :fields $ []
                 FieldDoc :name |:id :type |String :optional? true :note "|Element id, for comp-field :for."
                 FieldDoc :name |:type :type |String :optional? true :note "|Native input type, such as |password."
@@ -1976,13 +1976,13 @@
                 FieldDoc :name |:on-input :type |EventHandler :optional? true :note "|Raw input event handler (e d!)."
                 FieldDoc :name |:on-change :type "|Fn (String, d!)" :optional? true :note "|Receives the next value and d!."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |SelectOptions :note "|Options for comp-select." :fields $ []
                 FieldDoc :name |:id :type |String :optional? true :note "|Element id, for comp-field :for."
                 FieldDoc :name |:disabled :type |Bool :optional? true :note "|Disables the select."
                 FieldDoc :name |:on-change :type "|Fn (String, d!)" :optional? true :note "|Receives the next value and d!."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |SelectOption :note "|One item of comp-select or comp-radio-group." :fields $ []
                 FieldDoc :name |:value :type |String :optional? false :note "|Value sent to :on-change."
                 FieldDoc :name |:label :type |String :optional? false :note "|Visible text."
@@ -1992,7 +1992,7 @@
                 FieldDoc :name |:disabled :type |Bool :optional? true :note "|Disables the control."
                 FieldDoc :name |:on-change :type "|Fn (Bool, d!)" :optional? true :note "|Receives the next Bool and d!."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |RadioGroupOptions :note "|Options for comp-radio-group." :fields $ []
                 FieldDoc :name |:name :type |String :optional? true :note "|Shared name of the radio inputs."
                 FieldDoc :name |:label :type |String :optional? true :note "|Group aria-label."
@@ -2000,27 +2000,27 @@
                 FieldDoc :name |:disabled :type |Bool :optional? true :note "|Disables every choice."
                 FieldDoc :name |:on-change :type "|Fn (String, d!)" :optional? true :note "|Receives the picked value and d!."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |FieldOptions :note "|Options for comp-field." :fields $ []
                 FieldDoc :name |:for :type |String :optional? true :note "|Id of the labelled control."
                 FieldDoc :name |:description :type |String :optional? true :note "|Help text under the label."
                 FieldDoc :name |:error :type |String :optional? true :note "|Error text, rendered with role=alert."
                 FieldDoc :name |:required? :type |Bool :optional? true :note "|Shows the required marker."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |TabsOptions :note "|Options for comp-tabs." :fields $ []
                 FieldDoc :name |:selected :type |Value :optional? true :note "|The selected tab value."
                 FieldDoc :name |:vertical? :type |Bool :optional? true :note "|Vertical layout."
                 FieldDoc :name |:width :type |Number :optional? true :note "|Width of a vertical tab list, in px."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
                 FieldDoc :name |:tab-class-name :type |String :optional? true :note "|Extra class names for each tab."
-                FieldDoc :name |:tab-style :type |Map :optional? true :note "|Inline styles for each tab."
-                FieldDoc :name |:selected-tab-style :type |Map :optional? true :note "|Inline styles for the selected tab."
+                FieldDoc :name |:tab-style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles for each tab. Values are String, Number, Tag or Option StyleValue; none omits a property."
+                FieldDoc :name |:selected-tab-style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles for the selected tab. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |BreadcrumbOptions :note "|Options for comp-breadcrumb." :fields $ []
                 FieldDoc :name |:separator :type |String :optional? true :note "|Text between items. Default is /."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |BreadcrumbItem :note "|One link of the trail." :fields $ []
                 FieldDoc :name |:label :type |String :optional? false :note "|Visible text."
                 FieldDoc :name |:href :type |String :optional? true :note "|Link target. Items without it render as text."
@@ -2028,11 +2028,11 @@
                 FieldDoc :name |:siblings :type |Number :optional? true :note "|Pages shown beside the current one. Default is 1."
                 FieldDoc :name |:on-change :type "|Fn (Number, d!)" :optional? true :note "|Receives the next page and d!."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |StepsOptions :note "|Options for comp-steps." :fields $ []
                 FieldDoc :name |:vertical? :type |Bool :optional? true :note "|Vertical layout with descriptions."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |StepItem :note "|One step of the sequence." :fields $ []
                 FieldDoc :name |:title :type |String :optional? false :note "|Step title."
                 FieldDoc :name |:description :type |String :optional? true :note "|Text under the title."
@@ -2040,55 +2040,55 @@
                 FieldDoc :name |:open? :type |Bool :optional? true :note "|Initially open."
                 FieldDoc :name |:name :type |String :optional? true :note "|Disclosures sharing a name open one at a time."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |TooltipOptions :note "|Options for comp-tooltip." :fields $ []
                 FieldDoc :name |:placement :type |Tag :optional? true :note "|:top (default) or :bottom."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |PresentationOptions :note "|Shared presentation options." :fields $ []
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |SpinnerOptions :note "|Options for comp-spinner." :fields $ []
                 FieldDoc :name |:label :type |String :optional? true :note "|Accessible label. Default is Loading."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |SkeletonOptions :note "|Options for comp-skeleton." :fields $ []
                 FieldDoc :name |:label :type |String :optional? true :note "|Exposes role=status with this label. Unlabeled skeletons are decorative."
                 FieldDoc :name |:kind :type |Tag :optional? true :note "|:text (default) or :circle."
                 FieldDoc :name |:width :type |String :optional? true :note "|CSS width."
                 FieldDoc :name |:height :type |String :optional? true :note "|CSS height."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |EmptyOptions :note "|Options for comp-empty." :fields $ []
                 FieldDoc :name |:icon :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:description :type |String :optional? true :note "|Text under the title."
                 FieldDoc :name |:action :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |BadgeOptions :note "|Options for comp-badge." :fields $ []
                 FieldDoc :name |:kind :type |Tag :optional? true :note "|:info, :success, :warning or :error."
                 FieldDoc :name |:dot? :type |Bool :optional? true :note "|Render a dot and keep the content as aria-label."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |CardOptions :note "|Options for comp-card." :fields $ []
                 FieldDoc :name |:title :type |String :optional? true :note "|Header text."
                 FieldDoc :name |:footer :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |AvatarOptions :note "|Options for comp-avatar." :fields $ []
                 FieldDoc :name |:src :type |String :optional? true :note "|Image URL. Initials show when absent."
                 FieldDoc :name |:alt :type |String :optional? true :note "|Image alt text."
                 FieldDoc :name |:title :type |String :optional? true :note "|Hover title."
                 FieldDoc :name |:size :type |Tag :optional? true :note "|:small or :large. Default is medium."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
               StructDoc :name |AttributesOptions :note "|Options for comp-attributes, including its items." :fields $ []
                 FieldDoc :name |:items :type |List :optional? false :note "|Label/value items, each with :label, :value and optional :span."
                 FieldDoc :name |:title :type |String :optional? true :note "|Heading above the grid."
                 FieldDoc :name |:item-width :type |Number :optional? true :note "|Minimum column width in px."
                 FieldDoc :name |:item-height :type |Number :optional? true :note "|Reserved. Currently has no effect."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
                 FieldDoc :name |:css-item :type |String :optional? true :note "|Class names for each item."
                 FieldDoc :name |:css-label :type |String :optional? true :note "|Class names for labels."
                 FieldDoc :name |:css-value :type |String :optional? true :note "|Class names for values."
@@ -2096,7 +2096,7 @@
               StructDoc :name |DividerOptions :note "|Options for comp-divider." :fields $ []
                 FieldDoc :name |:vertical? :type |Bool :optional? true :note "|Vertical divider between inline items."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
-                FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
+                FieldDoc :name |:style :type "|Map Tag InlineStyleValue" :optional? true :note "|Inline styles merged onto the root element. Values are String, Number, Tag or Option StyleValue; none omits a property."
           :examples $ []
           :schema $ quote $ List respo-ui.comp.component-docs/StructDoc
       :ns $ %{} 'NsEntry
@@ -3725,7 +3725,7 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.34.1)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.34.2)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     Option :none
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
                   div
@@ -4654,7 +4654,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.13.0
+          :code $ quote $ def version |0.14.0
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
@@ -5313,7 +5313,7 @@
             :item-width $ quote $ Option Number
             :item-height $ quote $ Option Number
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
             :css-item $ quote $ Option String
             :css-label $ quote $ Option String
             :css-value $ quote $ Option String
@@ -5329,7 +5329,7 @@
             :title $ quote $ Option String
             :size $ quote $ Option Tag
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             AvatarOptions :title (Option :some "|Chen Yong") :size $ Option :some :large
           :schema $ quote StructDef
@@ -5338,7 +5338,7 @@
             :kind $ quote $ Option Tag
             :dot? $ quote $ Option Bool
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             BadgeOptions :dot? $ Option :some true
           :schema $ quote StructDef
@@ -5352,7 +5352,7 @@
           :code $ quote $ defstruct BreadcrumbOptions
             :separator $ quote $ Option String
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ []
           :schema $ quote StructDef
         'ButtonOptions $ %{} 'CodeEntry
@@ -5363,7 +5363,7 @@
             :disabled $ quote $ Option Bool
             :on-click $ quote $ Option respo.schema/EventHandler
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             ButtonOptions :kind $ Option :some :primary
           :schema $ quote StructDef
@@ -5373,7 +5373,7 @@
             :title $ quote $ Option String
             :footer $ quote $ Option respo-ui.schema/ContentNode
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             CardOptions :title $ Option :some |Summary
           :schema $ quote StructDef
@@ -5382,7 +5382,7 @@
             :open? $ quote $ Option Bool
             :name $ quote $ Option String
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             CollapseOptions :name $ Option :some |faq
           :schema $ quote StructDef
@@ -5428,7 +5428,7 @@
           :code $ quote $ defstruct DividerOptions
             :vertical? $ quote $ Option Bool
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             DividerOptions :vertical? $ Option :some true
           :schema $ quote StructDef
@@ -5439,7 +5439,7 @@
             :description $ quote $ Option String
             :action $ quote $ Option respo-ui.schema/ContentNode
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             EmptyOptions :description $ Option :some "|Try another search term."
           :schema $ quote StructDef
@@ -5450,10 +5450,32 @@
             :error $ quote $ Option String
             :required? $ quote $ Option Bool
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             FieldOptions :error $ Option :some "|Required field"
           :schema $ quote StructDef
+        'InlineStyleValue $ %{} 'CodeEntry
+          :doc "|Inline CSS values: scalar StyleValue or Option StyleValue; none omits a property. Existing exported static StyleValue maps stay scalar."
+          :code $ quote $ defunion InlineStyleValue respo-ui.schema/StyleValue
+            quote $ Option respo-ui.schema/StyleValue
+          :examples $ []
+          :schema $ quote UnionDef
+          :tests $ [] $ %{} 'TestEntry (:name |inline-styles-preserve-optional-properties)
+            :code $ quote $ let
+                styles $ assert-type
+                  {} (:opacity 0.5) (:color |red)
+                    :border-color $ Option :none
+                    :outline-color $ Option :some :blue
+                  quote $ Map Tag respo-ui.schema/InlineStyleValue
+                node $ respo-ui.comp/comp-button |Save $ Option :some
+                  ButtonOptions :style $ Option :some styles
+                html $ respo.render.html/make-string node
+              assert= true $ includes? html |opacity:0.5;
+              assert= true $ includes? html |color:red;
+              assert= true $ includes? html |outline-color:blue;
+              assert= false $ includes? html |border-color:
+              , &unit
+            :tags $ #{} :js-only
         'InputOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-input and comp-textarea. :on-change receives the current text and d!; :on-input still receives the raw event map."
           :code $ quote $ defstruct InputOptions
@@ -5471,7 +5493,7 @@
                     :return 'Unit
                 :return 'Unit
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ []
           :schema $ quote StructDef
         'Op $ %{} 'CodeEntry
@@ -5500,7 +5522,7 @@
                     :return 'Unit
                 :return 'Unit
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             PaginationOptions :siblings $ Option :some 2
           :schema $ quote StructDef
@@ -5508,7 +5530,7 @@
           :doc "|Shared typed class-name and style options for presentation-only components."
           :code $ quote $ defstruct PresentationOptions
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             PresentationOptions :class-name $ Option :some |status
           :schema $ quote StructDef
@@ -5527,7 +5549,7 @@
                     :return 'Unit
                 :return 'Unit
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             RadioGroupOptions :name $ Option :some |language
           :schema $ quote StructDef
@@ -5551,7 +5573,7 @@
                     :return 'Unit
                 :return 'Unit
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             SelectOptions :disabled $ Option :some false
           :schema $ quote StructDef
@@ -5563,7 +5585,7 @@
             :width $ quote $ Option String
             :height $ quote $ Option String
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             SkeletonOptions :kind (Option :some :text) :width $ Option :some |60%
           :schema $ quote StructDef
@@ -5572,7 +5594,7 @@
           :code $ quote $ defstruct SpinnerOptions
             :label $ quote $ Option String
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             SpinnerOptions :label $ Option :some "|Loading results"
           :schema $ quote StructDef
@@ -5586,7 +5608,7 @@
           :code $ quote $ defstruct StepsOptions
             :vertical? $ quote $ Option Bool
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ []
           :schema $ quote StructDef
         'Store $ %{} 'CodeEntry
@@ -5621,7 +5643,7 @@
                     :return 'Unit
                 :return 'Unit
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             SwitchOptions :label $ Option :some "|Compact mode"
           :schema $ quote StructDef
@@ -5640,10 +5662,10 @@
             :vertical? $ quote $ Option Bool
             :width $ quote $ Option Number
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
             :tab-class-name $ quote $ Option String
-            :tab-style $ quote $ Option (Map Tag Dynamic)
-            :selected-tab-style $ quote $ Option (Map Tag Dynamic)
+            :tab-style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
+            :selected-tab-style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             TabsOptions :selected $ Option :some :book
           :schema $ quote StructDef
@@ -5651,7 +5673,7 @@
           :code $ quote $ defstruct TooltipOptions
             :placement $ quote $ Option Tag
             :class-name $ quote $ Option String
-            :style $ quote $ Option (Map Tag Dynamic)
+            :style $ quote $ Option (Map Tag respo-ui.schema/InlineStyleValue)
           :examples $ [] $ quote
             TooltipOptions :placement $ Option :some :bottom
           :schema $ quote StructDef
