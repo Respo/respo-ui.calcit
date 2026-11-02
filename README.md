@@ -10,7 +10,20 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.11.0 候选：用 union 收窄节点和正文
+### 0.12.0 候选：路由合同跟随 Router struct
+
+使用者影响：CLI / `@calcit/procs` 配对正式 **0.34.1**，依赖改为正式 Router **0.10.0**、Respo **0.18.0**、JS-FFI **0.2.9**；重新安装完整精确图、生成 JS 并完整刷新。旧 Git 0.11.0 保持不动。
+
+`respo-ui.schema/Store.router` 与 `Op` 的 `:router/route` payload 改为
+`respo-router.schema/Router`，`updater` 接收 `respo-ui.schema/Op`。直接构造 Store 的
+调用方须传 `respo-router.schema/router`（空路由）或 `parse-address` 的结果，不能再传 Map；
+路由操作也须用声明的 Op 构造器。此公开合同不兼容，因此升 minor。展示规则中的 Tag 参数保留，
+组件正文和样式的 union 合同沿用 0.11.0，未用强转或扩大 Dynamic 绕过检查。
+
+原类型门禁、测试、Message 源码兼容夹具、HUD 与 COS 内置 verify/部署路径保留。
+本轮验收和正式依赖解析结果见 PR；下文浏览器记录属于历史迁移。
+
+### 0.11.0 历史：用 union 收窄节点和正文
 
 使用者影响：CLI 与 `@calcit/procs` 配对正式 **0.34.1**。`EmptyOptions.icon`、
 `EmptyOptions.action` 和 `CardOptions.footer` 使用 `Option ContentNode`，其中
@@ -25,17 +38,13 @@ Element/Component 原样插入；没有正文时传空字符串。nil 和未收�
 样式值和生成的 CSS 不变，读取这些常量的代码可保留具体类型。
 `merge-styles` 仍接受调用方的开放样式 Map，保留 Option 尺寸和不同值类型合并的原合同；
 静态常量的 union 不替代调用方样式边界校验。声明采用 0.34 的类型名写法，prototype 的
-schema 按实际定义使用 `StructDef` / `EnumDef`。此处是候选说明，发布前仍需完整原门禁和评审；
+schema 按实际定义使用 `StructDef` / `EnumDef`。0.11.0 已发布，后续修改仍需完整原门禁和评审；
 不把仅加载成功或局部类型检查当作渲染验收。
 0.34.1 修复了混合 Map 初始化可能漏检非法 union 成员的问题；CLI 与 runtime 须一起升级，
 不要使用 0.34.0 的绿灯替代此门禁。CI 的 Message 源码兼容夹具使用正式 `0.1.2` tag，
 仍只验证当前 UI 宿主图下的源码兼容性，不代表 Message 自身完整发布图验收。
 
-路由数据跟随 Router 的 `Router` struct：`respo-ui.schema/Store` 的 `:router` 字段是
-`respo-router.schema/Router`，`Op` 的 `:router/route` 变体带同一类型，`updater` 改收
-`respo-ui.schema/Op`，不再从 Dynamic 解码路由。直接构造 `Store` 的下游需传
-`respo-router.schema/router`（空路由）或 `parse-address` 的结果，不能再传 Map。
-需要包含 Router #92 与 #95 的新 Router tag。
+
 
 ### 0.10.0：保留 Option 的组件选项
 
