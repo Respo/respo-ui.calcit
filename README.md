@@ -31,6 +31,12 @@ schema 按实际定义使用 `StructDef` / `EnumDef`。此处是候选说明，�
 不要使用 0.34.0 的绿灯替代此门禁。CI 的 Message 源码兼容夹具使用正式 `0.1.2` tag，
 仍只验证当前 UI 宿主图下的源码兼容性，不代表 Message 自身完整发布图验收。
 
+路由数据跟随 Router 的 `Router` struct：`respo-ui.schema/Store` 的 `:router` 字段是
+`respo-router.schema/Router`，`Op` 的 `:router/route` 变体带同一类型，`updater` 改收
+`respo-ui.schema/Op`，不再从 Dynamic 解码路由。直接构造 `Store` 的下游需传
+`respo-router.schema/router`（空路由）或 `parse-address` 的结果，不能再传 Map。
+需要包含 Router #92 与 #95 的新 Router tag。
+
 ### 0.10.0：保留 Option 的组件选项
 
 使用者影响：CLI / `@calcit/procs` 继续配对正式 **0.32.1**，需要统一使用
