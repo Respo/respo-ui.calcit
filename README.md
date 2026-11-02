@@ -12,7 +12,7 @@ Find details in https://ui.respo-mvc.org/ .
 
 ### 0.11.0 候选：用 union 收窄节点和正文
 
-使用者影响：CLI 与 `@calcit/procs` 配对正式 **0.34.0**。`EmptyOptions.icon`、
+使用者影响：CLI 与 `@calcit/procs` 配对正式 **0.34.1**。`EmptyOptions.icon`、
 `EmptyOptions.action` 和 `CardOptions.footer` 使用 `Option ContentNode`，其中
 `respo-ui.schema/ContentNode` 是 `Element | Component` 的透明 union。现有 Element 和
 Component 仍直接放入 `Option :some`，无需增加节点包装；空内容使用 `Option :none`。
@@ -24,9 +24,12 @@ Element/Component 原样插入；没有正文时传空字符串。nil 和未收�
 `Map Tag respo-ui.schema/StyleValue`，其中 `StyleValue` 是 `String | Number | Tag`；
 样式值和生成的 CSS 不变，读取这些常量的代码可保留具体类型。
 `merge-styles` 仍接受调用方的开放样式 Map，保留 Option 尺寸和不同值类型合并的原合同；
-静态常量的 union 不替代调用方样式边界校验。声明采用 0.34.0 的类型名写法，prototype 的
+静态常量的 union 不替代调用方样式边界校验。声明采用 0.34 的类型名写法，prototype 的
 schema 按实际定义使用 `StructDef` / `EnumDef`。此处是候选说明，发布前仍需完整原门禁和评审；
 不把仅加载成功或局部类型检查当作渲染验收。
+0.34.1 修复了混合 Map 初始化可能漏检非法 union 成员的问题；CLI 与 runtime 须一起升级，
+不要使用 0.34.0 的绿灯替代此门禁。CI 的 Message 源码兼容夹具使用正式 `0.1.2` tag，
+仍只验证当前 UI 宿主图下的源码兼容性，不代表 Message 自身完整发布图验收。
 
 ### 0.10.0：保留 Option 的组件选项
 
