@@ -34,11 +34,9 @@
                   str-spaced style-alert $ match kind (:success style-alert-success) (:warning style-alert-warning) (:error style-alert-error) (_ style-alert-info)
                   respo-ui.schema/option-field options :class-name
                 :style $ respo-ui.schema/option-field options :style
-              if (literal? content)
-                <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-                , content
+              render-content content
           :examples $ [] $ quote (comp-alert :success "|Changes saved")
-          :schema $ quote $ Fn Tag Content (calcit.core/Option respo-ui.schema/PresentationOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn Tag respo-ui.schema/Content (calcit.core/Option respo-ui.schema/PresentationOptions) (-> respo.schema/Component)
         'comp-attributes $ %{} 'CodeEntry
           :doc "|Render a responsive label/value grid from AttributesOptions :items. Each item may carry :label, :value (text or a Respo node), and :span; options also set the title, item size, and CSS overrides."
           :code $ quote $ defcomp comp-attributes (options)
@@ -268,12 +266,10 @@
                   respo-ui.schema/option-field options :class-name
                 :style $ respo-ui.schema/option-field options :style
                 :on-click $ respo-ui.schema/option-field options :on-click
-              if (literal? content)
-                <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-                , content
+              render-content content
           :examples $ [] $ quote
             comp-button |Save $ respo-ui.schema/opts respo-ui.schema/ButtonOptions :kind :primary
-          :schema $ quote $ Fn Content (calcit.core/Option respo-ui.schema/ButtonOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn respo-ui.schema/Content (calcit.core/Option respo-ui.schema/ButtonOptions) (-> respo.schema/Component)
         'comp-card $ %{} 'CodeEntry
           :doc "|Render a composable card. Content may be text or a Respo node; options support :title, :footer, :class-name, and :style."
           :code $ quote $ defcomp comp-card (content options)
@@ -292,9 +288,7 @@
                   []
                 [] $ [] 1 $ div
                   {} $ :class-name style-card-body
-                  if (literal? content)
-                    <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
-                    , content
+                  render-content content
                 if
                   .some? $ respo-ui.schema/option-field options :footer
                   [] $ [] 2 $ div
@@ -303,7 +297,7 @@
                   []
           :examples $ [] $ quote
             comp-card |Content $ respo-ui.schema/opts respo-ui.schema/CardOptions :title |Summary
-          :schema $ quote $ Fn Content (calcit.core/Option respo-ui.schema/CardOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn respo-ui.schema/Content (calcit.core/Option respo-ui.schema/CardOptions) (-> respo.schema/Component)
           :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
             :code $ quote $ let
                 plain $ comp-card |Body $ Option :none
@@ -422,12 +416,10 @@
                 <> title
               div
                 {} $ :class-name style-collapse-body
-                if (literal? content)
-                  <> $ respo.util.format/scalar-attribute-text content
-                  , content
+                render-content content
           :examples $ [] $ quote
             comp-collapse "|What is Respo?" "|A virtual DOM library in Calcit." $ respo-ui.schema/opts respo-ui.schema/CollapseOptions :open? true
-          :schema $ quote $ Fn String Content (calcit.core/Option respo-ui.schema/CollapseOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn String respo-ui.schema/Content (calcit.core/Option respo-ui.schema/CollapseOptions) (-> respo.schema/Component)
           :tests $ [] $ %{} 'TestEntry (:name |render-disclosure)
             :code $ quote $ let
                 html $ respo.render.html/make-string $ comp-collapse |Title |Body
@@ -1065,13 +1057,11 @@
                   str-spaced style-tooltip $ match (respo-ui.schema/field-or options :placement :top) (:bottom style-tooltip-bottom) (_ |)
                   respo-ui.schema/option-field options :class-name
                 :style $ respo-ui.schema/option-field options :style
-              if (literal? content)
-                <> $ respo.util.format/scalar-attribute-text content
-                , content
+              render-content content
               span $ {} (:role |tooltip) (:class-name style-tooltip-tip) (:inner-text tip)
           :examples $ [] $ quote
             comp-tooltip |Save "|Saves the draft" $ respo-ui.schema/opts respo-ui.schema/TooltipOptions :placement :bottom
-          :schema $ quote $ Fn Content String (calcit.core/Option respo-ui.schema/TooltipOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn respo-ui.schema/Content String (calcit.core/Option respo-ui.schema/TooltipOptions) (-> respo.schema/Component)
           :tests $ [] $ %{} 'TestEntry (:name |render-tip)
             :code $ quote $ let
                 html $ respo.render.html/make-string $ comp-tooltip |Save |Hint
@@ -1229,6 +1219,65 @@
                 [] 1 0 8 9 10 11 12 0 20
                 pagination-pages 10 20 2
             :tags $ #{} :boundary
+        'render-content $ %{} 'CodeEntry
+          :doc "|Render component content: scalars become a text node, Element and Component are returned as they are."
+          :code $ quote $ defn render-content (content)
+            match content
+              (String s) (<> s)
+              (Number n)
+                <> $ str n
+              (Tag t)
+                <> $ to-string t
+              (Bool b)
+                <> $ str b
+              (Element e) e
+              (Component c) c
+          :examples $ []
+          :schema $ quote $ Fn respo-ui.schema/Content (-> respo-ui.schema/ContentNode)
+          :tests $ [] $ %{} 'TestEntry (:name |renders-scalars-and-keeps-nodes)
+            :code $ quote $ let
+                element $ respo.core/div $ {}
+              match (render-content element)
+                (Element actual)
+                  assert |element-identity $ identical? element actual
+                (Component actual) (assert |element-kind false)
+              match (render-content |text)
+                (Element node)
+                  assert=
+                    :attrs $ <> |text
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content 12)
+                (Element node)
+                  assert=
+                    :attrs $ <> |12
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content :tag)
+                (Element node)
+                  assert=
+                    :attrs $ <> |tag
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content true)
+                (Element node)
+                  assert=
+                    :attrs $ <> |true
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content false)
+                (Element node)
+                  assert=
+                    :attrs $ <> |false
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+              match (render-content |)
+                (Element node)
+                  assert=
+                    :attrs $ <> |
+                    :attrs node
+                (Component node) (assert |scalar-must-render-as-element false)
+            :tags $ #{} :unit
         'render-page-button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-page-button (page total target text label options)
             let
@@ -1788,25 +1837,25 @@
     'respo-ui.comp.component-docs $ %{} 'FileEntry
       :defs $ {}
         'ArgDoc $ %{} 'CodeEntry (:doc "|One positional argument of a component.")
-          :code $ quote $ defstruct ArgDoc (:name 'String) (:note 'String)
+          :code $ quote $ defstruct ArgDoc (:name String) (:note String)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'ComponentDoc $ %{} 'CodeEntry
           :doc "|Page data for one component: title, group, summary, positional arguments and the structs shown in its API tables."
-          :code $ quote $ defstruct ComponentDoc (:id 'String) (:title 'String) (:group 'String) (:signature 'String) (:summary 'String)
+          :code $ quote $ defstruct ComponentDoc (:id String) (:title String) (:group String) (:signature String) (:summary String)
             :args $ quote $ List respo-ui.comp.component-docs/ArgDoc
             :structs $ quote $ List String
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'FieldDoc $ %{} 'CodeEntry (:doc "|One field of an options struct.")
-          :code $ quote $ defstruct FieldDoc (:name 'String) (:type 'String) (:optional? 'Bool) (:note 'String)
+          :code $ quote $ defstruct FieldDoc (:name String) (:type String) (:optional? Bool) (:note String)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'StructDoc $ %{} 'CodeEntry (:doc "|An options or item struct and its fields.")
-          :code $ quote $ defstruct StructDoc (:name 'String) (:note 'String)
+          :code $ quote $ defstruct StructDoc (:name String) (:note String)
             :fields $ quote $ List respo-ui.comp.component-docs/FieldDoc
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'component-docs $ %{} 'CodeEntry (:doc "|Every component page, in sidebar order.")
           :code $ quote $ def component-docs
             []
@@ -2007,9 +2056,9 @@
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |EmptyOptions :note "|Options for comp-empty." :fields $ []
-                FieldDoc :name |:icon :type |Dynamic :optional? true :note "|Element shown above the title."
+                FieldDoc :name |:icon :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:description :type |String :optional? true :note "|Text under the title."
-                FieldDoc :name |:action :type |Dynamic :optional? true :note "|Element shown below, such as a button."
+                FieldDoc :name |:action :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |BadgeOptions :note "|Options for comp-badge." :fields $ []
@@ -2019,7 +2068,7 @@
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |CardOptions :note "|Options for comp-card." :fields $ []
                 FieldDoc :name |:title :type |String :optional? true :note "|Header text."
-                FieldDoc :name |:footer :type |Dynamic :optional? true :note "|Element rendered in the footer."
+                FieldDoc :name |:footer :type |ContentNode :optional? true :note "|Element or Component rendered in this slot; use Option :none for absence."
                 FieldDoc :name |:class-name :type |String :optional? true :note "|Extra class names for the root element."
                 FieldDoc :name |:style :type |Map :optional? true :note "|Inline styles merged onto the root element."
               StructDoc :name |AvatarOptions :note "|Options for comp-avatar." :fields $ []
@@ -3008,11 +3057,11 @@
     'respo-ui.comp.design-page $ %{} 'FileEntry
       :defs $ {}
         'DesignNote $ %{} 'CodeEntry (:doc "|A titled paragraph on the design system page.")
-          :code $ quote $ defstruct DesignNote (:title 'String) (:body 'String)
+          :code $ quote $ defstruct DesignNote (:title String) (:body String)
           :examples $ []
           :schema $ quote StructDef
         'TokenGroup $ %{} 'CodeEntry (:doc "|A titled set of token names shown together.")
-          :code $ quote $ defstruct TokenGroup (:title 'String)
+          :code $ quote $ defstruct TokenGroup (:title String)
             :names $ quote $ List String
           :examples $ []
           :schema $ quote StructDef
@@ -3587,7 +3636,7 @@
           :code $ quote $ def style-section
             {} (:font-size 24) (:font-family ui/font-fancy) (:line-height |60px)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.fonts-page
           :require
@@ -3672,7 +3721,7 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.32.1)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.34.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     Option :none
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
                   div
@@ -4163,7 +4212,7 @@
     'respo-ui.comp.sidebar $ %{} 'FileEntry
       :defs $ {}
         'ComponentGroup $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct ComponentGroup (:id 'String) (:title 'String)
+          :code $ quote $ defstruct ComponentGroup (:id String) (:title String)
           :examples $ []
           :schema $ quote StructDef
         'comp-sidebar $ %{} 'CodeEntry (:doc |)
@@ -4454,7 +4503,7 @@
               :display :inline-block
               :vertical-align :text-bottom
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'style-nav-sub-title $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-nav-sub-title
             {} $ |& $ {} (:margin "|12px 0 2px") (:padding "|0 10px 0 12px") (:font-size tokens/text-xs) (:font-weight tokens/weight-semibold) (:letter-spacing |0.02em) (:color tokens/color-text-muted)
@@ -4601,7 +4650,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.10.0
+          :code $ quote $ def version |0.11.0
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
@@ -4616,57 +4665,57 @@
               :background-color tokens/color-surface
               :transition tokens/transition-colors
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'button-danger $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def button-danger
             merge-styles button $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-danger) (:border-color tokens/color-danger)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'button-primary $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def button-primary
             merge-styles button $ {} (:color tokens/color-text-inverse) (:background-color tokens/color-primary) (:border-color tokens/color-primary)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'card $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def card
             {} $ :padding tokens/space-4
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'center $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def center
             {} (:display |flex) (:flex-direction |column) (:justify-content |center) (:align-items |center)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'checkbox $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def checkbox
             {} (:accent-color tokens/color-primary) (:width tokens/space-4) (:height tokens/space-4) (:margin 0) (:cursor :pointer) (:vertical-align :middle)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'checkbox-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def checkbox-label
             {} (:display :inline-flex) (:align-items :center) (:gap tokens/space-2) (:line-height tokens/leading-tight) (:cursor :pointer) (:user-select :none)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column
             {} (:display |flex) (:align-items |stretch) (:flex-direction |column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column-dispersive $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column-dispersive
             {} (:display |flex) (:align-items |center) (:justify-content |space-around) (:flex-direction |column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column-evenly $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column-evenly
             {} (:display |flex) (:align-items |center) (:justify-content |space-evenly) (:flex-direction |column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'column-parted $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def column-parted
             {} (:display :flex) (:align-items :stretch) (:justify-content :space-between) (:flex-direction :column)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'default-fonts $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def default-fonts "|Hind,Verdana,'Hiragino Sans GB','WenQuanYi Micro Hei','Microsoft Yahei',sans-serif"
           :examples $ []
@@ -4675,12 +4724,12 @@
           :code $ quote $ def expand
             {} (:flex |1) (:overflow :auto)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'flex $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def flex
             {} $ :flex 1
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'font-code $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def font-code "|Source Code Pro, Menlo, Ubuntu Mono, Consolas, monospace"
           :examples $ []
@@ -4697,12 +4746,12 @@
           :code $ quote $ def fullscreen
             {} (:position |absolute) (:left 0) (:top 0) (:width |100%) (:height |100%) (:overflow :auto)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'global $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def global
             {} (:line-height tokens/leading-normal) (:font-size tokens/text-md) (:font-family tokens/font-sans) (:color tokens/color-text)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'hsl $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn hsl (h s l a)
             match a
@@ -4719,12 +4768,12 @@
               :background-color tokens/color-surface
               :transition tokens/transition-colors
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def link
             {} (:display :inline-block) (:height tokens/control-sm) (:line-height tokens/control-sm) (:margin tokens/space-1) (:color tokens/color-primary) (:text-decoration :underline) (:text-underline-offset |2px) (:cursor :pointer) (:user-select :none) (:transition tokens/transition-colors)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'merge-styles $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn merge-styles (base overrides) (&merge base overrides)
           :examples $ []
@@ -4734,32 +4783,32 @@
           :code $ quote $ def row
             {} (:display |flex) (:align-items |stretch) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-center $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-center
             {} (:display |flex) (:align-items |center) (:justify-content |center) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-dispersive $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-dispersive
             {} (:display |flex) (:align-items |center) (:justify-content |space-around) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-evenly $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-evenly
             {} (:display |flex) (:align-items |center) (:flex-direction |row) (:justify-content |space-evenly)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-middle $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-middle
             {} (:display :flex) (:align-items :center) (:justify-content :flex-start) (:flex-direction :row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'row-parted $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def row-parted
             {} (:display |flex) (:align-items |center) (:justify-content |space-between) (:flex-direction |row)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'select $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def select
             {} (:box-sizing :border-box) (:height tokens/control-md) (:min-width |120px) (:padding-inline tokens/control-md-padding) (:border-radius tokens/radius-md) (:outline :none) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:vertical-align :middle) (:cursor :pointer)
@@ -4767,28 +4816,28 @@
               :color tokens/color-text
               :background-color tokens/color-surface
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'tag $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag
             {} (:display :inline-block) (:padding "|0 8px") (:border-radius tokens/radius-sm) (:font-size tokens/text-sm) (:line-height tokens/space-5) (:color tokens/color-text-inverse) (:background-color tokens/color-primary)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'tag-outline $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag-outline
             merge-styles tag $ {} (:color tokens/color-primary-active) (:background-color tokens/color-surface)
               :border $ str "|1px solid " tokens/color-primary-border
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'tag-stroke $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tag-stroke
             merge-styles tag $ {} (:color tokens/color-primary-active) (:background-color tokens/color-primary-soft)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'text-label $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def text-label
             {} (:display :inline-block) (:line-height tokens/control-md) (:font-size tokens/text-md) (:color tokens/color-text) (:vertical-align :middle)
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def textarea
             {} (:box-sizing :border-box) (:min-width |240px) (:padding "|8px 12px") (:border-radius tokens/radius-md) (:outline :none) (:font-family tokens/font-sans) (:font-size tokens/text-md) (:line-height tokens/leading-normal) (:vertical-align :top)
@@ -4797,7 +4846,7 @@
               :background-color tokens/color-surface
               :transition tokens/transition-colors
           :examples $ []
-          :schema $ quote $ Map Tag Dynamic
+          :schema $ quote $ Map Tag respo-ui.schema/StyleValue
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.core
           :require $ respo-ui.tokens :as tokens
@@ -5269,7 +5318,7 @@
             :css-title $ quote $ Option String
           :examples $ [] $ quote
             AttributesOptions :items $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'AvatarOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-avatar image metadata, size, class name, and style."
           :code $ quote $ defstruct AvatarOptions
@@ -5281,7 +5330,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             AvatarOptions :title (Option :some "|Chen Yong") :size $ Option :some :large
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'BadgeOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct BadgeOptions
             :kind $ quote $ Option Tag
@@ -5290,20 +5339,20 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             BadgeOptions :dot? $ Option :some true
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'BreadcrumbItem $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct BreadcrumbItem (:label 'String)
+          :code $ quote $ defstruct BreadcrumbItem (:label String)
             :href $ quote $ Option String
           :examples $ [] $ quote
             BreadcrumbItem :label |Home :href $ Option :some |#/
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'BreadcrumbOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct BreadcrumbOptions
             :separator $ quote $ Option String
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'ButtonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-button: kind, native type, disabled state, click handler, class name, and style."
           :code $ quote $ defstruct ButtonOptions
@@ -5315,17 +5364,17 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             ButtonOptions :kind $ Option :some :primary
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'CardOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-card with a string title and generic footer content."
           :code $ quote $ defstruct CardOptions
             :title $ quote $ Option String
-            :footer $ quote $ Option Dynamic
+            :footer $ quote $ Option respo-ui.schema/ContentNode
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             CardOptions :title $ Option :some |Summary
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'CollapseOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct CollapseOptions
             :open? $ quote $ Option Bool
@@ -5334,7 +5383,44 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             CollapseOptions :name $ Option :some |faq
-          :schema $ quote Enum
+          :schema $ quote StructDef
+        'Content $ %{} 'CodeEntry
+          :doc "|Component content: String, Number, Tag and Bool render as text; Element and Component pass through unchanged. Use an empty string for no body."
+          :code $ quote $ defunion Content String Number Tag Bool respo.schema/Element respo.schema/Component
+          :examples $ []
+          :schema $ quote UnionDef
+        'ContentNode $ %{} 'CodeEntry
+          :doc "|An unwrapped Respo Element or Component, returned by render-content and accepted by optional UI node slots. Use Option :none for absence."
+          :code $ quote $ defunion ContentNode respo.schema/Element respo.schema/Component
+          :examples $ []
+          :schema $ quote UnionDef
+          :tests $ [] $ %{} 'TestEntry (:name |preserves-element-component-and-absence)
+            :code $ quote $ let
+                element $ respo.core/<> "|union element slot"
+                component $ respo.comp.space/comp-space 1 1
+                empty-options $ EmptyOptions :icon (Option :some element) :action $ Option :some component
+                card $ CardOptions :footer $ Option :some component
+              match
+                option:unwrap $ :icon empty-options
+                (Element node)
+                  assert= true $ identical? element node
+                (Component node) (raise "|Unexpected UI slot node kind")
+              match
+                option:unwrap $ :action empty-options
+                (Element node) (raise "|Unexpected UI slot node kind")
+                (Component node)
+                  assert= true $ identical? component node
+              match
+                option:unwrap $ :footer card
+                (Element node) (raise "|Unexpected UI slot node kind")
+                (Component node)
+                  assert= true $ identical? component node
+              assert= true $ option:none? $ :footer (CardOptions)
+              match (respo-ui.comp/render-content component)
+                (Component actual)
+                  assert |component-identity $ identical? component actual
+                (Element actual) (assert |component-kind false)
+            :tags $ #{} :js-only :unit
         'DividerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-divider, including vertical orientation."
           :code $ quote $ defstruct DividerOptions
@@ -5343,18 +5429,18 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             DividerOptions :vertical? $ Option :some true
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'EmptyOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-empty with generic icon and action slots."
           :code $ quote $ defstruct EmptyOptions
-            :icon $ quote $ Option Dynamic
+            :icon $ quote $ Option respo-ui.schema/ContentNode
             :description $ quote $ Option String
-            :action $ quote $ Option Dynamic
+            :action $ quote $ Option respo-ui.schema/ContentNode
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             EmptyOptions :description $ Option :some "|Try another search term."
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'FieldOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct FieldOptions
             :for $ quote $ Option String
@@ -5365,7 +5451,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             FieldOptions :error $ Option :some "|Required field"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'InputOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-input and comp-textarea. :on-change receives the current text and d!; :on-input still receives the raw event map."
           :code $ quote $ defstruct InputOptions
@@ -5391,13 +5477,13 @@
           :code $ quote $ defenum Op
             :states
               quote $ List Dynamic
-              , 'Dynamic
-            :router/nav 'String
-            :router/route 'Dynamic
+              , Dynamic
+            :router/nav String
+            :router/route Dynamic
           :examples $ []
           :schema $ quote EnumDef
         'PageRoute $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:design) (:components) (:component 'String) (:utils) (:not-found 'String)
+          :code $ quote $ defenum PageRoute (:index) (:widgets) (:layouts) (:fonts) (:design) (:components) (:component String) (:utils) (:not-found String)
           :examples $ []
           :schema $ quote EnumDef
         'PaginationOptions $ %{} 'CodeEntry (:doc |)
@@ -5415,7 +5501,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             PaginationOptions :siblings $ Option :some 2
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'PresentationOptions $ %{} 'CodeEntry
           :doc "|Shared typed class-name and style options for presentation-only components."
           :code $ quote $ defstruct PresentationOptions
@@ -5423,7 +5509,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             PresentationOptions :class-name $ Option :some |status
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'RadioGroupOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct RadioGroupOptions
             [] $ quote Op
@@ -5442,13 +5528,13 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             RadioGroupOptions :name $ Option :some |language
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SelectOption $ %{} 'CodeEntry
           :doc "|A typed native select item with string value and label plus optional disabled state."
-          :code $ quote $ defstruct SelectOption (:value 'String) (:label 'String)
+          :code $ quote $ defstruct SelectOption (:value String) (:label String)
             :disabled $ quote $ Option Bool
           :examples $ [] $ quote (SelectOption :value |calcit :label |Calcit)
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SelectOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-select. The Op generic preserves the operation accepted by the dispatcher passed to on-change."
           :code $ quote $ defstruct SelectOptions
@@ -5466,7 +5552,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SelectOptions :disabled $ Option :some false
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SkeletonOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-skeleton: label, kind, dimensions, class name, and style."
           :code $ quote $ defstruct SkeletonOptions
@@ -5478,7 +5564,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SkeletonOptions :kind (Option :some :text) :width $ Option :some |60%
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'SpinnerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-spinner, including its accessible label."
           :code $ quote $ defstruct SpinnerOptions
@@ -5487,20 +5573,20 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SpinnerOptions :label $ Option :some "|Loading results"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'StepItem $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct StepItem (:title 'String)
+          :code $ quote $ defstruct StepItem (:title String)
             :description $ quote $ Option String
           :examples $ [] $ quote
             StepItem :title |Profile :description $ Option :some "|Tell us about you"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'StepsOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct StepsOptions
             :vertical? $ quote $ Option Bool
             :class-name $ quote $ Option String
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
           :code $ quote $ defstruct Store
@@ -5515,6 +5601,11 @@
                 Store :router ({}) :states $ {}
                 , store
             :tags $ #{} :regression :unit
+        'StyleValue $ %{} 'CodeEntry
+          :doc "|Scalar CSS values used by exported static UI styles: String, Number or Tag. This does not describe optional or open caller-provided style maps."
+          :code $ quote $ defunion StyleValue String Number Tag
+          :examples $ []
+          :schema $ quote UnionDef
         'SwitchOptions $ %{} 'CodeEntry
           :doc "|Typed options shared by comp-switch and comp-checkbox. The Op generic preserves the dispatched operation type."
           :code $ quote $ defstruct SwitchOptions
@@ -5532,14 +5623,14 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             SwitchOptions :label $ Option :some "|Compact mode"
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'TabRoute $ %{} 'CodeEntry
           :doc "|Normalized typed tab route carrying a generic value and string display label."
           :code $ quote $ defenum TabRoute
             [] $ quote Value
-            :tab (quote Value) 'String
+            :tab Value String
           :examples $ [] $ quote (%:: TabRoute :tab :book |Book)
-          :schema $ quote Enum
+          :schema $ quote EnumDef
         'TabsOptions $ %{} 'CodeEntry
           :doc "|Typed visual and selection options for comp-tabs with a generic selected value."
           :code $ quote $ defstruct TabsOptions
@@ -5554,7 +5645,7 @@
             :selected-tab-style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             TabsOptions :selected $ Option :some :book
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'TooltipOptions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct TooltipOptions
             :placement $ quote $ Option Tag
@@ -5562,7 +5653,7 @@
             :style $ quote $ Option (Map Tag Dynamic)
           :examples $ [] $ quote
             TooltipOptions :placement $ Option :some :bottom
-          :schema $ quote Enum
+          :schema $ quote StructDef
         'field-or $ %{} 'CodeEntry
           :doc "|Read an optional field from optional options, falling back to `default` when either the options or the field is none: `field-or options :disabled false`."
           :code $ quote $ defmacro field-or (value field default)
@@ -5724,7 +5815,7 @@
       :defs $ {}
         'DesignToken $ %{} 'CodeEntry
           :doc "|One design token: its group, CSS variable name without the --rui- prefix, default value and usage note."
-          :code $ quote $ defstruct DesignToken (:group 'String) (:name 'String) (:value 'String) (:note 'String)
+          :code $ quote $ defstruct DesignToken (:group String) (:name String) (:value String) (:note String)
           :examples $ []
           :schema $ quote StructDef
         'amber-200 $ %{} 'CodeEntry (:doc "|Default: hsl(42 80% 76%)")

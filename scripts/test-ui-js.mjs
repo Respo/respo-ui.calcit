@@ -56,7 +56,7 @@ try {
     operations.push(["edit", "def", `${namespace}/${helper}`, "--input-format", "json-ast", "--code",
       JSON.stringify(["defn", helper, [], test.code, "&unit"])]);
     operations.push(["edit", "schema", `${namespace}/${helper}`, "--input-format", "cirru", "--code",
-      "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)"]);
+      "quote $ Fn (-> Unit)"]);
     calls.push([`${namespace}/${helper}`]);
   });
   // Styles are a JS-host API; keep these render assertions outside native tests.
@@ -88,7 +88,7 @@ try {
   operations.push(["edit", "def", browser, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-js-skeleton", [], ...scenarios, "&unit"])]);
   operations.push(["edit", "schema", browser, "--input-format", "cirru", "--code",
-    "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)"]);
+    "quote $ Fn (-> Unit)"]);
   calls.push([browser]);
   // Exercise every real showcase route, not only isolated component examples.
   const pages = "respo-ui.comp.container/replay-js-pages";
@@ -148,7 +148,7 @@ try {
   operations.push(["edit", "def", pages, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-js-pages", [], ...pageScenarios, "&unit"])]);
   operations.push(["edit", "schema", pages, "--input-format", "cirru", "--code",
-    "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)"]);
+    "quote $ Fn (-> Unit)"]);
   calls.push([pages]);
   // Build typed callbacks in Calcit, then invoke the actual DOM-host handlers.
   // The event table intentionally exposes opaque host-callable functions.
@@ -164,24 +164,22 @@ try {
     operations.push(["edit", "def", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code", `quote $ defn ${helper} ()
   ${component} $ Option :some $ ${options} :on-change
     Option :some $ fn (value d!)
-      hint-fn $ {} (:return 'Unit)
-        :args $ [] '${type}
-          :: 'Fn $ {} (:args $ [] '${type}) (:return 'Unit)
+      hint-fn $ Fn ${type} (Fn ${type} (-> Unit)) (-> Unit)
       d! value`]);
     operations.push(["edit", "schema", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code",
-      "quote $ :: 'Fn $ {} (:args $ []) (:return 'respo.schema/Component)"]);
+      "quote $ Fn (-> respo.schema/Component)"]);
     calls.push([`respo-ui.comp/${helper}`]);
   }
   const entry = "respo-ui.util/replay-all-attached";
   operations.push(["edit", "def", entry, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-all-attached", [], ...calls, "&unit"])]);
   operations.push(["edit", "schema", entry, "--input-format", "cirru", "--code",
-    "quote $ :: 'Fn $ {} (:args $ []) (:return 'Unit)"]);
+    "quote $ Fn (-> Unit)"]);
   operations.push(["config", "set", "init-fn", entry]);
   operations.push(["config", "set", "reload-fn", entry]);
   const code = JSON.stringify(operations);
   const preview = JSON.parse(run(snapshot, "edit", "transaction", "--code", code, "--dry-run", "--format", "json"));
-  run(snapshot, "edit", "transaction", "--code", code, "--expect-revision", preview.original_revision, "--format", "json");
+  run(snapshot, "edit", "transaction", "--code", code, "--expect-revision", preview.scoped_revision, "--format", "json");
   const output = path.join(scratch, "js-out");
   run("--emit-path", output, snapshot, "js");
   const generated = await import(pathToFileURL(path.join(output, "respo-ui.util.mjs")).href);

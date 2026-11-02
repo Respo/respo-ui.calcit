@@ -10,7 +10,25 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.10.0 候选：保留 Option 的组件选项
+### 0.11.0 候选：用 union 收窄节点和正文
+
+使用者影响：CLI 与 `@calcit/procs` 配对正式 **0.34.0**。`EmptyOptions.icon`、
+`EmptyOptions.action` 和 `CardOptions.footer` 使用 `Option ContentNode`，其中
+`respo-ui.schema/ContentNode` 是 `Element | Component` 的透明 union。现有 Element 和
+Component 仍直接放入 `Option :some`，无需增加节点包装；空内容使用 `Option :none`。
+数字、字符串、Effect 和 `Option :some nil` 现在会在类型检查时被拒绝。
+
+组件正文参数使用 `Content` union：String、Number、Tag、Bool 按文本渲染，
+Element/Component 原样插入；没有正文时传空字符串。nil 和未收窄的 Dynamic
+不再作为正文。DOM 数据合同保持。31 个静态样式常量使用
+`Map Tag respo-ui.schema/StyleValue`，其中 `StyleValue` 是 `String | Number | Tag`；
+样式值和生成的 CSS 不变，读取这些常量的代码可保留具体类型。
+`merge-styles` 仍接受调用方的开放样式 Map，保留 Option 尺寸和不同值类型合并的原合同；
+静态常量的 union 不替代调用方样式边界校验。声明采用 0.34.0 的类型名写法，prototype 的
+schema 按实际定义使用 `StructDef` / `EnumDef`。此处是候选说明，发布前仍需完整原门禁和评审；
+不把仅加载成功或局部类型检查当作渲染验收。
+
+### 0.10.0：保留 Option 的组件选项
 
 使用者影响：CLI / `@calcit/procs` 继续配对正式 **0.32.1**，需要统一使用
 Respo **0.18.0**、Router **0.9.0**、JS-FFI **0.2.9** 的精确依赖图再重新生成 JS。
