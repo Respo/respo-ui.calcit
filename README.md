@@ -10,11 +10,28 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.13.0 事件 API 配对候选
+### 0.14.0 / Calcit 0.34.2
 
-事件回调参数显式声明为 Map 的调用方需要迁移到 `respo.schema/RespoEvent`，使用字段或受检 helper 读取。受控控件的值回调继续返回 String 或 Bool。候选依赖图为 Calcit / JS 运行时 0.34.1、Respo 0.19.0、Router 0.11.0 与 JS-FFI 0.2.10。须待正式 tag 发布后严格安装并重新构建，不能将候选号视为已发版。
+使用者需同步 Calcit CLI / `@calcit/procs` 0.34.2、Respo 0.19.1、Router 0.11.1 和 JS-FFI 0.2.10 的精确正式依赖图，再生成 JS。0.13 的 RespoEvent、Router struct 和有限内容 union 合同保持，已有控件的 String / Bool 值回调不变；页面错误提示 `hud!` 保留。上述依赖均已正式发布并通过 Caps 严格安装。UI 0.14.0 的发行状态以正式 Git tag 为准；tag 只在原 CI 通过、评审无阻塞后创建。
 
-### 0.12.0 候选：路由合同跟随 Router struct
+公开 Options 的 23 个 `style` / `tab-style` / `selected-tab-style` 字段收紧为 `Option (Map Tag respo-ui.schema/InlineStyleValue)`，`InlineStyleValue` 是现有标量 `respo-ui.schema/StyleValue`（String、Number、Tag）与 `Option StyleValue` 的有限 union。原有效 CSS 值、每个属性的 Option some/none 与外层 Option 缺省行为保持；声明为 `Map Tag Dynamic` 的样式须改用该 union 或在真实外部输入处解码，Bool、集合、函数本就不属于 Respo 支持的 CSS 值，本次提前拒绝；旧 nil 省略值则改为 Option :none。因为公开类型收紧，升级 minor 为 0.14.0。混合标量与 Option 的内联 Map 可能推断为 Dynamic，也需要明确标注；已知字面量可用静态受检的 assert-type，真实外部输入应解码。
+
+```cirru
+let
+    style $ assert-type
+      {} (:opacity 0.5) (:color |red) (:display :block)
+        :border-color $ Option :none
+      quote $ Map Tag respo-ui.schema/InlineStyleValue
+  respo-ui.schema/ButtonOptions :style $ Option :some style
+```
+
+保留原完整 strict、测试、Message 源码兼容夹具及 COS 内置 verify，不增加额外脚本或放宽基线。
+
+### 0.13.0 事件 API 历史
+
+事件回调参数显式声明为 Map 的调用方需要迁移到 `respo.schema/RespoEvent`，使用字段或受检 helper 读取。受控控件的值回调继续返回 String 或 Bool。0.13.0 原依赖图为 Calcit / JS 运行时 0.34.1、Respo 0.19.0、Router 0.11.0 与 JS-FFI 0.2.10。0.13.0 已正式发布；升级时仍须严格安装完整图并重新构建。
+
+### 0.12.0 历史：路由合同跟随 Router struct
 
 使用者影响：CLI / `@calcit/procs` 配对正式 **0.34.1**，依赖改为正式 Router **0.10.0**、Respo **0.18.0**、JS-FFI **0.2.9**；重新安装完整精确图、生成 JS 并完整刷新。旧 Git 0.11.0 保持不动。
 
@@ -272,8 +289,7 @@ props and `field-or` or `option-field` elsewhere.
 已移除：DOM 属性改用 `option-field`，其他位置用 `field-or` 或 `option-field`。
 
 ```cirru
-ns app.demo $ :require
-  respo-ui.schema :refer $ opts field-or option-field ButtonOptions
+ns app.demo $ :require $ respo-ui.schema :refer (opts field-or option-field ButtonOptions)
 
 let
     options $ opts ButtonOptions :kind :primary :type |submit
