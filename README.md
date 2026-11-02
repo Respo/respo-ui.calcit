@@ -90,7 +90,8 @@ JS-FFI 旧 0.2.6 tag 实际声明 0.30.1，本次改为真正配对 0.31 的已�
 `calcit query type respo-ui.schema/Store` 因而展示真实 Struct 的方法，而非 Enum 方法。
 Store 字段更新和 CSS token Map 写入使用已有 `.assoc`，由编译器完成字段与容器 lowering。
 状态 updater 位于 `respo-ui.updater/updater`，与浏览器启动代码分开，便于独立回放状态行为。
-这项 Store 调整不改变组件接口或样式；状态 payload 和路由 Map 的内部值仍保留原开放边界。
+这项 Store 调整不改变组件接口或样式；状态 payload 仍保留原开放边界。自 0.12.0 起 `Store` 的 `:router`
+是 `respo-router.schema/Router`，不再接受路由 Map，见上文 0.12.0 一节。
 
 ### 0.8.0
 
