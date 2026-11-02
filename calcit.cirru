@@ -4654,7 +4654,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.12.0
+          :code $ quote $ def version |0.13.0
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)

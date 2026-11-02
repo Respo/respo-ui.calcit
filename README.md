@@ -10,6 +10,10 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
+### 0.13.0 事件 API 配对候选
+
+事件回调参数显式声明为 Map 的调用方需要迁移到 `respo.schema/RespoEvent`，使用字段或受检 helper 读取。受控控件的值回调继续返回 String 或 Bool。候选依赖图为 Calcit / JS 运行时 0.34.1、Respo 0.19.0、Router 0.11.0 与 JS-FFI 0.2.10。须待正式 tag 发布后严格安装并重新构建，不能将候选号视为已发版。
+
 ### 0.12.0 候选：路由合同跟随 Router struct
 
 使用者影响：CLI / `@calcit/procs` 配对正式 **0.34.1**，依赖改为正式 Router **0.10.0**、Respo **0.18.0**、JS-FFI **0.2.9**；重新安装完整精确图、生成 JS 并完整刷新。旧 Git 0.11.0 保持不动。
