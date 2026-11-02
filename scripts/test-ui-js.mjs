@@ -195,6 +195,16 @@ try {
     }
   }
   const components = await import(pathToFileURL(path.join(output, "respo-ui.comp.mjs")).href);
+  // Handlers receive respo.schema/RespoEvent; build one from a Cirru EDN map of the fields under test.
+  const { RespoEvent } = await import(pathToFileURL(path.join(output, "respo.schema.mjs")).href);
+  const respoEvent = (source) => {
+    const fields = c.parse_cirru_edn(source);
+    return c._$n__PCT__$M_(RespoEvent, ...RespoEvent.fields.flatMap((tag) => {
+      const found = fields.get(tag);
+      const fallback = tag.value === "type" ? c.newTag("input") : null;
+      return [tag, found == null ? fallback : found];
+    }));
+  };
   const field = (value, name) => value.get(c.newTag(name));
   const elements = (option) => {
     if (option.tag.value === "none") return [];
@@ -220,34 +230,34 @@ try {
     for (const [input, expected] of [["{}", false], ["{} (:checked nil)", false],
       ["{} (:checked false)", false], ["{} (:checked true)", true]]) {
       const dispatched = [];
-      assert.equal(handler(c.parse_cirru_edn(input), value => { dispatched.push(value); }), undefined);
+      assert.equal(handler(respoEvent(input), value => { dispatched.push(value); }), undefined);
       assert.deepEqual(dispatched, [expected], `${name}: ${input}`);
     }
     for (const input of ["{} (:checked |wrong)", "{} (:checked 0)", "{} (:checked |)"]) {
       const dispatched = [];
-      assert.throws(() => handler(c.parse_cirru_edn(input), value => { dispatched.push(value); }), /Bool|bool/);
+      assert.throws(() => handler(respoEvent(input), value => { dispatched.push(value); }), /Bool|bool/);
       assert.deepEqual(dispatched, [], "rejected checked payload must not dispatch");
     }
     const failure = new Error(`${name} dispatch failure`);
-    assert.throws(() => handler(c.parse_cirru_edn("{} (:checked true)"), () => { throw failure; }), error => error === failure);
+    assert.throws(() => handler(respoEvent("{} (:checked true)"), () => { throw failure; }), error => error === failure);
   }
   const select = eventHandler("select", "select", "change");
   for (const [input, expected] of [["{}", ""], ["{} (:value nil)", ""], ["{} (:value false)", "false"],
     ["{} (:value 0)", "0"], ["{} (:value |)", ""], ["{} (:value |中文😀)", "中文😀"]]) {
     const dispatched = [];
-    assert.equal(select(c.parse_cirru_edn(input), value => { dispatched.push(value); }), undefined);
+    assert.equal(select(respoEvent(input), value => { dispatched.push(value); }), undefined);
     assert.deepEqual(dispatched, [expected], `select: ${input}`);
   }
   for (const name of ["input", "textarea"]) {
     const handler = eventHandler(name, name, "input");
     for (const [input, expected] of [["{}", ""], ["{} (:value |)", ""], ["{} (:value |中文😀)", "中文😀"], ["{} (:value 0)", "0"]]) {
       const dispatched = [];
-      assert.equal(handler(c.parse_cirru_edn(input), value => { dispatched.push(value); }), undefined);
+      assert.equal(handler(respoEvent(input), value => { dispatched.push(value); }), undefined);
       assert.deepEqual(dispatched, [expected], `${name}: ${input}`);
     }
   }
   const failure = new Error("select dispatch failure");
-  assert.throws(() => select(c.parse_cirru_edn("{} (:value |a)"), () => { throw failure; }), error => error === failure);
+  assert.throws(() => select(respoEvent("{} (:value |a)"), () => { throw failure; }), error => error === failure);
   // Radio inputs dispatch their own item value, whatever the host event carries.
   const radios = elements(field(components.replay_radio_group_event(), "tree"))
     .filter(element => field(element, "name").value === "input");
@@ -255,7 +265,7 @@ try {
   for (const [index, expected] of [[0, "a"], [1, "b"]]) {
     const dispatched = [];
     const handler = field(radios[index], "event").get(c.newTag("change"));
-    assert.equal(handler(c.parse_cirru_edn("{}"), value => { dispatched.push(value); }), undefined);
+    assert.equal(handler(respoEvent("{}"), value => { dispatched.push(value); }), undefined);
     assert.deepEqual(dispatched, [expected], `radio-group: item ${index}`);
   }
   // Page buttons dispatch their target page; the current page does not dispatch.

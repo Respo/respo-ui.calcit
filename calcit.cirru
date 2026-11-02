@@ -343,7 +343,7 @@
                     :disabled $ respo-ui.schema/field-or options :disabled false
                     :on $ {} $ :input
                       fn (e d!)
-                        hint-fn $ Fn (Map Tag Dynamic)
+                        hint-fn $ Fn respo.schema/RespoEvent
                           Fn Op $ -> Unit
                           -> Unit
                         if-let
@@ -351,7 +351,8 @@
                           on-change
                             match
                               try-decode-map-as
-                                match (get e :checked)
+                                match
+                                  js-nullish->option $ :checked e
                                   (:some checked-value) (or checked-value false)
                                   (:none) false
                                 , 'Bool
@@ -690,7 +691,7 @@
                       :disabled disabled?
                       :class-name style-radio-input
                       :on-change $ fn (e d!)
-                        hint-fn $ Fn (Map Tag Dynamic)
+                        hint-fn $ Fn respo.schema/RespoEvent
                           Fn Op $ -> Unit
                           -> Unit
                         if-let
@@ -743,13 +744,14 @@
                 :class-name $ respo-ui.schema/with-class-name (str-spaced css/select) (respo-ui.schema/option-field options :class-name)
                 :style $ respo-ui.schema/option-field options :style
                 :on-change $ fn (e d!)
-                  hint-fn $ Fn (Map Tag Dynamic)
+                  hint-fn $ Fn respo.schema/RespoEvent
                     Fn Op $ -> Unit
                     -> Unit
                   if-let
                     on-change $ respo-ui.schema/option-field options :on-change
                     on-change
-                      match (get e :value)
+                      match
+                        nil->option $ :value e
                         (:some event-value) (str event-value)
                         (:none) |
                       fn (op)
@@ -891,7 +893,7 @@
                     :aria-label $ respo-ui.schema/option-field options :label
                     :class-name style-switch-input
                     :on-input $ fn (e d!)
-                      hint-fn $ Fn (Map Tag Dynamic)
+                      hint-fn $ Fn respo.schema/RespoEvent
                         Fn Op $ -> Unit
                         -> Unit
                       if-let
@@ -899,7 +901,8 @@
                         on-change
                           match
                             try-decode-map-as
-                              match (get e :checked)
+                              match
+                                js-nullish->option $ :checked e
                                 (:some checked-value) (or checked-value false)
                                 (:none) false
                               , 'Bool
@@ -965,7 +968,7 @@
                                   if (option:some? options.:selected-tab-style) (option:unwrap options.:selected-tab-style) ({})
                                   {}
                               :on-click $ fn (e d!)
-                                hint-fn $ Fn (Map Tag Dynamic)
+                                hint-fn $ Fn respo.schema/RespoEvent
                                   Fn Op $ -> Unit
                                   -> Unit
                                 on-route item $ fn (op)
@@ -1159,11 +1162,12 @@
                 match o.:on-change
                   (:some on-change)
                     Option :some $ fn (e d!)
-                      hint-fn $ Fn (Map Tag Dynamic)
+                      hint-fn $ Fn respo.schema/RespoEvent
                         Fn Op $ -> Unit
                         -> Unit
                       on-change
-                        match (get e :value)
+                        match
+                          nil->option $ :value e
                           (:some event-value) (str event-value)
                           (:none) |
                         , d!
@@ -1288,7 +1292,7 @@
                 {} (:type |button) (:inner-text text) (:aria-label label) (:disabled disabled?)
                   :class-name $ if current? (str-spaced style-pagination-item style-pagination-current) (str-spaced style-pagination-item)
                   :on-click $ fn (e d!)
-                    hint-fn $ Fn (Map Tag Dynamic)
+                    hint-fn $ Fn respo.schema/RespoEvent
                       Fn Op $ -> Unit
                       -> Unit
                     if-let
@@ -2173,7 +2177,7 @@
           :doc "|Group crumb handler: clear the overview search so every category is rendered, then open the overview scrolled to this group."
           :code $ quote $ defn on-open-category (group-id)
             fn (e dispatch!)
-              hint-fn $ Fn (Map Tag Dynamic)
+              hint-fn $ Fn respo.schema/RespoEvent
                 Fn *dispatch-op $ -> Unit
                 -> Unit
               dispatch! $ :: :states ([] :components) |
@@ -4400,7 +4404,7 @@
         'on-jump $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn on-jump (selector)
             fn (e d!)
-              hint-fn $ Fn (Map Tag Dynamic)
+              hint-fn $ Fn respo.schema/RespoEvent
                 Fn *dispatch-op $ -> Unit
                 -> Unit
               match (query-selector selector)
@@ -4417,7 +4421,7 @@
           :doc "|Click handler that navigates to path-name, then scrolls the element matching selector into view."
           :code $ quote $ defn on-route-to (path-name selector)
             fn (e dispatch!)
-              hint-fn $ Fn (Map Tag Dynamic)
+              hint-fn $ Fn respo.schema/RespoEvent
                 Fn *dispatch-op $ -> Unit
                 -> Unit
               dispatch! $ :: :router/nav path-name
@@ -4650,7 +4654,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.12.0
+          :code $ quote $ def version |0.13.0
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
