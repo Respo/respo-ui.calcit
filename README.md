@@ -17,7 +17,8 @@ JS-FFI **0.2.9** 的精确兼容图。需要统一依赖并重新生成 JS；这
 事件/坐标 API 的迁移，也不能与要求该 API 的 UI 0.14 混装。
 若直接消费 Respo `show` 宏且省略 fallback，需按 0.18.1 的合同接收 Option。
 原 `Content` / `ContentNode` / `StyleValue` union、Option 组件选项、开放合并样式、
-事件、样式与全部原断言保持，源码 Snapshot 和生成组件文档均不变。
+事件、样式与全部原断言保持。Snapshot 仅同步页面版本号与 Quick start 的工具链版本，
+组件算法、schema 和生成组件文档不变。
 
 这是已发布 0.11.0 的独立维护补丁，不更新现代 main、不部署生产 Demo。
 本地 Router 源码候选图已通过 804 个定义、完整 strict、原 native 17 项及 JS 43 项、
