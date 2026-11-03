@@ -1,3 +1,9 @@
+### UI 0.12 维护线：Calcit 0.34.2
+
+使用者影响：0.12.1 保持原 Router struct / Store 合同和 Map 事件，配对官方 CLI / @calcit/procs 0.34.2、Router 0.10.1、Respo 0.18.1 与 JS-FFI 0.2.9。不要与 Respo 0.19 新事件图混装，也不回退为旧 Map Router。原控件算法、schema、测试与文档示例保持；Snapshot 只更新首页展示版本和 Quick start 工具链字符串。
+
+已通过 Router 0.10.1 正式 tag 的 Caps strict / toolchain 验收，安装源码与预检候选逐字节相同。全部 803 定义、616 公开定义、完整 strict、原 native 15 项/JS 41 项、三个 Skeleton 场景、七条展示页路由及原示例/文档/构建检查通过。现代 main 不回滚，维护分支不触发生产 Demo 部署。
+
 
 Respo UI for calcit-js
 ----
