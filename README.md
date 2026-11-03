@@ -10,7 +10,24 @@ Find details in https://ui.respo-mvc.org/ .
 @import url(cirru-color/assets/cirru.css);
 ```
 
-### 0.11.0 候选：用 union 收窄节点和正文
+### 0.11.1 兼容维护候选：使用者影响
+
+CLI / `@calcit/procs` 配对正式 **0.34.2**，使用 Respo **0.18.1**、Router **0.9.1**、
+JS-FFI **0.2.9** 的精确兼容图。需要统一依赖并重新生成 JS；这不是 Respo 0.19
+事件/坐标 API 的迁移，也不能与要求该 API 的 UI 0.14 混装。
+若直接消费 Respo `show` 宏且省略 fallback，需按 0.18.1 的合同接收 Option。
+原 `Content` / `ContentNode` / `StyleValue` union、Option 组件选项、开放合并样式、
+事件、样式与全部原断言保持。Snapshot 仅同步页面版本号与 Quick start 的工具链版本，
+组件算法、schema 和生成组件文档不变。
+
+这是已发布 0.11.0 的独立维护补丁，不更新现代 main、不部署生产 Demo。
+本地 Router 源码候选图已通过 804 个定义、完整 strict、原 native 17 项及 JS 43 项、
+原三类 skeleton 场景、七个 showcase 路由与受检输入边界、Message 0.1.2 原源码夹具
+的全定义/strict/五项测试，以及 Vite 构建。Router 0.9.1 正式发布后，已另外执行真正的
+Caps strict 安装、toolchain 校验，并核对安装 Snapshot 与上述已测源码逐字节一致。
+原完整远端 CI 和评审仍待验收，不把本地源码预检与公开安装证据混为一谈。
+
+### 历史 0.11.0：用 union 收窄节点和正文
 
 使用者影响：CLI 与 `@calcit/procs` 配对正式 **0.34.1**。`EmptyOptions.icon`、
 `EmptyOptions.action` 和 `CardOptions.footer` 使用 `Option ContentNode`，其中
@@ -49,7 +66,7 @@ npm 新候选继续一小时包龄，移除旧单包豁免，COS 只用 action �
 
 使用者影响：Calcit CLI 与 `@calcit/procs` 成对升级到 `0.32.1`，依赖 Respo `0.17.1`、Router `0.9.0-alpha.4`，并通过它们解析 JS-FFI `0.2.9`。0.32 拒绝旧的 `:: 'Fn` 类型写法，Snapshot 已用 `calcit edit format` 迁移；组件接口不变。消费者须同步工具链并重新生成 JS，不要与 0.31 的库混装。以下历史记录仅供参考。
 
-### 0.9.0-alpha.4 候选：0.31 依赖图配对修正
+### 历史 0.9.0-alpha.4：0.31 依赖图配对修正
 
 Calcit CLI 与 `@calcit/procs` 成对固定为已发布的 `0.31.0`，使用
 Respo `0.17.0-alpha.4`、Router `0.9.0-alpha.3` 和 JS-FFI `0.2.7`。
