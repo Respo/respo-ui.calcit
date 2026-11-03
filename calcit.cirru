@@ -3604,7 +3604,7 @@
               render-font-demo css/font-normal ui/font-normal 300
               render-font-demo css/font-normal ui/font-normal 400
               render-font-demo css/font-normal ui/font-normal 500
-              =< 0 32
+              space-x 0
               div
                 {} $ :style style-section
                 <> "|Fancy fonts"
@@ -3612,7 +3612,7 @@
               render-font-demo css/font-fancy! ui/font-fancy 100
               render-font-demo css/font-fancy! ui/font-fancy 300
               render-font-demo css/font-fancy! ui/font-fancy 400
-              =< 0 32
+              space-x 0
               div
                 {} $ :style style-section
                 <> "|Code fonts"
@@ -3647,7 +3647,7 @@
             respo.core :refer $ defcomp div <>
             respo-ui.css :as css
             respo-ui.core :as ui
-            respo.comp.space :refer $ =<
+            respo.comp.space :refer $ space-x
             respo.css :refer $ defstyle
             respo-ui.comp.docs :refer $ comp-doc-block
     'respo-ui.comp.home $ %{} 'FileEntry
@@ -4226,7 +4226,7 @@
               div
                 {} $ :style $ {} (:text-align :right)
                 div $ {} $ :style style-logo
-              =< 0 16
+              space-x 0
               render-entry |index.html "|Respo UI" $ = :index router-name
               render-entry |layouts.html |Layouts $ = :layouts router-name
               render-entry |widgets.html |Widgets $ = :widgets router-name
@@ -4551,7 +4551,7 @@
             respo.core :refer $ defcomp div <> a list->
             respo-ui.core :as ui
             respo.util.format :refer $ hsl
-            respo.comp.space :refer $ =<
+            respo.comp.space :refer $ space-x
             respo.css :refer $ defstyle
             respo-ui.css :as css
             respo-ui.config :as config
@@ -4573,11 +4573,11 @@
           :code $ quote $ defcomp comp-widgets-page ()
             div ({})
               div ({}) (<> |Widgets)
-              div ({}) (<> "|link to external pages" ui/text-label) (=< 0 16)
+              div ({}) (<> "|link to external pages" ui/text-label) (space-x 0)
                 a $ {} (:class-name css/link) (:inner-text |link)
-              div ({}) (<> "|slight link without underscore" ui/text-label) (=< 0 16)
+              div ({}) (<> "|slight link without underscore" ui/text-label) (space-x 0)
                 a $ {} (:class-name css/link-slight) (:inner-text |link)
-              =< 0 16
+              space-x 0
               div
                 {} $ :style $ {} (:display |flex) (:align-items |stretch) (:flex-direction |row) (:gap 16)
                 button
@@ -4592,26 +4592,26 @@
                 button
                   {} $ :class-name css/button-danger
                   <> |css/button-danger
-              =< 0 16
+              space-x 0
               div ({})
                 input $ {} (:placeholder "|Some short text") (:class-name css/input)
-                =< 16 0
+                space-x 16
                 button
                   {} $ :class-name css/button
                   <> |Add
-                =< 16 0
+                space-x 16
                 <> |nothing ui/text-label
-              =< 0 16
+              space-x 0
               div ({})
                 select
                   {} $ :class-name css/select
                   option $ {} (:selected true) (:inner-text |Haskell)
                   option $ {} (:selected false) (:inner-text |Clojure)
                   option $ {} (:selected false) (:inner-text |OCaml)
-              =< 0 16
+              space-x 0
               div ({})
                 textarea $ {} (:placeholder "|Some long text") (:class-name css/textarea)
-                =< 16 0
+                space-x 16
                 button
                   {} $ :class-name css/button
                   <> |Add
@@ -4619,16 +4619,16 @@
                 {} (:height 1) (:width |50%)
                   :background-color $ hsl 0 0 90
                   :margin "|48px 12px"
-              =< 0 16
+              space-x 0
               div ({})
                 div ({}) (<> |Checkboxes ui/text-label)
-                =< 0 4
+                space-x 0
                 comp-checkbox false $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Option A"
-                =< 0 4
+                space-x 0
                 comp-checkbox true $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Option B (default checked)"
-                =< 0 4
+                space-x 0
                 comp-checkbox false $ respo-ui.schema/opts respo-ui.schema/SwitchOptions :label "|Option C (disabled)" :disabled true
-              =< 0 8
+              space-x 0
               comp-tags-styles
           :examples $ []
           :schema $ quote $ Fn (-> respo.schema/Component)
@@ -4636,7 +4636,7 @@
         :code $ quote $ ns respo-ui.comp.widgets-page
           :require
             respo.core :refer $ defcomp div input textarea button span select option a <> >>
-            respo.comp.space :refer $ =<
+            respo.comp.space :refer $ space-x
             respo-ui.core :as ui
             respo-ui.css :as css
             respo.util.format :refer $ hsl
@@ -4654,7 +4654,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.14.0
+          :code $ quote $ def version |0.14.1
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)

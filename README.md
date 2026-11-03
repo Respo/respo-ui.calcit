@@ -2,6 +2,14 @@
 Respo UI for calcit-js
 ----
 
+### 0.14.1 候选：统一 Respo 0.19.2 正式图
+
+使用者需同步正式 Calcit / `@calcit/procs` **0.34.2**、Respo **0.19.2**、Router **0.11.2** 与 JS-FFI **0.2.10** 的精确依赖图，再重新生成 JS。本 patch 保留 0.14.0 的全部组件、Options、有限样式 union 和 RespoEvent 回调合同；协调宿主依赖和展示版本号，并迁移下述旧间距写法，不扩大 Dynamic 或改变控件交互。
+
+Fonts、Widgets 和侧栏共 17 处旧 `=<` 改为 `space-x`，按原合同保留非 nil 宽度优先：`=< 0 16` 实际渲染宽度 0，因此迁为 `space-x 0`，不猜测改成高度 16。三个页面除 spacer 的组件标签外，布局、样式与内容保持；不借迁移调整间距。
+
+Router 0.11.2 是已发布 0.11.1 的 0.34.2 维护补丁，不包含 Router main 要求 0.34.3 的 RouteRule 参数收紧。以上精确正式 tag 已严格安装并核对工具链；不使用 main/hash 或本地 module 链接冒充正式依赖。原完整 strict、附带断言、所有页面与真实事件的 JS 回放、Message 源码夹具、文档和 COS action 内置 verify 保留；本候选发布状态以精确提交 CI、评审及正式 tag 为准。
+
 ### Usages
 
 Find details in https://ui.respo-mvc.org/ .
