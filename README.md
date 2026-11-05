@@ -6,7 +6,7 @@ Respo UI for calcit-js
 
 CLI / `@calcit/procs` 配对正式 **0.35.1**，Respo **0.19.4**、Router **0.12.1** 和 JS-FFI **0.2.13** 须统一精确依赖图并重新生成 JS；正式 tag 发布前仍为候选。
 
-本 patch 除同步 Demo 展示版本字符串外，不改组件、Options、样式/内容 union、泛型 `merge-styles`、回调和 HUD。原完整 strict、公开定义、附带测试、真实事件 JS 回放、Message 源码夹具、文档生成检查与 COS 内置 verify 保留。两个独立样式 Map 的泛型推断限制继续跟踪 #2608，本次不放宽类型；本轮验收结果以 PR 为准，不沿用历史版本数字。
+本 patch 除同步 Demo 展示版本和首页快速入门工具链文本外，不改组件、Options、样式/内容 union、泛型 `merge-styles`、回调和 HUD。原完整 strict、公开定义、附带测试、真实事件 JS 回放、Message 源码夹具、文档生成检查与 COS 内置 verify 保留。两个独立样式 Map 的泛型推断限制继续跟踪 #2608，本次不放宽类型；本轮验收结果以 PR 为准，不沿用历史版本数字。
 
 ### 历史 0.15.0：Calcit 0.35.0 与样式泛型
 
