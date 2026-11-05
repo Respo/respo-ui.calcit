@@ -2,6 +2,16 @@
 Respo UI for calcit-js
 ----
 
+### 0.15.0 候选：Calcit 0.35.0 与样式泛型
+
+使用者注意：须同步正式 Calcit CLI / `@calcit/procs` **0.35.0**、Respo **0.19.3**、Router **0.12.0** 与 JS-FFI **0.2.12** 后重新生成 JS。以上三个依赖已发布并通过 Caps strict 安装与工具链验证，临时候选链接已移除；本模块 0.15.0 仍为候选，待正式 Git tag 发布后再安装。
+
+`merge-styles` 现在以同一泛型 V 关联两个 `Map Tag V` 和返回值，删除三个无必要的 Dynamic；调用方已经声明的 `StyleValue` / `InlineStyleValue` union 因而保留到结果，不再被擦除。若两个独立 Map 分别推断为 String、Number 等不同值类型，需要先声明共同的有限 CSS union，再合并。此类型要求可能使旧调用不能直接编译，因此发布 minor；运行时仍是原有的覆盖合并，不改样式优先级或缺省行为。已知内部 CSS 字面量可使用静态受检的类型标注；外部原始数据仍需在入口解码，不能用强转代替检查。
+
+泛型实参顺序对推断的影响已提供无依赖最小复现，见 [Calcit #2608](https://github.com/calcit-lang/calcit/issues/2608)；本候选保留显式共同 union，不放宽为 Dynamic 等待上游优化。
+
+Demo 的九条路由规则跟随 Router 改为 `RouteRule` 构造器，路径和参数 Tag 保持；控件回调、Option、样式 union 与页面 `hud!` 错误提示保留。原类型门禁、全部测试、Message 消费者夹具及 COS action 内置 verify 保持。
+
 ### 0.14.1 候选：统一 Respo 0.19.2 正式图
 
 使用者需同步正式 Calcit / `@calcit/procs` **0.34.2**、Respo **0.19.2**、Router **0.11.2** 与 JS-FFI **0.2.10** 的精确依赖图，再重新生成 JS。本 patch 保留 0.14.0 的全部组件、Options、有限样式 union 和 RespoEvent 回调合同；协调宿主依赖和展示版本号，并迁移下述旧间距写法，不扩大 Dynamic 或改变控件交互。
