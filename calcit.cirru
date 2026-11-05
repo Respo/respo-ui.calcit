@@ -3729,12 +3729,12 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.35.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.35.1)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     Option :none
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
                   div
                     {} $ :class-name style-home-sub
-                    <> "|Use Calcit CLI and @calcit/procs 0.35.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+                    <> "|Use Calcit CLI and @calcit/procs 0.35.1 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
               div
                 {} $ :class-name style-footer
                 <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
@@ -4658,7 +4658,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.15.0
+          :code $ quote $ def version |0.15.1
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)

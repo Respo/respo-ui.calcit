@@ -2,9 +2,15 @@
 Respo UI for calcit-js
 ----
 
-### 0.15.0 候选：Calcit 0.35.0 与样式泛型
+### 0.15.1 候选：使用者影响
 
-使用者注意：须同步正式 Calcit CLI / `@calcit/procs` **0.35.0**、Respo **0.19.3**、Router **0.12.0** 与 JS-FFI **0.2.12** 后重新生成 JS。以上三个依赖已发布并通过 Caps strict 安装与工具链验证，临时候选链接已移除；本模块 0.15.0 仍为候选，待正式 Git tag 发布后再安装。
+CLI / `@calcit/procs` 配对正式 **0.35.1**，Respo **0.19.4**、Router **0.12.1** 和 JS-FFI **0.2.13** 须统一精确依赖图并重新生成 JS；正式 tag 发布前仍为候选。
+
+本 patch 除同步 Demo 展示版本和首页快速入门工具链文本外，不改组件、Options、样式/内容 union、泛型 `merge-styles`、回调和 HUD。原完整 strict、公开定义、附带测试、真实事件 JS 回放、Message 源码夹具、文档生成检查与 COS 内置 verify 保留。两个独立样式 Map 的泛型推断限制继续跟踪 #2608，本次不放宽类型；本轮验收结果以 PR 为准，不沿用历史版本数字。
+
+### 历史 0.15.0：Calcit 0.35.0 与样式泛型
+
+使用者注意：须同步正式 Calcit CLI / `@calcit/procs` **0.35.0**、Respo **0.19.3**、Router **0.12.0** 与 JS-FFI **0.2.12** 后重新生成 JS。以上三个依赖已发布并通过 Caps strict 安装与工具链验证，临时候选链接已移除；该版本的正式发布状态以对应 Git tag 为准。
 
 `merge-styles` 现在以同一泛型 V 关联两个 `Map Tag V` 和返回值，删除三个无必要的 Dynamic；调用方已经声明的 `StyleValue` / `InlineStyleValue` union 因而保留到结果，不再被擦除。若两个独立 Map 分别推断为 String、Number 等不同值类型，需要先声明共同的有限 CSS union，再合并。此类型要求可能使旧调用不能直接编译，因此发布 minor；运行时仍是原有的覆盖合并，不改样式优先级或缺省行为。已知内部 CSS 字面量可使用静态受检的类型标注；外部原始数据仍需在入口解码，不能用强转代替检查。
 
