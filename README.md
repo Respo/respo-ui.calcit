@@ -2,9 +2,9 @@
 Respo UI for calcit-js
 ----
 
-### 0.15.2 候选：Calcit 0.36.0
+### 0.15.2 候选：Calcit 0.37.0
 
-CLI / `@calcit/procs` 配对正式 **0.36.0**，tests 里的复合类型去掉 quote，Message 源码夹具升到 0.3.1。
+CLI / `@calcit/procs` 配对正式 **0.37.0**，依赖升到 Respo **0.19.5**、Router **0.12.2**、JS-FFI **0.2.13**（与 Respo 0.19.5 一致；0.36.0 候选未打 tag，直接并入本版）；tests 里的复合类型去掉 quote，Message 源码夹具改指向 0.37 候选提交（0.3.1 把 `:dispatch-op` 绑到 `Dynamic`，0.37 不再接受）。
 
 ### 历史 0.15.1：使用者影响
 
