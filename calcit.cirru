@@ -6,7 +6,7 @@
     {} (:description |) (:init-fn 'respo-ui.main/main!) (:mode :js) (:reload-fn 'respo-ui.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo-router.calcit/ |respo.calcit/ |js-ffi/
-      :type-slots $ {} $ :dispatch-op |respo-ui.schema/Op
+      :type-slots $ {} $ :dispatch-op 'respo-ui.schema/Op
   :files $ {}
     'respo-ui.comp $ %{} 'FileEntry
       :defs $ {}
@@ -1005,14 +1005,13 @@
                     -> Unit
                   , &unit
               assert= "|<div class=\"style-tabs__respo-ui_comp row__respo-ui_css \" data-comp=\"comp-tabs\"><div class=\"style-tab-highlight__respo-ui_comp\"></div><div class=\"css-tab__respo-ui_comp \"><span>Alpha</span></div></div>" $ respo.render.html/make-string $ comp-tabs
-                assert-type (respo-ui.schema/TabsOptions)
-                  quote $ respo-ui.schema/TabsOptions Tag
+                assert-type (respo-ui.schema/TabsOptions) (respo-ui.schema/TabsOptions Tag)
                 [] $ respo-ui.schema/TabRoute :tab :a |Alpha
                 , callback
               assert= "|<div class=\"style-tabs__respo-ui_comp column__respo-ui_css \" data-comp=\"comp-tabs\"><div class=\"style-tab-highlight__respo-ui_comp style-tab-vertical-highlight__respo-ui_comp\"></div><div class=\"css-tab__respo-ui_comp  style-selected-tab__respo-ui_comp\"><span>Alpha</span></div></div>" $ respo.render.html/make-string $ comp-tabs
                 assert-type
                   respo-ui.schema/TabsOptions :vertical? (Option :some true) :selected $ Option :some :a
-                  quote $ respo-ui.schema/TabsOptions Tag
+                  respo-ui.schema/TabsOptions Tag
                 [] $ respo-ui.schema/TabRoute :tab :a |Alpha
                 , callback
             :tags $ #{} :js-only
@@ -2689,7 +2688,8 @@
                   {} $ :class-name style-demo-code
                   comp-cirru-snippet ~code $ Option :none
           :examples $ []
-          :schema $ quote $ Macro & (Expr Dynamic)
+          :schema $ quote $ Macro
+            & $ Expr Dynamic
             -> $ Expr respo.schema/Element
         'doc-matches? $ %{} 'CodeEntry
           :doc "|True when the query is blank or appears, ignoring ASCII case, in the doc's title, name, group or summary."
@@ -5470,7 +5470,7 @@
                   {} (:opacity 0.5) (:color |red)
                     :border-color $ Option :none
                     :outline-color $ Option :some :blue
-                  quote $ Map Tag respo-ui.schema/InlineStyleValue
+                  Map Tag respo-ui.schema/InlineStyleValue
                 node $ respo-ui.comp/comp-button |Save $ Option :some
                   ButtonOptions :style $ Option :some styles
                 html $ respo.render.html/make-string node
@@ -5714,7 +5714,7 @@
                 fields $ &opts-fields pairs
               quasiquote $ calcit.core/Option :some $ ~struct-name ~@fields
           :examples $ [] $ quote (opts ButtonOptions :kind :primary :type |submit)
-          :schema $ quote $ Macro Syntax & Syntax
+          :schema $ quote $ Macro Syntax (& Syntax)
             -> $ Expr Dynamic
           :tests $ [] $ %{} 'TestEntry (:name |reads-shorthand-options)
             :code $ quote $ let
