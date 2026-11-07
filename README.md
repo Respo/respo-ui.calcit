@@ -2,7 +2,11 @@
 Respo UI for calcit-js
 ----
 
-### 0.15.1 候选：使用者影响
+### 0.15.2 候选：Calcit 0.36.0
+
+CLI / `@calcit/procs` 配对正式 **0.36.0**，tests 里的复合类型去掉 quote，Message 源码夹具升到 0.3.1。
+
+### 历史 0.15.1：使用者影响
 
 CLI / `@calcit/procs` 配对正式 **0.35.1**，Respo **0.19.4**、Router **0.12.1** 和 JS-FFI **0.2.13** 须统一精确依赖图并重新生成 JS；正式 tag 发布前仍为候选。
 
