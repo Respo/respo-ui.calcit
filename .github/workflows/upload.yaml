@@ -63,9 +63,8 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           repository: Respo/respo-message.calcit
-          # Message 0.37 candidate (Respo/respo-message.calcit branch claude/calcit-0.37.0); 0.3.1 binds
-          # :dispatch-op to Dynamic, which Calcit 0.37 rejects. Repin to the 0.4.0 tag once it exists.
-          ref: 817a1276ee059f1fa7b7eea6c07731a3593bffd7
+          # Released Message source; this remains a source fixture using the UI host graph.
+          ref: 0.4.0
           path: .calcit/message-consumer
           persist-credentials: false
 
