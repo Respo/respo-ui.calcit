@@ -3,4 +3,4 @@
   :version |0.15.2
   :dependencies $ {} (|Respo/respo-router.calcit |0.12.2)
     |Respo/respo.calcit |0.19.5
-    |calcit-lang/js-ffi |0.2.14
+    |calcit-lang/js-ffi |0.2.13
