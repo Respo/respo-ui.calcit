@@ -1178,8 +1178,10 @@
               (:none) (Option :none)
           :examples $ []
           :schema $ quote $ Fn
-            calcit.core/Option $ respo-ui.schema/InputOptions Op
-            -> $ Option Dynamic
+            Option $ respo-ui.schema/InputOptions Op
+            -> $ Option $ Fn respo.schema/RespoEvent
+              Fn Op $ -> Unit
+              -> Unit
             :generics Op
         'literal? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn literal? (v)
@@ -2462,19 +2464,8 @@
       :defs $ {}
         'comp-components-page $ %{} 'CodeEntry
           :doc "|Component overview: a hero, a search box that filters by name, group or summary, then the matching components as cards grouped by category. A card opens the component's own page."
-          :code $ quote $ defcomp comp-components-page (states)
+          :code $ quote $ defcomp comp-components-page (cursor query)
             let
-                cursor $ decode-map-as
-                  match (calcit.core/get states :cursor)
-                    (:some value)
-                      either value $ []
-                    (:none) ([])
-                  List Dynamic
-                query $ decode-map-as
-                  match (calcit.core/get states :data)
-                    (:some value) (either value |)
-                    (:none) |
-                  , 'String
                 matched $ filter component-docs $ fn (doc) (doc-matches? doc query)
               div
                 {} $ :class-name style-components-page
@@ -2498,9 +2489,9 @@
                   comp-input query $ Option :some $ InputOptions :id (Option :some |component-search) :type (Option :some |search) :placeholder (Option :some "|Search components by name or purpose") :class-name (Option :some style-search-input) :on-change
                     Option :some $ fn (text d!)
                       hint-fn $ Fn String
-                        Fn Dynamic $ -> Unit
+                        Fn respo-ui.schema/Op $ -> Unit
                         -> Unit
-                      d! $ :: :states cursor text
+                      d! $ respo-ui.schema/Op :states cursor text
                   div
                     {} $ :class-name style-search-count
                     <> $ if (blank? query)
@@ -2519,7 +2510,7 @@
                         [] group.:id $ render-card-group group $ filter matched
                           fn (doc) (= doc.:group group.:id)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (-> respo.schema/Component)
+          :schema $ quote $ Fn (List respo.schema/CoordKey) String (-> respo.schema/Component)
         'component-demo $ %{} 'CodeEntry
           :doc "|Live examples for one component page, keyed by component id. Each branch renders the component and the Cirru code that produced it."
           :code $ quote $ defn component-demo (id)
@@ -2927,7 +2918,9 @@
                           (:fonts) (comp-fonts-page)
                           (:design) (comp-design-page)
                           (:components)
-                            comp-components-page $ >> states :components
+                            let
+                                branch $ >> states :components
+                              comp-components-page (respo.core/state-cursor branch) (respo.core/pick-state branch 'String |)
                           (:component id) (comp-component-page id)
                           (:utils) (comp-utils-page)
                           (:not-found pp)
@@ -3729,12 +3722,12 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.37.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.38.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     Option :none
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" $ Option :none
                   div
                     {} $ :class-name style-home-sub
-                    <> "|Use Calcit CLI and @calcit/procs 0.37.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+                    <> "|Use Calcit CLI and @calcit/procs 0.38.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
               div
                 {} $ :class-name style-footer
                 <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
@@ -4658,7 +4651,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.15.2
+          :code $ quote $ def version |0.15.3
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
@@ -5481,14 +5474,16 @@
               , &unit
             :tags $ #{} :js-only
         'InputOptions $ %{} 'CodeEntry
-          :doc "|Typed options for comp-input and comp-textarea. :on-change receives the current text and d!; :on-input still receives the raw event map."
+          :doc "|Typed options for comp-input and comp-textarea. :on-change receives the current text and d!; :on-input receives the RespoEvent and d! for the same Op."
           :code $ quote $ defstruct InputOptions
             [] $ quote Op
             :id $ Option String
             :type $ Option String
             :placeholder $ Option String
             :disabled $ Option Bool
-            :on-input $ Option respo.schema/EventHandler
+            :on-input $ Option $ Fn respo.schema/RespoEvent
+              Fn Op $ -> Unit
+              -> Unit
             :on-change $ :: 'Option $ :: 'Fn
               {}
                 :args $ [] 'String $ :: 'Fn
