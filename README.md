@@ -2,7 +2,13 @@
 Respo UI for calcit-js
 ----
 
-### 0.15.2 候选：Calcit 0.37.0
+### 0.15.3 候选：Calcit 0.38.0
+
+请配对 Calcit CLI 与 `@calcit/procs` 0.38.0 后重新生成 JS。输入框和文本域的 `:on-input` 收到 RespoEvent，分发回调与 `:on-change` 使用同一个应用 Op。原事件载荷和回调优先级保持。
+
+组件索引从 Respo 状态边界读取 String 搜索词和具名 CoordKey 路径，再用应用 Op 更新搜索状态。
+
+### 历史 0.15.2：Calcit 0.37.0
 
 CLI / `@calcit/procs` 配对正式 **0.37.0**，依赖升到 Respo **0.19.5**、Router **0.12.2**、JS-FFI **0.2.13**（与 Respo 0.19.5 一致；0.36.0 候选未打 tag，直接并入本版）；tests 里的复合类型去掉 quote，Message 源码夹具改指向 0.37 候选提交（0.3.1 把 `:dispatch-op` 绑到 `Dynamic`，0.37 不再接受）。
 
