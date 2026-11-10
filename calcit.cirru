@@ -3707,10 +3707,11 @@
                 div
                   {} $ :class-name style-home-sub
                   <> "|33 components in six groups. Pick a group to jump into the components page."
-                list->
+                keyed->
                   {} $ :class-name style-cat-grid
                   map component-groups $ fn (group)
-                    [] group.:id $ render-cat-card group
+                    hint-fn $ Fn respo-ui.comp.sidebar/ComponentGroup $ -> respo.schema/ChildPair
+                    keyed-element group.:id $ render-cat-card group
               div
                 {} $ :class-name style-home-section
                 div
@@ -3957,7 +3958,7 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.home
           :require
-            respo.core :refer $ defcomp div a <> list->
+            respo.core :refer $ defcomp div a <> keyed-> keyed-element
             respo.css :refer $ defstyle
             respo.util.format :refer $ hsl
             respo-ui.comp :refer $ comp-cirru-snippet comp-button comp-card comp-input comp-select comp-switch comp-alert comp-progress comp-badge comp-tag comp-tabs comp-pagination comp-steps comp-avatar comp-kbd comp-attributes
@@ -4247,9 +4248,10 @@
                   <> |Foundations
                 [] $ [] 3 $ render-nav-item |design.html "|Design system" (= route-name :design)
                 if (= route-name :design)
-                  [] $ [] 4 $ list-> ({})
+                  [] $ [] 4 $ keyed-> ({})
                     map design-sections $ fn (section)
-                      [] section.:id $ div
+                      hint-fn $ Fn respo-ui.comp.sidebar/ComponentGroup $ -> respo.schema/ChildPair
+                      keyed-element section.:id $ div
                         {} (:class-name css-nav-sub)
                           :on-click $ on-jump $ str |#design- section.:id
                         <> section.:title
@@ -4260,9 +4262,10 @@
                   {} $ :class-name style-nav-title
                   <> |Components
                 [] $ [] 8 $ render-nav-item |components.html |Overview (= route-name :components)
-                [] $ [] 9 $ list-> ({})
+                [] $ [] 9 $ keyed-> ({})
                   map component-groups $ fn (group)
-                    [] group.:id $ render-nav-group group active-id
+                    hint-fn $ Fn respo-ui.comp.sidebar/ComponentGroup $ -> respo.schema/ChildPair
+                    keyed-element group.:id $ render-nav-group group active-id
                 [] $ [] 10 $ div
                   {} $ :class-name style-nav-title
                   <> |More
@@ -4449,10 +4452,11 @@
               div
                 {} $ :class-name style-nav-sub-title
                 <> group.:title
-              list-> ({})
+              keyed-> ({})
                 map (group-item-ids group.:id)
                   fn (item)
-                    [] item $ div
+                    hint-fn $ Fn String $ -> respo.schema/ChildPair
+                    keyed-element item $ div
                       {}
                         :class-name $ if (= item active-id) css-nav-sub-active css-nav-sub
                         :on-click $ on-route $ component-path item
@@ -4545,7 +4549,7 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.comp.sidebar
           :require
-            respo.core :refer $ defcomp div <> a list->
+            respo.core :refer $ defcomp div <> a keyed-> keyed-element
             respo-ui.core :as ui
             respo.util.format :refer $ hsl
             respo.comp.space :refer $ space-x
