@@ -45,15 +45,15 @@ ns app.comp.demo $ :require
 \`\`\`
 
 Every component returns \`respo.schema/Component\`. Most take an \`Option\` of a
-named options struct as the last argument: pass \`Option :none\` for defaults,
-or \`Option :some\` with the struct constructor. \`comp-tabs\` and
+named options struct as the last argument: pass \`None\` for defaults,
+or \`Some\` with the struct constructor. \`comp-tabs\` and
 \`comp-attributes\` take the struct itself, and \`comp-time\` and
 \`comp-placeholder\` take no options; the headings below show each signature.
-The constructor fills every omitted \`Option\` field with \`Option :none\`, so
+The constructor fills every omitted \`Option\` field with \`None\`, so
 only write the fields you use:
 
 \`\`\`cirru
-comp-button "|Save" $ Option :some $ ButtonOptions :kind (Option :some :primary)
+comp-button "|Save" $ Some $ ButtonOptions :kind (Some :primary)
 \`\`\`
 
 Callbacks such as \`:on-change\` receive the new value and \`d!\`; call \`d!\` with

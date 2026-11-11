@@ -13,7 +13,7 @@ const run = (...args) => execFileSync(cli, args, {
 const queryDef = (target) => JSON.parse(run("query", "def", target, "--format", "json")).data;
 // Runtime values alone cannot catch stale source metadata exposed to agents.
 assert.equal(queryDef("respo-ui.schema/Store").schema, "'StructDef");
-assert.equal(queryDef("respo-ui.schema/store").schema, "'respo-ui.schema/Store");
+assert.equal(queryDef("respo-ui.schema/store").schema, "'Store");
 const literalList = (code) => {
   assert.equal(code[0], "[]", "Expected a literal metadata list");
   return code.slice(1);
@@ -62,18 +62,18 @@ try {
   // Styles are a JS-host API; keep these render assertions outside native tests.
   const options = (values = {}) => ["respo-ui.schema/SkeletonOptions",
     ...["label", "kind", "width", "height", "class-name", "style"].flatMap((field) => [
-      `:${field}`, field in values ? ["Option", ":some", values[field]] : ["Option", ":none"],
+      `:${field}`, field in values ? ["Some", values[field]] : "None",
     ])];
   const render = (value) => ["respo.render.html/make-string", ["comp-skeleton", value]];
   const browser = "respo-ui.comp/replay-js-skeleton";
   const scenarios = [
-    ["let", [["html", render(["Option", ":none"])]],
+    ["let", [["html", render("None")]],
       ["assert", [".includes?", "html", "style-skeleton-text"], "|Missing options must use text skeleton"],
       ["assert", [".includes?", "html", '|aria-hidden="true"'], "|Unlabeled skeleton must be decorative"]],
-    ["let", [["html", render(["Option", ":some", options()])]],
+    ["let", [["html", render(["Some", options()])]],
       ["assert", [".includes?", "html", "style-skeleton-text"], "|Missing kind must use text skeleton"],
       ["assert", [".includes?", "html", '|aria-hidden="true"'], "|Missing label must remain decorative"]],
-    ["let", [["html", render(["Option", ":some", options({
+    ["let", [["html", render(["Some", options({
       label: "|Loading 中文", kind: ":circle", width: "|20px", height: "|20px", "class-name": "|custom-skeleton",
       style: ["{}", [":width", "|48px"], [":color", "|red"]],
     })])]],
@@ -162,8 +162,8 @@ try {
       pagination: "respo-ui.schema/PaginationOptions" }[name]
       ?? "respo-ui.schema/SwitchOptions";
     operations.push(["edit", "def", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code", `quote $ defn ${helper} ()
-  ${component} $ Option :some $ ${options} :on-change
-    Option :some $ fn (value d!)
+  ${component} $ Some $ ${options} :on-change
+    Some $ fn (value d!)
       hint-fn $ Fn ${type} (Fn ${type} (-> Unit)) (-> Unit)
       d! value`]);
     operations.push(["edit", "schema", `respo-ui.comp/${helper}`, "--input-format", "cirru", "--code",
