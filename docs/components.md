@@ -12,15 +12,15 @@ ns app.comp.demo $ :require
 ```
 
 Every component returns `respo.schema/Component`. Most take an `Option` of a
-named options struct as the last argument: pass `Option :none` for defaults,
-or `Option :some` with the struct constructor. `comp-tabs` and
+named options struct as the last argument: pass `None` for defaults,
+or `Some` with the struct constructor. `comp-tabs` and
 `comp-attributes` take the struct itself, and `comp-time` and
 `comp-placeholder` take no options; the headings below show each signature.
-The constructor fills every omitted `Option` field with `Option :none`, so
+The constructor fills every omitted `Option` field with `None`, so
 only write the fields you use:
 
 ```cirru
-comp-button "|Save" $ Option :some $ ButtonOptions :kind (Option :some :primary)
+comp-button "|Save" $ Some $ ButtonOptions :kind (Some :primary)
 ```
 
 Callbacks such as `:on-change` receive the new value and `d!`; call `d!` with
@@ -86,7 +86,7 @@ Render a controlled radio group from SelectOption items. Options: :name, :label 
 ```cirru
 comp-radio-group |calcit
   [] (respo-ui.schema/SelectOption :value |calcit :label |Calcit) (respo-ui.schema/SelectOption :value |clojure :label |Clojure)
-  Option :some $ respo-ui.schema/RadioGroupOptions :name (Option :some |language) :label (Option :some |Language)
+  Some $ respo-ui.schema/RadioGroupOptions :name (Some |language) :label (Some |Language)
 ```
 
 ### `comp-field (label control options)`
@@ -96,7 +96,7 @@ Wrap a form control with a label, optional description, and error message. Optio
 ```cirru
 comp-field |Email
   comp-input | $ respo-ui.schema/opts respo-ui.schema/InputOptions :placeholder |you@example.com
-  Option :some $ respo-ui.schema/FieldOptions :description (Option :some "|Used for notifications.") :required? (Option :some true)
+  Some $ respo-ui.schema/FieldOptions :description (Some "|Used for notifications.") :required? (Some true)
 ```
 
 ## Navigation
@@ -107,7 +107,7 @@ Render horizontal or vertical tabs from TabRoute items. TabsOptions sets :select
 
 ```cirru
 comp-tabs
-  respo-ui.schema/TabsOptions :selected $ Option :some :book
+  respo-ui.schema/TabsOptions :selected $ Some :book
   [] (respo-ui.schema/TabRoute :tab :book |Book) (respo-ui.schema/TabRoute :tab :card |Card)
   fn (route d!)
     hint-fn $ Fn (respo-ui.schema/TabRoute Tag)
@@ -125,9 +125,9 @@ Render a breadcrumb trail. Items with :href render links; the last item is marke
 ```cirru
 comp-breadcrumb
   []
-    respo-ui.schema/BreadcrumbItem :label |Home :href $ Option :some |#/
+    respo-ui.schema/BreadcrumbItem :label |Home :href $ Some |#/
     respo-ui.schema/BreadcrumbItem :label |Components
-  Option :none
+  , None
 ```
 
 ### `comp-pagination (page total options)`
@@ -145,7 +145,7 @@ Render a step indicator. current is the 0-based active step; earlier steps show 
 ```cirru
 comp-steps 1
   [] (respo-ui.schema/StepItem :title |Account) (respo-ui.schema/StepItem :title |Profile) (respo-ui.schema/StepItem :title |Done)
-  Option :none
+  , None
 ```
 
 ## Disclosure and hints
@@ -171,7 +171,7 @@ comp-tooltip |Save "|Saves the draft" $ respo-ui.schema/opts respo-ui.schema/Too
 Render a keyboard shortcut from key names, joined with +. Options: :class-name and :style.
 
 ```cirru
-comp-kbd ([] |Ctrl |K) (Option :none)
+comp-kbd ([] |Ctrl |K) None
 ```
 
 ## Feedback
@@ -247,7 +247,7 @@ comp-avatar |CY $ respo-ui.schema/opts respo-ui.schema/AvatarOptions :title "|Ch
 Render a small semantic tag. Kinds are :info, :success, :warning, and :error; any other tag uses the neutral style. ButtonOptions :on-click, :class-name, and :style apply.
 
 ```cirru
-comp-tag :success |Stable $ Option :none
+comp-tag :success |Stable None
 ```
 
 ### `comp-attributes (options)`
@@ -255,7 +255,7 @@ comp-tag :success |Stable $ Option :none
 Render a responsive label/value grid from AttributesOptions :items. Each item may carry :label, :value (text or a Respo node), and :span; options also set the title, item size, and CSS overrides.
 
 ```cirru
-comp-attributes $ respo-ui.schema/AttributesOptions :title (Option :some |Project) :items
+comp-attributes $ respo-ui.schema/AttributesOptions :title (Some |Project) :items
   [] (:: :attr |Name |Respo) (:: :attr-span |Description "|A virtual DOM library in Calcit" 2)
 ```
 
@@ -282,7 +282,7 @@ comp-time |2026-10-20T08:00:00Z
 Render plain preformatted code. Options: :class-name and :style.
 
 ```cirru
-comp-snippet "|yarn install" $ Option :none
+comp-snippet "|yarn install" None
 ```
 
 ### `comp-cirru-snippet (text options)`
@@ -290,7 +290,7 @@ comp-snippet "|yarn install" $ Option :none
 Render Cirru code with syntax highlighting. Options: :class-name and :style.
 
 ```cirru
-comp-cirru-snippet "|defn f (x) x" $ Option :none
+comp-cirru-snippet "|defn f (x) x" None
 ```
 
 ### `comp-copy (code f)`
@@ -298,7 +298,7 @@ comp-cirru-snippet "|defn f (x) x" $ Option :none
 Render a copy icon. Clicking copies code to the clipboard, unless a handler is passed, which then replaces the default copy.
 
 ```cirru
-comp-copy "|caps --ci" $ Option :none
+comp-copy "|caps --ci" None
 ```
 
 ### `comp-close (options)`
@@ -306,7 +306,7 @@ comp-copy "|caps --ci" $ Option :none
 Render a clickable close (✕) mark. ButtonOptions :on-click handles the click; :class-name and :style adjust presentation.
 
 ```cirru
-comp-close $ Option :none
+comp-close None
 ```
 
 ### `comp-placeholder (text)`
@@ -322,5 +322,5 @@ comp-placeholder "|Nothing here yet"
 by "catoptric text" I mean text added with CSS content, thus unsearchable from browser search or select. The text can still be grabbed from DOM tree though.
 
 ```cirru
-comp-catoptric-text |Respo $ Option :none
+comp-catoptric-text |Respo None
 ```
