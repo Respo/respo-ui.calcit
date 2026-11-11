@@ -3711,12 +3711,12 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.38.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.41.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     , None
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" None
                   div
                     {} $ :class-name style-home-sub
-                    <> "|Use Calcit CLI and @calcit/procs 0.38.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+                    <> "|Use Calcit CLI and @calcit/procs 0.41.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
               div
                 {} $ :class-name style-footer
                 <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
@@ -6506,13 +6506,10 @@
             %{} 'TestEntry (:name |invalid-cursor-remains-rejected)
               :code $ quote $ let
                   original $ schema/Store :router respo-router.schema/router :states $ {}
-                assert= true $ try
-                  do
-                    updater original $ :: :states
-                      decode-map-as (parse-cirru-edn |1) (List respo.schema/CoordKey)
-                      , |bad-cursor
-                    , false
-                  fn (message) true
+                  op $ schema/Op :states ([] |bad-root-key) |bad-cursor
+                assert= "|decode-map-as failed at $.key: expected tag, got string" $ try
+                  do (updater original op) |accepted
+                  fn (message) message
                 assert=
                   schema/Store :router respo-router.schema/router :states $ {}
                   , original
