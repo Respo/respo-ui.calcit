@@ -2667,8 +2667,7 @@
                   {} $ :class-name style-demo-code
                   comp-cirru-snippet ~code $ Option :none
           :examples $ []
-          :schema $ quote $ Macro
-            & $ Expr Dynamic
+          :schema $ quote $ Macro (& Syntax)
             -> $ Expr respo.schema/Element
         'doc-matches? $ %{} 'CodeEntry
           :doc "|True when the query is blank or appears, ignoring ASCII case, in the doc's title, name, group or summary."
@@ -2919,7 +2918,7 @@
                       {} $ :bottom 0
                     []
           :examples $ []
-          :schema $ quote $ Fn respo-ui.schema/Store (-> respo.schema/Component)
+          :schema $ quote $ Fn respo-ui.schema/Store (-> respo.schema/Component) (:features :io)
           :tests $ [] $ %{} 'TestEntry (:name |conditional-child-keys)
             :code $ quote $ do
               let
@@ -5175,7 +5174,7 @@
             reset! *store $ updater @*store op
             , &unit
           :examples $ []
-          :schema $ quote $ Fn schema/Op (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn schema/Op (-> Unit) (:features :js-ffi :state)
         'get-mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn get-mount-target ()
             unsafe-coerce
@@ -5210,7 +5209,7 @@
             println "|App started!"
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
@@ -5229,12 +5228,12 @@
               hud! |error build-errors
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
             render! (get-mount-target) (comp-container @*store) dispatch!
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'render-router! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-router! ()
             let
@@ -5242,7 +5241,7 @@
               render-url! store.:router router/dict router/mode
               , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit)
+          :schema $ quote $ Fn (-> Unit) (:features :state)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.main
           :require
