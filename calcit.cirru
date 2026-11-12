@@ -789,7 +789,7 @@
                   {}
                     :width $ respo-ui.schema/option-field options :width
                     :height $ respo-ui.schema/option-field options :height
-                  Map Tag respo-ui.schema/InlineStyleValue
+                  Map Tag schema/InlineStyleValue
                 respo-ui.schema/field-or options :style $ {}
           :examples $ [] $ quote
             comp-skeleton $ respo-ui.schema/opts respo-ui.schema/SkeletonOptions :label "|Loading title" :width |60%
@@ -944,13 +944,13 @@
                         if (.some? options.:width)
                           {} $ :width $ .unwrap-or options.:width 0
                           {}
-                        Map Tag respo-ui.schema/InlineStyleValue
+                        Map Tag schema/InlineStyleValue
                       if (.some? options.:style) (.unwrap options.:style) ({})
                   div $ {} $ :class-name
                     if vertical? (str-spaced style-tab-highlight style-tab-vertical-highlight) (str-spaced style-tab-highlight)
                   , & $ -> tabs $ map
                     fn (item)
-                      hint-fn $ Fn (respo-ui.schema/TabRoute Value) (-> respo.schema/Element)
+                      hint-fn $ Fn (schema/TabRoute Value) (-> respo.schema/Element)
                       match item $
                         :tab value display
                         let
@@ -979,7 +979,7 @@
               respo-ui.schema/TabsOptions :selected $ Some :book
               [] (respo-ui.schema/TabRoute :tab :book |Book) (respo-ui.schema/TabRoute :tab :card |Card)
               fn (route d!)
-                hint-fn $ Fn (respo-ui.schema/TabRoute Tag)
+                hint-fn $ Fn (schema/TabRoute Tag)
                   Fn Dynamic $ -> Unit
                   -> Unit
                 match route $
@@ -995,18 +995,18 @@
           :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
             :code $ quote $ let
                 callback $ fn (route d!)
-                  hint-fn $ Fn (respo-ui.schema/TabRoute Tag)
+                  hint-fn $ Fn (schema/TabRoute Tag)
                     Fn Tag $ -> Unit
                     -> Unit
                   , &unit
               assert= "|<div class=\"style-tabs__respo-ui_comp row__respo-ui_css \" data-comp=\"comp-tabs\"><div class=\"style-tab-highlight__respo-ui_comp\"></div><div class=\"css-tab__respo-ui_comp \"><span>Alpha</span></div></div>" $ respo.render.html/make-string $ comp-tabs
-                assert-type (respo-ui.schema/TabsOptions) (respo-ui.schema/TabsOptions Tag)
+                assert-type (respo-ui.schema/TabsOptions) (schema/TabsOptions Tag)
                 [] $ respo-ui.schema/TabRoute :tab :a |Alpha
                 , callback
               assert= "|<div class=\"style-tabs__respo-ui_comp column__respo-ui_css \" data-comp=\"comp-tabs\"><div class=\"style-tab-highlight__respo-ui_comp style-tab-vertical-highlight__respo-ui_comp\"></div><div class=\"css-tab__respo-ui_comp  style-selected-tab__respo-ui_comp\"><span>Alpha</span></div></div>" $ respo.render.html/make-string $ comp-tabs
                 assert-type
                   respo-ui.schema/TabsOptions :vertical? (Some true) :selected $ Some :a
-                  respo-ui.schema/TabsOptions Tag
+                  schema/TabsOptions Tag
                 [] $ respo-ui.schema/TabRoute :tab :a |Alpha
                 , callback
             :tags $ #{} :js-only
@@ -4238,7 +4238,7 @@
                 if (= route-name :design)
                   [] $ [] 4 $ keyed-> ({})
                     map design-sections $ fn (section)
-                      hint-fn $ Fn respo-ui.comp.sidebar/ComponentGroup $ -> respo.schema/ChildPair
+                      hint-fn $ Fn ComponentGroup $ -> respo.schema/ChildPair
                       keyed-element section.:id $ div
                         {} (:class-name css-nav-sub)
                           :on-click $ on-jump $ str |#design- section.:id
@@ -4252,7 +4252,7 @@
                 [] $ [] 8 $ render-nav-item |components.html |Overview (= route-name :components)
                 [] $ [] 9 $ keyed-> ({})
                   map component-groups $ fn (group)
-                    hint-fn $ Fn respo-ui.comp.sidebar/ComponentGroup $ -> respo.schema/ChildPair
+                    hint-fn $ Fn ComponentGroup $ -> respo.schema/ChildPair
                     keyed-element group.:id $ render-nav-group group active-id
                 [] $ [] 10 $ div
                   {} $ :class-name style-nav-title
@@ -5198,12 +5198,12 @@
             println "|Running mode:" $ if config/dev? |dev |release
             render-router!
             add-watch! *store :changes $ fn (store prev)
-              hint-fn $ Fn respo-ui.schema/Store respo-ui.schema/Store $ -> Unit
+              hint-fn $ Fn schema/Store schema/Store $ -> Unit
               render-app!
               , &unit
             listen! router/dict dispatch! router/mode
             add-watch! *store :router-changes $ fn (store prev)
-              hint-fn $ Fn respo-ui.schema/Store respo-ui.schema/Store $ -> Unit
+              hint-fn $ Fn schema/Store schema/Store $ -> Unit
               render-router!
               , &unit
             render-app!
@@ -5216,11 +5216,11 @@
             if (nil? build-errors)
               do (remove-watch! *store :changes) (remove-watch! *store :router-changes) (clear-cache!)
                 add-watch! *store :changes $ fn (store prev)
-                  hint-fn $ Fn respo-ui.schema/Store respo-ui.schema/Store $ -> Unit
+                  hint-fn $ Fn schema/Store schema/Store $ -> Unit
                   render-app!
                   , &unit
                 add-watch! *store :router-changes $ fn (store prev)
-                  hint-fn $ Fn respo-ui.schema/Store respo-ui.schema/Store $ -> Unit
+                  hint-fn $ Fn schema/Store schema/Store $ -> Unit
                   render-router!
                   , &unit
                 render-app!
@@ -5413,6 +5413,10 @@
                   assert |component-identity $ identical? component actual
                 (Element actual) (assert |component-kind false)
             :tags $ #{} :js-only :unit
+        'DemoStateNode $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion DemoStateNode String Bool (Map respo.schema/CoordKey DemoStateNode)
+          :examples $ []
+          :schema $ quote UnionDef
         'DividerOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-divider, including vertical orientation."
           :code $ quote $ defstruct DividerOptions
@@ -5454,7 +5458,7 @@
                 styles $ assert-type
                   {} (:opacity 0.5) (:color |red) (:border-color None)
                     :outline-color $ Some :blue
-                  Map Tag respo-ui.schema/InlineStyleValue
+                  Map Tag InlineStyleValue
                 node $ respo-ui.comp/comp-button |Save $ Some
                   ButtonOptions :style $ Some styles
                 html $ respo.render.html/make-string node
@@ -5489,7 +5493,7 @@
         'Op $ %{} 'CodeEntry
           :doc "|Dispatch Op of the demo app, bound to the :dispatch-op type slot."
           :code $ quote $ defenum Op
-            :states (List respo.schema/CoordKey) Dynamic
+            :states (List respo.schema/CoordKey) DemoStateNode
             :router/nav String
             :router/route respo-router.schema/Router
           :examples $ []
@@ -5602,11 +5606,11 @@
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
           :code $ quote $ defstruct Store (:router respo-router.schema/Router)
-            :states $ Map Tag Dynamic
+            :states $ Map Tag respo-ui.schema/DemoStateNode
           :examples $ []
           :schema $ quote StructDef
           :tests $ [] $ %{} 'TestEntry (:name |nominal-store-metadata)
-            :code $ quote $ do (assert-type Store StructDef) (assert-type store 'respo-ui.schema/Store)
+            :code $ quote $ do (assert-type Store StructDef) (assert-type store Store)
               assert= :struct-def $ type-of Store
               assert=
                 Store :router respo-router.schema/router :states $ {}
@@ -6477,7 +6481,7 @@
                 match
                   try-decode-map-as
                     update-state-tree (:states store) cursor s
-                    Map Tag Dynamic
+                    Map Tag respo-ui.schema/DemoStateNode
                   (:ok states) (.assoc store :states states)
                   (:err error) (raise error)
               (:router/nav path)

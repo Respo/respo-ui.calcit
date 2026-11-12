@@ -2,9 +2,9 @@
 Respo UI for calcit-js
 ----
 
-### 0.15.3 候选：Calcit 0.41.0
+### 0.15.3 候选：Calcit 0.41.1
 
-请配对 Calcit CLI 与 `@calcit/procs` 0.41.0 后重新生成 JS。输入框和文本域的 `:on-input` 收到 RespoEvent，分发回调与 `:on-change` 使用同一个应用 Op。原事件载荷和回调优先级保持。
+请配对 Calcit CLI 与 `@calcit/procs` 0.41.1 后重新生成 JS。输入框和文本域的 `:on-input` 收到 RespoEvent，分发回调与 `:on-change` 使用同一个应用 Op。原事件载荷和回调优先级保持。
 
 组件索引从 Respo 状态边界读取 String 搜索词和具名 CoordKey 路径，再用应用 Op 更新搜索状态。
 
