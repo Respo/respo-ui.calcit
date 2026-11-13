@@ -5282,18 +5282,6 @@
         :code $ quote $ ns respo-ui.router
     'respo-ui.schema $ %{} 'FileEntry
       :defs $ {}
-        '&opts-fields $ %{} 'CodeEntry
-          :doc "|Internal helper of `opts`: wraps every value of a field/value list in `Option :some`."
-          :code $ quote $ defn &opts-fields (pairs)
-            if
-              even? $ count pairs
-              map-indexed pairs $ fn (idx node)
-                if (even? idx) node $ [] 'calcit.core/Option :some node
-              raise "|opts expects field and value pairs"
-          :examples $ []
-          :schema $ quote $ Fn (List T)
-            -> $ List Dynamic
-            :generics T
         'AttributesOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-attributes. Item keeps the collection item type visible to callers."
           :code $ quote $ defstruct AttributesOptions
@@ -5700,9 +5688,13 @@
         'opts $ %{} 'CodeEntry
           :doc "|Shorthand for typed component options: `opts ButtonOptions :kind :primary :on-click f` expands to `Option :some $ ButtonOptions :kind (Option :some :primary) :on-click (Option :some f)`. Fields you leave out stay `Option :none`."
           :code $ quote $ defmacro opts (struct-name & pairs)
-            let
-                fields $ &opts-fields pairs
-              quasiquote $ calcit.core/Option :some $ ~struct-name ~@fields
+            if
+              even? $ .len pairs
+              let
+                  fields $ map-indexed pairs $ fn (idx node)
+                    if (even? idx) node $ [] 'calcit.core/Option :some node
+                quasiquote $ calcit.core/Option :some $ ~struct-name ~@fields
+              raise "|opts expects field and value pairs"
           :examples $ [] $ quote (opts ButtonOptions :kind :primary :type |submit)
           :schema $ quote $ Macro Syntax (& Syntax)
             -> $ Expr Dynamic
