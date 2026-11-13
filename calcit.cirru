@@ -5291,8 +5291,9 @@
                 if (even? idx) node $ [] 'calcit.core/Option :some node
               raise "|opts expects field and value pairs"
           :examples $ []
-          :schema $ quote $ Fn (List Dynamic)
+          :schema $ quote $ Fn (List T)
             -> $ List Dynamic
+            :generics T
         'AttributesOptions $ %{} 'CodeEntry
           :doc "|Typed options for comp-attributes. Item keeps the collection item type visible to callers."
           :code $ quote $ defstruct AttributesOptions
