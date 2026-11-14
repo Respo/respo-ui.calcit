@@ -1109,7 +1109,7 @@
             when
               or (= action :update) (= action :mount)
               if (string? text)
-                browser/element-data-set! (unsafe-coerce el 'js-ffi.browser/DomElementHost) |text text
+                browser/element-data-set! (respo-browser/host-element el) |text text
                 raise "|effect-dataset-text expected a String text"
           :examples $ []
           :schema $ quote $ Fn String (-> respo.schema/Effect) (:features :js-ffi)
@@ -1118,7 +1118,7 @@
             when
               or (= action :mount) (= action :update)
               let
-                  root $ unsafe-coerce el 'js-ffi.browser/DomElementHost
+                  root $ respo-browser/host-element el
                   target $ browser/element-query-selector root $ str |. style-selected-tab
                   cursor $ browser/element-query-selector root $ str |. style-tab-highlight
                 if
@@ -1837,6 +1837,7 @@
             respo-ui.schema :as schema
             |dayjs/plugin/isToday.js :default is-today
             js-ffi.browser :as browser
+            respo.ffi.browser :as respo-browser
     'respo-ui.comp.component-docs $ %{} 'FileEntry
       :defs $ {}
         'ArgDoc $ %{} 'CodeEntry (:doc "|One positional argument of a component.")
@@ -5177,9 +5178,7 @@
           :schema $ quote $ Fn schema/Op (-> Unit) (:features :js-ffi :state)
         'get-mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn get-mount-target ()
-            unsafe-coerce
-              .unwrap $ browser/query-selector |.app
-              , 'respo.dom/DomElement
+            .unwrap $ respo-browser/query-selector |.app
           :examples $ []
           :schema $ quote $ Fn (-> respo.dom/DomElement) (:features :js-ffi)
         'initial-router $ %{} 'CodeEntry (:doc |)
@@ -5258,6 +5257,7 @@
             js-ffi.browser :as browser
             js-ffi.shared :as shared
             respo-ui.updater :refer $ updater
+            respo.ffi.browser :as respo-browser
     'respo-ui.router $ %{} 'FileEntry
       :defs $ {}
         'dict $ %{} 'CodeEntry (:doc |)
