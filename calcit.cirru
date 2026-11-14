@@ -980,11 +980,9 @@
               [] (respo-ui.schema/TabRoute :tab :book |Book) (respo-ui.schema/TabRoute :tab :card |Card)
               fn (route d!)
                 hint-fn $ Fn (schema/TabRoute Tag)
-                  Fn Dynamic $ -> Unit
+                  Fn (schema/TabRoute Tag) (-> Unit)
                   -> Unit
-                match route $
-                  :tab value _title
-                  d! $ :: :select-tab value
+                d! route
           :schema $ quote $ Fn (schema/TabsOptions Value)
             List $ schema/TabRoute Value
             Fn (schema/TabRoute Value)
