@@ -6569,7 +6569,7 @@
                     , &unit
             , &unit
           :examples $ []
-          :schema $ quote $ Fn Dynamic (Option Tag) (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn Data (Option Tag) (-> Unit) (:generics Data) (:features :js-ffi)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.util
           :require $ js-ffi.browser :as browser
