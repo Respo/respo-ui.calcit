@@ -63,8 +63,8 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           repository: Respo/respo-message.calcit
-          # Released Message source; this remains a source fixture using the UI host graph.
-          ref: 0.4.0
+          # Calcit 0.43 Message candidate, pending its formal 0.4.2 release.
+          ref: 746398ea0dac74f8db5d57761212ad0587b820f5
           path: .calcit/message-consumer
           persist-credentials: false
 
