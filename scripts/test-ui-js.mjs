@@ -56,7 +56,7 @@ try {
     operations.push(["edit", "def", `${namespace}/${helper}`, "--input-format", "json-ast", "--code",
       JSON.stringify(["defn", helper, [], test.code, "&unit"])]);
     operations.push(["edit", "schema", `${namespace}/${helper}`, "--input-format", "cirru", "--code",
-      "quote $ Fn (-> Unit)"]);
+      "quote $ Fn (-> Unit) (:features :io :state)"]);
     calls.push([`${namespace}/${helper}`]);
   });
   // Styles are a JS-host API; keep these render assertions outside native tests.
@@ -88,7 +88,7 @@ try {
   operations.push(["edit", "def", browser, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-js-skeleton", [], ...scenarios, "&unit"])]);
   operations.push(["edit", "schema", browser, "--input-format", "cirru", "--code",
-    "quote $ Fn (-> Unit)"]);
+    "quote $ Fn (-> Unit) (:features :io :state)"]);
   calls.push([browser]);
   // Exercise every real showcase route, not only isolated component examples.
   const pages = "respo-ui.comp.container/replay-js-pages";
@@ -148,7 +148,7 @@ try {
   operations.push(["edit", "def", pages, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-js-pages", [], ...pageScenarios, "&unit"])]);
   operations.push(["edit", "schema", pages, "--input-format", "cirru", "--code",
-    "quote $ Fn (-> Unit)"]);
+    "quote $ Fn (-> Unit) (:features :io :state)"]);
   calls.push([pages]);
   // Build typed callbacks in Calcit, then invoke the actual DOM-host handlers.
   // The event table intentionally exposes opaque host-callable functions.
@@ -174,7 +174,7 @@ try {
   operations.push(["edit", "def", entry, "--input-format", "json-ast", "--code",
     JSON.stringify(["defn", "replay-all-attached", [], ...calls, "&unit"])]);
   operations.push(["edit", "schema", entry, "--input-format", "cirru", "--code",
-    "quote $ Fn (-> Unit)"]);
+    "quote $ Fn (-> Unit) (:features :io :state)"]);
   operations.push(["config", "set", "init-fn", entry]);
   operations.push(["config", "set", "reload-fn", entry]);
   const code = JSON.stringify(operations);

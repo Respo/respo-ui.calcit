@@ -2150,7 +2150,7 @@
                     {} $ :class-name style-page-lead
                     <> $ str "|No component is named " id "|. Pick one from the sidebar."
           :examples $ []
-          :schema $ quote $ Fn String (-> respo.schema/Component)
+          :schema $ quote $ Fn String (-> respo.schema/Component) (:features :io :state)
         'group-title $ %{} 'CodeEntry
           :doc "|Title of the sidebar group with this id, or the id itself."
           :code $ quote $ defn group-title (group-id)
@@ -2176,7 +2176,7 @@
           :code $ quote $ defn on-open-category (group-id)
             fn (e dispatch!)
               hint-fn $ Fn respo.schema/RespoEvent
-                Fn *dispatch-op $ -> Unit
+                Fn *dispatch-op (-> Unit) (:features :io :state)
                 -> Unit
               dispatch! $ :: :states ([] :components) |
               dispatch! $ :: :router/nav |components.html
@@ -2185,7 +2185,7 @@
                 (:some el) (element-scroll-into-view! el)
                 (:none) &unit
           :examples $ []
-          :schema $ quote $ Fn String (-> respo.schema/EventHandler) (:features :js-ffi)
+          :schema $ quote $ Fn String (-> respo.schema/EventHandler) (:features :io :js-ffi :state)
         'render-api $ %{} 'CodeEntry
           :doc "|Signature, positional arguments and one table per options or item struct."
           :code $ quote $ defn render-api (doc)
@@ -2238,7 +2238,7 @@
                 (:none)
                   span $ {}
           :examples $ []
-          :schema $ quote $ Fn String (-> respo.schema/Element)
+          :schema $ quote $ Fn String (-> respo.schema/Element) (:features :io :state)
         'render-pager-link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-pager-link (doc label class-name)
             button
@@ -2252,7 +2252,7 @@
                 {} $ :class-name style-pager-title
                 <> doc.:title
           :examples $ []
-          :schema $ quote $ Fn respo-ui.comp.component-docs/ComponentDoc String String (-> respo.schema/Element)
+          :schema $ quote $ Fn respo-ui.comp.component-docs/ComponentDoc String String (-> respo.schema/Element) (:features :io :state)
         'render-struct-table $ %{} 'CodeEntry (:doc "|Field table for one struct from struct-docs.")
           :code $ quote $ defn render-struct-table (name)
             match
@@ -2503,7 +2503,7 @@
                         [] group.:id $ render-card-group group $ filter matched
                           fn (doc) (= doc.:group group.:id)
           :examples $ []
-          :schema $ quote $ Fn (List respo.schema/CoordKey) String (-> respo.schema/Component)
+          :schema $ quote $ Fn (List respo.schema/CoordKey) String (-> respo.schema/Component) (:features :io :state)
         'component-demo $ %{} 'CodeEntry
           :doc "|Live examples for one component page, keyed by component id. Each branch renders the component and the Cirru code that produced it."
           :code $ quote $ defn component-demo (id)
@@ -2726,7 +2726,7 @@
                 map docs $ fn (doc)
                   [] doc.:id $ render-component-card doc
           :examples $ []
-          :schema $ quote $ Fn respo-ui.comp.sidebar/ComponentGroup (List respo-ui.comp.component-docs/ComponentDoc) (-> respo.schema/Element)
+          :schema $ quote $ Fn respo-ui.comp.sidebar/ComponentGroup (List respo-ui.comp.component-docs/ComponentDoc) (-> respo.schema/Element) (:features :io :state)
         'render-component-card $ %{} 'CodeEntry
           :doc "|A clickable card with the component's title, name and summary."
           :code $ quote $ defn render-component-card (doc)
@@ -2743,7 +2743,7 @@
                 {} $ :class-name style-card-summary
                 <> doc.:summary
           :examples $ []
-          :schema $ quote $ Fn respo-ui.comp.component-docs/ComponentDoc (-> respo.schema/Element)
+          :schema $ quote $ Fn respo-ui.comp.component-docs/ComponentDoc (-> respo.schema/Element) (:features :io :state)
         'render-entry $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-entry (url title)
             div ({})
@@ -2917,7 +2917,7 @@
                       {} $ :bottom 0
                     []
           :examples $ []
-          :schema $ quote $ Fn respo-ui.schema/Store (-> respo.schema/Component) (:features :io)
+          :schema $ quote $ Fn respo-ui.schema/Store (-> respo.schema/Component) (:features :io :state)
           :tests $ [] $ %{} 'TestEntry (:name |conditional-child-keys)
             :code $ quote $ do
               let
@@ -3719,7 +3719,7 @@
                 {} $ :class-name style-footer
                 <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
           :examples $ []
-          :schema $ quote $ Fn (-> respo.schema/Component)
+          :schema $ quote $ Fn (-> respo.schema/Component) (:features :io :state)
         'comp-home-gallery $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-home-gallery ()
             div
@@ -3788,7 +3788,7 @@
                 {} $ :class-name style-cat-items
                 <> $ join-string (group-item-ids group.:id) "|  "
           :examples $ []
-          :schema $ quote $ Fn respo-ui.comp.sidebar/ComponentGroup (-> respo.schema/Element)
+          :schema $ quote $ Fn respo-ui.comp.sidebar/ComponentGroup (-> respo.schema/Element) (:features :io :state)
         'render-feature $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-feature (title text)
             div
@@ -4218,7 +4218,7 @@
               render-entry |components.html |Components $ = :components router-name
               render-entry |utils.html |Utils $ = :utils router-name
           :examples $ []
-          :schema $ quote $ Fn Tag (-> respo.schema/Component)
+          :schema $ quote $ Fn Tag (-> respo.schema/Component) (:features :io :state)
         'comp-sidenav $ %{} 'CodeEntry
           :doc "|Left navigation. On component routes it lists every component, highlighting active-id."
           :code $ quote $ defcomp comp-sidenav (route-name active-id)
@@ -4258,7 +4258,7 @@
                 [] $ [] 11 $ render-nav-item |widgets.html |Widgets (= route-name :widgets)
                 [] $ [] 12 $ render-nav-item |utils.html |Utils (= route-name :utils)
           :examples $ []
-          :schema $ quote $ Fn Tag String (-> respo.schema/Component)
+          :schema $ quote $ Fn Tag String (-> respo.schema/Component) (:features :io :state)
           :tests $ [] $ %{} 'TestEntry (:name |conditional-child-keys)
             :code $ quote $ let
                 index-children $ match
@@ -4301,7 +4301,7 @@
               div $ {} $ :class-name css/expand
               a $ {} (:href |https://github.com/Respo/respo-ui.calcit) (:target |_blank) (:rel |noreferrer) (:class-name css-nav-link) (:inner-text |GitHub)
           :examples $ []
-          :schema $ quote $ Fn Tag (-> respo.schema/Component)
+          :schema $ quote $ Fn Tag (-> respo.schema/Component) (:features :io :state)
         'component-groups $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def component-groups
             [] (ComponentGroup :id |form :title "|Form controls") (ComponentGroup :id |navigation :title |Navigation) (ComponentGroup :id |disclosure :title "|Disclosure and hints") (ComponentGroup :id |feedback :title |Feedback) (ComponentGroup :id |data :title "|Data display") (ComponentGroup :id |utilities :title "|Code and utilities")
@@ -4391,7 +4391,7 @@
           :code $ quote $ defn on-jump (selector)
             fn (e d!)
               hint-fn $ Fn respo.schema/RespoEvent
-                Fn *dispatch-op $ -> Unit
+                Fn *dispatch-op (-> Unit) (:features :io :state)
                 -> Unit
               match (query-selector selector)
                 (:some el) (element-scroll-into-view! el)
@@ -4402,20 +4402,20 @@
           :doc "|Navigate to a router path and scroll the content area back to the top."
           :code $ quote $ defn on-route (path-name) (on-route-to path-name |#content-top)
           :examples $ []
-          :schema $ quote $ Fn String (-> respo.schema/EventHandler) (:features :js-ffi)
+          :schema $ quote $ Fn String (-> respo.schema/EventHandler) (:features :io :js-ffi :state)
         'on-route-to $ %{} 'CodeEntry
           :doc "|Click handler that navigates to path-name, then scrolls the element matching selector into view."
           :code $ quote $ defn on-route-to (path-name selector)
             fn (e dispatch!)
               hint-fn $ Fn respo.schema/RespoEvent
-                Fn *dispatch-op $ -> Unit
+                Fn *dispatch-op (-> Unit) (:features :io :state)
                 -> Unit
               dispatch! $ :: :router/nav path-name
               match (query-selector selector)
                 (:some el) (element-scroll-into-view! el)
                 (:none) &unit
           :examples $ []
-          :schema $ quote $ Fn String String (-> respo.schema/EventHandler) (:features :js-ffi)
+          :schema $ quote $ Fn String String (-> respo.schema/EventHandler) (:features :io :js-ffi :state)
         'render-entry $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-entry (path title selected?)
             div
@@ -4426,7 +4426,7 @@
                 :on-click $ on-route path
               <> title
           :examples $ []
-          :schema $ quote $ Fn String String Bool (-> respo.schema/Element)
+          :schema $ quote $ Fn String String Bool (-> respo.schema/Element) (:features :io :state)
           :tests $ [] $ %{} 'TestEntry (:name |conditional-absence)
             :code $ quote $ do
               assert= "|<div class=\"css-sidebar-entry__respo-ui_comp_sidebar\"><span>Components</span></div>" $ respo.render.html/make-string $ render-entry |components |Components false
@@ -4448,7 +4448,7 @@
                         :on-click $ on-route $ component-path item
                       <> $ item-title item
           :examples $ []
-          :schema $ quote $ Fn ComponentGroup String (-> respo.schema/Element)
+          :schema $ quote $ Fn ComponentGroup String (-> respo.schema/Element) (:features :io :state)
         'render-nav-item $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-nav-item (path title active?)
             div
@@ -4457,7 +4457,7 @@
                 :on-click $ on-route path
               <> title
           :examples $ []
-          :schema $ quote $ Fn String String Bool (-> respo.schema/Element)
+          :schema $ quote $ Fn String String Bool (-> respo.schema/Element) (:features :io :state)
         'render-top-link $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-top-link (path title active?)
             div
@@ -4466,7 +4466,7 @@
                 :on-click $ on-route path
               <> title
           :examples $ []
-          :schema $ quote $ Fn String String Bool (-> respo.schema/Element)
+          :schema $ quote $ Fn String String Bool (-> respo.schema/Element) (:features :io :state)
         'style-brand $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstyle style-brand
             {} $ |& $ {} (:display :flex) (:align-items :center) (:gap |10px) (:cursor :pointer) (:flex-shrink 0)
