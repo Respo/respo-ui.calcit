@@ -2,6 +2,10 @@
 Respo UI for calcit-js
 ----
 
+### 0.15.7：对齐正式依赖
+
+请配对 Calcit 0.44.0、Respo 0.19.13、Router 0.12.11 与 JS-FFI 0.2.19 后重新安装并生成 JS；组件行为和 API 不变。
+
 ### 0.15.6：Calcit 0.44.0
 
 请配对 Calcit CLI 与 `@calcit/procs` 0.44.0、Respo 0.19.12 和 Router 0.12.10 后重新生成 JS。输入框和文本域的 `:on-input` 收到 RespoEvent，分发回调与 `:on-change` 使用同一个应用 Op。原事件载荷和回调优先级保持。
