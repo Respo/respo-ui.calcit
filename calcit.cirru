@@ -5204,7 +5204,9 @@
               , router/mode
             add-watch! *store :router-changes $ fn (store prev)
               hint-fn $ Fn schema/Store schema/Store $ -> Unit
-              render-router!
+              when
+                not= (:router store) (:router prev)
+                render-router!
               , &unit
             render-app!
             println "|App started!"
@@ -5221,7 +5223,9 @@
                   , &unit
                 add-watch! *store :router-changes $ fn (store prev)
                   hint-fn $ Fn schema/Store schema/Store $ -> Unit
-                  render-router!
+                  when
+                    not= (:router store) (:router prev)
+                    render-router!
                   , &unit
                 render-app!
                 hud! |ok~ |Ok
