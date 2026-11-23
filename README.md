@@ -2,9 +2,13 @@
 Respo UI for calcit-js
 ----
 
+### 0.16.1：对齐正式依赖
+
+重新安装依赖并生成 JS；配对 Calcit 0.44.0、Router 0.12.13、Respo 0.19.14 和 JS-FFI 0.2.20。组件 API、样式和演示行为不变；正式 tag 发布前此版本为候选。
+
 ### 0.16.0：演示站使用具名路由
 
-升级时请配对 Calcit 0.44.0、Router 0.12.12、Respo 0.19.13 和 JS-FFI 0.2.19，重新安装依赖并生成 JS。演示站的 `Store.router` 和 `Op :router/route` 现在使用 `ParsedRouter`；直接构造这些演示类型的调用方需要迁移。`route-from-router` 的参数改为旧 `Router` 本身；具名路由使用 `route-from-parsed`。组件 API 和样式未改，正式 tag 发布前此版本为候选。
+升级时请配对 Calcit 0.44.0、Router 0.12.12、Respo 0.19.13 和 JS-FFI 0.2.19，重新安装依赖并生成 JS。演示站的 `Store.router` 和 `Op :router/route` 现在使用 `ParsedRouter`；直接构造这些演示类型的调用方需要迁移。`route-from-router` 的参数改为旧 `Router` 本身；具名路由使用 `route-from-parsed`。组件 API 和样式未改。
 
 ### 0.15.7：对齐正式依赖
 
