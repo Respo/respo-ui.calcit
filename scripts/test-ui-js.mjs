@@ -100,7 +100,7 @@ try {
     "tag", "attributes", "divider", "time", "cirru-snippet", "snippet", "copy", "close", "placeholder", "catoptric-text"];
   const designSections = ["color", "typography", "spacing", "shape", "sizing", "elevation", "motion", "conventions", "usage"];
   const pageScenarios = routes.flatMap((route) => [["println", `|Showcase route: ${route}`], ["let", [["html", ["respo.render.html/make-string", ["comp-container",
-    ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address", `|/${route}.html`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
+    ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address-typed", `|/${route}.html`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
     ["assert", [".includes?", "html", "|Respo UI"], `|Showcase route ${route} must render`],
     ...(route === "components" ? [...categoryTitles, ...componentIds.map((id) => `>comp-${id}<`), 'id="component-search"', `>${componentIds.length} components<`].map((text) =>
       ["assert", [".includes?", "html", `|${text}`], `|Missing component showcase section: ${text}`]) : []),
@@ -108,14 +108,14 @@ try {
       ["assert", [".includes?", "html", `|${text}`], `|Missing design system section: ${text}`]) : []),
   ]]);
   const searchHtml = ["respo.render.html/make-string", ["comp-container", ["respo-ui.schema/Store", ":router",
-    ["respo-router.parser/parse-address", "|/components.html", "respo-ui.router/dict"], ":states", ["{}", [":components", ["{}", [":data", "|TOOLTIP"]]]]]]];
+    ["respo-router.parser/parse-address-typed", "|/components.html", "respo-ui.router/dict"], ":states", ["{}", [":components", ["{}", [":data", "|TOOLTIP"]]]]]]];
   pageScenarios.push(["println", "|Showcase route: components search"], ["let", [["html", searchHtml]],
     ["assert", [".includes?", "html", "|>comp-tooltip<"], "|Search must keep matching components"],
     ["assert", ["not", [".includes?", "html", "|>comp-button<"]], "|Search must hide components that do not match"],
     ["assert", [".includes?", "html", `|>1 of ${componentIds.length} components<`], "|Search must report the match count"]]);
   for (const id of componentIds) {
     pageScenarios.push(["let", [["html", ["respo.render.html/make-string", ["comp-container",
-      ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address", `|/component/${id}`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
+      ["respo-ui.schema/Store", ":router", ["respo-router.parser/parse-address-typed", `|/component/${id}`, "respo-ui.router/dict"], ":states", ["{}"]]]]]],
       ...[`>comp-${id}<`, "style-demo-stage", ">API<"].map((text) =>
         ["assert", [".includes?", "html", `|${text}`], `|Component page ${id} is missing ${text}`])]);
   }

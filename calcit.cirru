@@ -2866,7 +2866,7 @@
         'comp-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-container (store)
             let
-                router $ respo-ui.schema/route-from-router store
+                router $ respo-ui.schema/route-from-parsed $ :router store
                 states store.:states
                 route-name $ match router
                   (:index) :index
@@ -2921,7 +2921,7 @@
           :tests $ [] $ %{} 'TestEntry (:name |conditional-child-keys)
             :code $ quote $ do
               let
-                  home $ comp-container $ respo-ui.schema/Store :states ({}) :router (respo-router.parser/parse-address |/index.html respo-ui.router/dict)
+                  home $ comp-container $ respo-ui.schema/Store :states ({}) :router (respo-router.parser/parse-address-typed |/index.html respo-ui.router/dict)
                   home-root $ match
                     .unwrap $ :tree home
                     (:element element) element
@@ -2939,7 +2939,7 @@
                 assert= 1 $ :key $ .unwrap
                   .get (:children body) 0
               let
-                  design $ comp-container $ respo-ui.schema/Store :states ({}) :router (respo-router.parser/parse-address |/design.html respo-ui.router/dict)
+                  design $ comp-container $ respo-ui.schema/Store :states ({}) :router (respo-router.parser/parse-address-typed |/design.html respo-ui.router/dict)
                   design-root $ match
                     .unwrap $ :tree design
                     (:element element) element
@@ -3709,12 +3709,12 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.41.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.44.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     , None
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" None
                   div
                     {} $ :class-name style-home-sub
-                    <> "|Use Calcit CLI and @calcit/procs 0.41.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+                    <> "|Use Calcit CLI and @calcit/procs 0.44.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
               div
                 {} $ :class-name style-footer
                 <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
@@ -4641,7 +4641,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.15.7
+          :code $ quote $ def version |0.16.0
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
@@ -5183,11 +5183,11 @@
           :code $ quote $ defn initial-router ()
             let
                 location $ browser/location-snapshot
-              parse-address
+              parse-address-typed
                 slice (location :hash) 1
                 , router/dict
           :examples $ []
-          :schema $ quote $ Fn (-> respo-router.schema/Router) (:features :js-ffi)
+          :schema $ quote $ Fn (-> respo-router.schema/ParsedRouter) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             if config/dev? $ load-console-formatter!
@@ -5197,10 +5197,16 @@
               hint-fn $ Fn schema/Store schema/Store $ -> Unit
               render-app!
               , &unit
-            listen! router/dict dispatch! router/mode
+            listen-typed! router/dict
+              fn (route)
+                hint-fn $ Fn respo-router.schema/ParsedRouter $ -> Unit
+                dispatch! $ schema/Op :router/route route
+              , router/mode
             add-watch! *store :router-changes $ fn (store prev)
               hint-fn $ Fn schema/Store schema/Store $ -> Unit
-              render-router!
+              when
+                not= (:router store) (:router prev)
+                render-router!
               , &unit
             render-app!
             println "|App started!"
@@ -5217,7 +5223,9 @@
                   , &unit
                 add-watch! *store :router-changes $ fn (store prev)
                   hint-fn $ Fn schema/Store schema/Store $ -> Unit
-                  render-router!
+                  when
+                    not= (:router store) (:router prev)
+                    render-router!
                   , &unit
                 render-app!
                 hud! |ok~ |Ok
@@ -5235,7 +5243,7 @@
           :code $ quote $ defn render-router! ()
             let
                 store @*store
-              render-url! store.:router router/dict router/mode
+              render-url-typed! store.:router router/dict router/mode
               , &unit
           :examples $ []
           :schema $ quote $ Fn (-> Unit) (:features :state)
@@ -5247,9 +5255,9 @@
             respo-ui.router :as router
             respo-ui.schema :as schema
             respo-ui.config :as config
-            respo-router.parser :refer $ parse-address
-            respo-router.core :refer $ render-url!
-            respo-router.listener :refer $ listen!
+            respo-router.parser :refer $ parse-address-typed
+            respo-router.core :refer $ render-url-typed!
+            respo-router.listener :refer $ listen-typed!
             |./calcit.build-errors :default build-errors
             |bottom-tip :default hud!
             js-ffi.browser :as browser
@@ -5481,7 +5489,7 @@
           :code $ quote $ defenum Op
             :states (List respo.schema/CoordKey) DemoStateNode
             :router/nav String
-            :router/route respo-router.schema/Router
+            :router/route respo-router.schema/ParsedRouter
           :examples $ []
           :schema $ quote EnumDef
         'PageRoute $ %{} 'CodeEntry (:doc |)
@@ -5591,7 +5599,7 @@
           :schema $ quote StructDef
         'Store $ %{} 'CodeEntry
           :doc "|Typed application store shape for the documentation site."
-          :code $ quote $ defstruct Store (:router respo-router.schema/Router)
+          :code $ quote $ defstruct Store (:router respo-router.schema/ParsedRouter)
             :states $ Map Tag respo-ui.schema/DemoStateNode
           :examples $ []
           :schema $ quote StructDef
@@ -5599,7 +5607,7 @@
             :code $ quote $ do (assert-type Store StructDef) (assert-type store Store)
               assert= :struct-def $ type-of Store
               assert=
-                Store :router respo-router.schema/router :states $ {}
+                Store :router (respo-router.parser/parse-address-typed |/ dict) :states $ {}
                 , store
             :tags $ #{} :regression :unit
         'StyleValue $ %{} 'CodeEntry
@@ -5703,10 +5711,41 @@
               assert= |none $ field-or (respo-ui.schema/opts PresentationOptions) :class-name |none
               assert= (calcit.core/Option :some |status) (option-field options :class-name)
               assert= true $ .none? $ option-field (respo-ui.schema/opts PresentationOptions) :style
-        'route-from-router $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn route-from-router (store)
+        'route-from-parsed $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn route-from-parsed (router)
             match
-              first $ :path $ :router store
+              first $ :path router
+              (:none) (PageRoute :index)
+              (:some step)
+                match step
+                  (:unmatched path)
+                    PageRoute :not-found $ .join-string path |/
+                  (:matched entry)
+                    match (:name entry)
+                      :index $ PageRoute :index
+                      :widgets $ PageRoute :widgets
+                      :layouts $ PageRoute :layouts
+                      :fonts $ PageRoute :fonts
+                      :design $ PageRoute :design
+                      :components $ PageRoute :components
+                      :component $ PageRoute :component $ .unwrap
+                        first $ :params entry
+                      :utils $ PageRoute :utils
+                      _ $ PageRoute :index
+          :examples $ []
+          :schema $ quote $ Fn respo-router.schema/ParsedRouter (-> PageRoute)
+          :tests $ [] $ %{} 'TestEntry (:name |agrees-with-legacy)
+            :code $ quote $ do
+              &doseq
+                address $ [] |/index.html |/dev.html |/widgets.html |/layouts.html |/fonts.html |/design.html |/components.html |/utils.html |/component/button |/missing "|/missing/中文😀"
+                assert=
+                  route-from-router $ parse-address address dict
+                  route-from-parsed $ respo-router.parser/parse-address-typed address dict
+            :tags $ #{} :regression :router
+        'route-from-router $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn route-from-router (router)
+            match
+              first $ :path router
               (:none) (PageRoute :index)
               (:some route)
                 match route
@@ -5725,53 +5764,50 @@
                     PageRoute :not-found $ .join-string (respo-router.schema/path-segments path) |/
                   _ $ PageRoute :index
           :examples $ []
-          :schema $ quote $ Fn Store (-> PageRoute)
+          :schema $ quote $ Fn respo-router.schema/Router (-> PageRoute)
           :tests $ []
             %{} 'TestEntry (:name |empty-path)
-              :code $ quote $ assert= (PageRoute :index)
-                route-from-router $ Store :router respo-router.schema/router :states $ {}
+              :code $ quote $ assert= (PageRoute :index) (route-from-router respo-router.schema/router)
               :tags $ #{} :boundary :router
             %{} 'TestEntry (:name |all-published-page-routes)
               :code $ quote $ do
                 assert= (PageRoute :index)
-                  route-from-router $ Store :router (parse-address |/index.html dict) :states $ {}
+                  route-from-router $ parse-address |/index.html dict
                 assert= (PageRoute :index)
-                  route-from-router $ Store :router (parse-address |/dev.html dict) :states $ {}
+                  route-from-router $ parse-address |/dev.html dict
                 assert= (PageRoute :widgets)
-                  route-from-router $ Store :router (parse-address |/widgets.html dict) :states $ {}
+                  route-from-router $ parse-address |/widgets.html dict
                 assert= (PageRoute :layouts)
-                  route-from-router $ Store :router (parse-address |/layouts.html dict) :states $ {}
+                  route-from-router $ parse-address |/layouts.html dict
                 assert= (PageRoute :fonts)
-                  route-from-router $ Store :router (parse-address |/fonts.html dict) :states $ {}
+                  route-from-router $ parse-address |/fonts.html dict
                 assert= (PageRoute :design)
-                  route-from-router $ Store :router (parse-address |/design.html dict) :states $ {}
+                  route-from-router $ parse-address |/design.html dict
                 assert= (PageRoute :components)
-                  route-from-router $ Store :router (parse-address |/components.html dict) :states $ {}
+                  route-from-router $ parse-address |/components.html dict
                 assert= (PageRoute :utils)
-                  route-from-router $ Store :router (parse-address |/utils.html dict) :states $ {}
+                  route-from-router $ parse-address |/utils.html dict
               :tags $ #{} :regression :router
             %{} 'TestEntry (:name |published-router-unicode-404)
               :code $ quote $ assert= (PageRoute :not-found "|missing/中文😀")
-                route-from-router $ Store :router (parse-address "|/missing/中文😀" dict) :states $ {}
+                route-from-router $ parse-address "|/missing/中文😀" dict
               :tags $ #{} :boundary :router
             %{} 'TestEntry (:name |reject-wrong-404-container)
               :code $ quote $ assert= "|[respo-router/path-segments] expected List"
                 try
-                  route-from-router $ Store :states ({}) :router $ respo-router.schema/Router :query ({}) :path
-                    [] $ :: :404 |wrong
+                  route-from-router $ respo-router.schema/Router :query ({}) :path $ [] (:: :404 |wrong)
                   fn (error) error
               :tags $ #{} :boundary :router
             %{} 'TestEntry (:name |reject-wrong-404-element)
               :code $ quote $ assert= "|[respo-router/path-segments] expected String segment"
                 try
-                  route-from-router $ Store :router
-                    respo-router.schema/Router :query ({}) :path $ [] $ :: :404 ([] 1)
-                    , :states $ {}
+                  route-from-router $ respo-router.schema/Router :query ({}) :path $ []
+                    :: :404 $ [] 1
                   fn (error) error
               :tags $ #{} :boundary :router
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
-            Store :router respo-router.schema/router :states $ {}
+            Store :router (respo-router.parser/parse-address-typed |/ dict) :states $ {}
           :examples $ []
           :schema $ quote Store
         'with-class-name $ %{} 'CodeEntry
@@ -6475,17 +6511,17 @@
                   (:ok states) (.assoc store :states states)
                   (:err error) (raise error)
               (:router/nav path)
-                .assoc store :router $ parse-address path router/dict
+                .assoc store :router $ parse-address-typed path router/dict
               (:router/route route) (.assoc store :router route)
           :examples $ []
           :schema $ quote $ Fn schema/Store schema/Op (-> schema/Store)
           :tests $ []
             %{} 'TestEntry (:name |typed-store-updates-preserve-input)
               :code $ quote $ let
-                  route $ parse-address |/widgets.html router/dict
+                  route $ parse-address-typed |/widgets.html router/dict
                   states $ {} $ :data false
                   original $ schema/Store :router route :states states
-                  next-route $ parse-address |/component/button router/dict
+                  next-route $ parse-address-typed |/component/button router/dict
                   routed $ updater original $ :: :router/route next-route
                   edited $ updater original $ :: :states ([]) |new-state
                   navigated $ updater original $ :: :router/nav |/
@@ -6494,25 +6530,25 @@
                   schema/Store :router route :states $ {} $ :data |new-state
                   , edited
                 assert= states $ :states navigated
-                assert= (parse-address |/ router/dict) (:router navigated)
+                assert= (parse-address-typed |/ router/dict) (:router navigated)
                 assert= (schema/Store :router route :states states) original
               :tags $ #{} :regression :unit
             %{} 'TestEntry (:name |invalid-cursor-remains-rejected)
               :code $ quote $ let
-                  original $ schema/Store :router respo-router.schema/router :states $ {}
+                  original $ schema/Store :router (respo-router.parser/parse-address-typed |/ router/dict) :states $ {}
                   op $ schema/Op :states ([] |bad-root-key) |bad-cursor
                 assert= "|decode-map-as failed at $.key: expected tag, got string" $ try
                   do (updater original op) |accepted
                   fn (message) message
                 assert=
-                  schema/Store :router respo-router.schema/router :states $ {}
+                  schema/Store :router (respo-router.parser/parse-address-typed |/ router/dict) :states $ {}
                   , original
               :tags $ #{} :regression :unit
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns respo-ui.updater
           :require (respo-ui.schema :as schema) (respo-ui.router :as router)
             respo.cursor :refer $ update-state-tree
-            respo-router.parser :refer $ parse-address
+            respo-router.parser :refer $ parse-address-typed
     'respo-ui.util $ %{} 'FileEntry
       :defs $ {}
         'santinize-html-text $ %{} 'CodeEntry (:doc |)
