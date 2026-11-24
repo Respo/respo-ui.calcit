@@ -1124,7 +1124,8 @@
                   let
                       target $ .unwrap target
                       cursor $ .unwrap cursor
-                    if vertical?
+                    if
+                      not $ or (nil? vertical?) (= false vertical?)
                       do
                         browser/element-set-style! cursor |top $ str (target :offset-top) |px
                         browser/element-set-style! cursor |bottom |0px
@@ -1132,7 +1133,8 @@
                       do
                         browser/element-set-style! cursor |left $ str (target :offset-left) |px
                         browser/element-set-style! cursor |width $ str (target :client-width) |px
-                  when (not vertical?)
+                  when
+                    or (nil? vertical?) (= false vertical?)
                     if (.some? cursor)
                       browser/element-set-style! (.unwrap cursor) |width |0px
           :examples $ []
