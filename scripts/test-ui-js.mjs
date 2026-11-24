@@ -196,7 +196,7 @@ try {
   }
   const components = await import(pathToFileURL(path.join(output, "respo-ui.comp.mjs")).href);
   // Handlers receive respo.schema/RespoEvent; build one from a Cirru EDN map of the fields under test.
-  const { RespoEvent } = await import(pathToFileURL(path.join(output, "respo.schema.mjs")).href);
+  const { RespoEvent, EffectParams } = await import(pathToFileURL(path.join(output, "respo.schema.mjs")).href);
   const respoEvent = (source) => {
     const fields = c.parse_cirru_edn(source);
     return c._$n__PCT__$M_(RespoEvent, ...RespoEvent.fields.flatMap((tag) => {
@@ -277,6 +277,20 @@ try {
     const handler = field(pageButtons[index], "event").get(c.newTag("click"));
     assert.equal(handler(c.parse_cirru_edn("{}"), value => { dispatched.push(value); }), undefined);
     assert.deepEqual(dispatched, expected, `pagination: button ${index}`);
+  }
+  // Preserve horizontal and vertical highlight placement through the 0.45 Bool migration.
+  for (const vertical of [false, true]) {
+    const target = { offsetTop: 12, offsetLeft: 13, clientHeight: 14, clientWidth: 15 };
+    const cursor = { style: {} };
+    const root = { querySelector: selector => selector.includes("style-selected-tab") ? target : cursor };
+    const effect = components.effect_tab_highlight("selected", vertical);
+    const params = c._$n__PCT__$M_(EffectParams,
+      c.newTag("action"), c.newTag("mount"), c.newTag("target"), root,
+      c.newTag("at-place?"), false);
+    field(effect, "method")(field(effect, "args"), params);
+    assert.deepEqual(cursor.style, vertical
+      ? { top: "12px", bottom: "0px", height: "14px" }
+      : { left: "13px", width: "15px" });
   }
   console.log(`Generated JS replay passed: ${listed.selected}/${listed.selected} attached ASTs, ${scenarios.length} skeleton scenarios, ${routes.length} showcase routes and checked/value host-event boundaries`);
 } finally {
