@@ -64,7 +64,7 @@ jobs:
         with:
           repository: Respo/respo-message.calcit
           # Released Message source using the UI host graph.
-          ref: 0.4.8
+          ref: 0.4.10
           path: .calcit/message-consumer
           persist-credentials: false
 
