@@ -55,22 +55,23 @@
                       if (.some? options.:style) (.unwrap options.:style) ({})
                   -> items $ map-indexed $ fn (idx info)
                     [] idx $ let
-                        item $ cond
-                            map? info
-                            , info
-                          (enum? info)
-                            match info
+                        item $ match (data-view info)
+                          (:map m) m
+                          (:enum e)
+                            match e
                               (:attr l v)
                                 {} (:value v) (:label l)
                               (:attr-span l v s)
                                 {} (:value v) (:label l) (:span s)
-                          true $ raise "|unknown attribute info"
+                          _ $ raise "|unknown attribute info"
                       div
                         {}
                           :style $ {} $ :grid-column
                             match (get item :span)
                               (:some sp)
-                                if (non-nil? sp) (str-spaced |span sp) |
+                                match (data-view sp)
+                                  (:nil) |
+                                  _ $ str-spaced |span sp
                               (:none) |
                           :class-name $ str-spaced style-item $ .unwrap-or (:css-item options) |
                         div
@@ -78,26 +79,33 @@
                             .unwrap-or (:css-label options) |
                           <> $ match (get item :label)
                             (:some label-value)
-                              if (nil? label-value) | $ respo.util.format/scalar-attribute-text label-value
+                              match (data-view label-value)
+                                (:nil) |
+                                _ $ respo.util.format/scalar-attribute-text label-value
                             (:none) |
                         div
                           {} $ :class-name $ .unwrap-or (:css-value options) |
                           match (get item :value)
                             (:some v)
-                              Some $ if (literal? v)
-                                <> $ if (nil? v) | $ respo.util.format/scalar-attribute-text v
-                                , v
+                              Some $ match (data-view v)
+                                (:string s) (<> s)
+                                (:tag t)
+                                  <> $ to-string t
+                                (:number n)
+                                  <> $ str n
+                                (:bool b)
+                                  <> $ str b
+                                _ v
                             (:none) None
-              if (.some? title)
-                div ({})
-                  div
-                    {} $ :class-name $ str-spaced style-attributes-title
-                      .unwrap-or (:css-title options) |
-                    <> $ if
-                      nil? $ .unwrap-or title |
-                      , | $ respo.util.format/scalar-attribute-text (.unwrap-or title |)
-                  , ret
-                , ret
+              match title
+                (:some title-text)
+                  div ({})
+                    div
+                      {} $ :class-name $ str-spaced style-attributes-title
+                        .unwrap-or (:css-title options) |
+                      <> title-text
+                    , ret
+                (:none) ret
           :examples $ [] $ quote
             comp-attributes $ respo-ui.schema/AttributesOptions :title (Some |Project) :items $ [] (:: :attr |Name |Respo) (:: :attr-span |Description "|A virtual DOM library in Calcit" 2)
           :schema $ quote $ Fn (schema/AttributesOptions Item) (-> respo.schema/Component) (:generics Item)
@@ -278,14 +286,12 @@
                 :class-name $ respo-ui.schema/with-class-name (str-spaced style-card) (respo-ui.schema/option-field options :class-name)
                 :style $ respo-ui.schema/option-field options :style
               concat
-                if
-                  .some? $ respo-ui.schema/option-field options :title
-                  [] $ [] 0 $ div
-                    {} $ :class-name style-card-title
-                    <> $ if
-                      nil? $ respo-ui.schema/field-or options :title |
-                      , | $ respo.util.format/scalar-attribute-text (respo-ui.schema/field-or options :title |)
-                  []
+                match (respo-ui.schema/option-field options :title)
+                  (:some title-text)
+                    [] $ [] 0 $ div
+                      {} $ :class-name style-card-title
+                      <> title-text
+                  (:none) ([])
                 [] $ [] 1 $ div
                   {} $ :class-name style-card-body
                   render-content content
@@ -1018,9 +1024,9 @@
                   respo-ui.schema/option-field options :class-name
                 :style $ respo-ui.schema/option-field options :style
                 :on-click $ respo-ui.schema/field-or options :on-click $ fn (e d!)
-              <> $ if (nil? content) | $ respo.util.format/scalar-attribute-text content
+              render-content content
           :examples $ [] $ quote (comp-tag :success |Stable None)
-          :schema $ quote $ Fn Tag Content (Option schema/ButtonOptions) (-> respo.schema/Component) (:generics Content)
+          :schema $ quote $ Fn Tag schema/Content (Option schema/ButtonOptions) (-> respo.schema/Component)
         'comp-textarea $ %{} 'CodeEntry
           :doc "|Render a controlled textarea. Pass the current value and optional :placeholder, :disabled, :on-input, :class-name, and :style."
           :code $ quote $ defcomp comp-textarea (value options)
@@ -1106,9 +1112,7 @@
           :code $ quote $ defeffect effect-dataset-text (text) (action el at?)
             when
               or (= action :update) (= action :mount)
-              if (string? text)
-                browser/element-data-set! (respo-browser/host-element el) |text text
-                raise "|effect-dataset-text expected a String text"
+              browser/element-data-set! (respo-browser/host-element el) |text text
           :examples $ []
           :schema $ quote $ Fn String (-> respo.schema/Effect) (:features :js-ffi)
         'effect-tab-highlight $ %{} 'CodeEntry (:doc |)
@@ -1124,8 +1128,7 @@
                   let
                       target $ .unwrap target
                       cursor $ .unwrap cursor
-                    if
-                      not $ or (nil? vertical?) (&= false vertical?)
+                    if vertical?
                       do
                         browser/element-set-style! cursor |top $ str (target :offset-top) |px
                         browser/element-set-style! cursor |bottom |0px
@@ -1133,8 +1136,7 @@
                       do
                         browser/element-set-style! cursor |left $ str (target :offset-left) |px
                         browser/element-set-style! cursor |width $ str (target :client-width) |px
-                  when
-                    or (nil? vertical?) (&= false vertical?)
+                  when (not vertical?)
                     if (.some? cursor)
                       browser/element-set-style! (.unwrap cursor) |width |0px
           :examples $ []
@@ -1179,7 +1181,12 @@
             :generics Op
         'literal? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn literal? (v)
-            or (string? v) (tag? v) (number? v) (bool? v)
+            match (data-view v)
+              (:string _) true
+              (:tag _) true
+              (:number _) true
+              (:bool _) true
+              _ false
           :examples $ []
           :schema $ quote $ Fn Value (-> Bool) (:generics Value)
         'pagination-pages $ %{} 'CodeEntry
@@ -3711,12 +3718,12 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.46.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.47.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     , None
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" None
                   div
                     {} $ :class-name style-home-sub
-                    <> "|Use Calcit CLI and @calcit/procs 0.46.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+                    <> "|Use Calcit CLI and @calcit/procs 0.47.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
               div
                 {} $ :class-name style-footer
                 <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
@@ -4643,7 +4650,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.16.6
+          :code $ quote $ def version |0.16.7
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
@@ -5217,7 +5224,7 @@
           :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
-            if (nil? build-errors)
+            if (js-nullish? build-errors)
               do (remove-watch! *store :changes) (remove-watch! *store :router-changes) (clear-cache!)
                 add-watch! *store :changes $ fn (store prev)
                   hint-fn $ Fn schema/Store schema/Store $ -> Unit
