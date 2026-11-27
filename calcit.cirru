@@ -955,7 +955,7 @@
                         :tab value display
                         let
                             selected? $ and (.some? selected)
-                              = (.unwrap selected) value
+                              &= (.unwrap selected) value
                           div
                             {}
                               :class-name $ if selected?
@@ -1125,7 +1125,7 @@
                       target $ .unwrap target
                       cursor $ .unwrap cursor
                     if
-                      not $ or (nil? vertical?) (= false vertical?)
+                      not $ or (nil? vertical?) (&= false vertical?)
                       do
                         browser/element-set-style! cursor |top $ str (target :offset-top) |px
                         browser/element-set-style! cursor |bottom |0px
@@ -1134,7 +1134,7 @@
                         browser/element-set-style! cursor |left $ str (target :offset-left) |px
                         browser/element-set-style! cursor |width $ str (target :client-width) |px
                   when
-                    or (nil? vertical?) (= false vertical?)
+                    or (nil? vertical?) (&= false vertical?)
                     if (.some? cursor)
                       browser/element-set-style! (.unwrap cursor) |width |0px
           :examples $ []
@@ -3711,12 +3711,12 @@
                 div
                   {} $ :class-name $ str-spaced css/stack css/gap8
                   comp-cirru-snippet
-                    str "|{} (:calcit-version |0.45.1)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
+                    str "|{} (:calcit-version |0.46.0)\n  :dependencies $ {}\n    |Respo/respo-ui.calcit |" config/version
                     , None
                   comp-cirru-snippet "|ns app.comp.demo $ :require\n  respo-ui.comp :refer $ comp-button\n  respo-ui.schema :refer $ ButtonOptions\n\ncomp-button |Save $ Option :some $ ButtonOptions :kind (Option :some :primary)" None
                   div
                     {} $ :class-name style-home-sub
-                    <> "|Use Calcit CLI and @calcit/procs 0.45.1 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
+                    <> "|Use Calcit CLI and @calcit/procs 0.46.0 together. Options are the last argument: pass Option :none for defaults, or write only the fields you use. Dialogs and prompts live in respo-alerts."
               div
                 {} $ :class-name style-footer
                 <> $ str "|Respo UI " config/version "| · MIT · Built with Calcit and Respo"
@@ -4643,7 +4643,7 @@
           :examples $ []
           :schema $ quote $ Map Tag String
         'version $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def version |0.16.5
+          :code $ quote $ def version |0.16.6
           :examples $ []
           :schema $ quote String
       :ns $ %{} 'NsEntry (:doc |)
