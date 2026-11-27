@@ -2,6 +2,10 @@
 Respo UI for calcit-js
 ----
 
+### 0.16.7 候选 / Calcit 0.47.0
+
+配对正式 Calcit / `@calcit/procs` 0.47.0、Respo 0.20.1、Router 0.12.19 与 JS-FFI 0.2.26；重新安装依赖并生成 JS。清理 `comp-card` 与 `comp-attributes` 中的非空标题检查，并将 `comp-tag` 收敛到 `Content` union，组件公开 API 与样式保持不变。
+
 ### 0.16.6 候选 / Calcit 0.46.0
 
 配对正式 Calcit / `@calcit/procs` 0.46.0、Respo 0.20.0、Router 0.12.18 与 JS-FFI 0.2.26；重新安装依赖并生成 JS。页签开放值比较保持原有语义，正式 tag 发布后再升级。
